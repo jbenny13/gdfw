@@ -730,7 +730,7 @@
             // --- ALL FUNCTIONS (defined with `function` for hoisting) ---
             
             function getApiUrl(model, action = 'generateContent') {
-                const apiKey = ""; // IMPORTANT: Replace with your actual API key for local use
+                const apiKey = "AIzaSyDY48xF1byvU05kS9qKvN8iyrIR3hheP8w"; // IMPORTANT: Replace with your actual API key for local use
                 let baseUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:${action}`;
                 if (apiKey) {
                     baseUrl += `?key=${apiKey}`;

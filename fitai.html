@@ -8,7 +8,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -69,11 +68,6 @@
         }
          .star-rating > span.selected, .star-rating > span:hover, .star-rating > span:hover ~ span {
             color: #f59e0b; /* amber-500 */
-        }
-        #barcode-scanner-video {
-            width: 100%;
-            height: auto;
-            border-radius: 0.5rem;
         }
         /* Custom scrollbar for workout planner exercises */
         .planner-exercises::-webkit-scrollbar, #warmup-list::-webkit-scrollbar, #favorite-foods-list::-webkit-scrollbar, #ingredient-list-container::-webkit-scrollbar, #saved-recipes-list::-webkit-scrollbar {
@@ -205,8 +199,9 @@
                                     <button id="create-recipe-btn" type="button" class="p-2 bg-green-600 hover:bg-green-500 text-white rounded-md" title="Create Recipe">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-notebook-tabs"><path d="M5 21h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2Z"/><path d="M15 3v14a2 2 0 0 1-2 2H6"/><path d="M21 7V5h-2"/><path d="M21 11V9h-2"/><path d="M21 15v-2h-2"/></svg>
                                     </button>
-                                     <button id="scan-barcode-btn" type="button" class="p-2 bg-gray-600 hover:bg-gray-500 text-white rounded-md" title="Scan Barcode">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scan-barcode"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 7v10"/><path d="M12 7v10"/><path d="M16 7v10"/></svg>
+                                    <!-- Replaced barcode scanner button with food image scanner -->
+                                     <button id="scan-food-btn" type="button" class="p-2 bg-teal-600 hover:bg-teal-500 text-white rounded-md" title="Scan Food Image">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-camera"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
                                     </button>
                                 </div>
                                 <div id="add-food-error" class="text-red-400 text-sm mt-2 h-4"></div>
@@ -630,13 +625,47 @@
         </div>
     </div>
     
-     <div id="barcode-scanner-modal" class="modal-backdrop">
+    <!-- New Food Scanner Modal -->
+    <div id="food-scanner-modal" class="modal-backdrop">
         <div class="modal-content">
-             <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Scan Food Barcode</h2><button id="close-barcode-scanner-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div>
-             <div id="barcode-scanner-container" class="w-full aspect-square bg-gray-900 rounded-lg overflow-hidden">
-                <div id="barcode-reader" class="w-full h-full"></div>
-             </div>
-             <p id="barcode-scanner-status" class="text-center text-sm text-gray-400 mt-3 h-5"></p>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Scan Food with AI</h2>
+                <button id="close-food-scanner-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <div id="image-preview-container" class="w-full aspect-video bg-gray-700 rounded-lg flex items-center justify-center overflow-hidden">
+                     <img id="image-preview" src="" class="hidden w-full h-full object-contain">
+                     <p id="image-placeholder" class="text-gray-400">Upload or take a photo</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <label for="upload-photo-input" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md text-center cursor-pointer flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Upload
+                    </label>
+                    <input type="file" id="upload-photo-input" class="hidden" accept="image/*">
+                    
+                    <label for="take-picture-input" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md text-center cursor-pointer flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-camera"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                        Take Photo
+                    </label>
+                     <input type="file" id="take-picture-input" class="hidden" accept="image/*" capture="environment">
+                </div>
+
+                <div>
+                    <label for="scanner-food-name" class="block text-sm font-medium text-gray-400">Food Name (to help AI)</label>
+                    <input type="text" id="scanner-food-name" placeholder="e.g., 'bowl of oatmeal with berries'" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1" required>
+                </div>
+                 <div>
+                    <label for="scanner-food-details" class="block text-sm font-medium text-gray-400">Optional Details</label>
+                    <textarea id="scanner-food-details" rows="2" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 mt-1" placeholder="e.g., brand name, specific ingredients like 'Chobani greek yogurt', etc."></textarea>
+                </div>
+                
+                <button id="ai-get-macros-from-image-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md flex items-center justify-center">
+                    <span class="btn-text">Get Macros with AI</span>
+                    <div class="loader hidden ml-2"></div>
+                </button>
+                <p id="food-scanner-status" class="text-center text-sm text-gray-400 mt-2 h-5"></p>
+            </div>
         </div>
     </div>
     
@@ -768,7 +797,7 @@
             let editingSleepLogIndex = null;
             let editingExerciseName = null;
             let editingFoodLogIndex = null;
-            let barcodeScanner = null;
+            let scannedImageData = null; // For the new food scanner
             let currentSleepQuality = 0;
             let currentEditSleepQuality = 0;
             let editingWarmupIndex = null;
@@ -1023,8 +1052,17 @@
                   sleepWakeTimesDiv = document.getElementById('sleep-wake-times'), sleepLogForm = document.getElementById('sleep-log-form'), sleepQualityRatingDiv = document.getElementById('sleep-quality-rating'),
                   sleepHistoryDiv = document.getElementById('sleep-history'), progressExerciseSelect = document.getElementById('progress-exercise-select'),
                   editSleepModal = document.getElementById('edit-sleep-modal'), closeEditSleepModalBtn = document.getElementById('close-edit-sleep-modal-btn'), editSleepLogForm = document.getElementById('edit-sleep-log-form'), editSleepQualityRatingDiv = document.getElementById('edit-sleep-quality-rating'),
-                  scanBarcodeBtn = document.getElementById('scan-barcode-btn'), barcodeScannerModal = document.getElementById('barcode-scanner-modal'), closeBarcodeScannerModalBtn = document.getElementById('close-barcode-scanner-modal-btn'),
-                  barcodeReaderDiv = document.getElementById('barcode-reader'), barcodeScannerStatus = document.getElementById('barcode-scanner-status'),
+                  // New Food Scanner UI Elements
+                  scanFoodBtn = document.getElementById('scan-food-btn'),
+                  foodScannerModal = document.getElementById('food-scanner-modal'),
+                  closeFoodScannerModalBtn = document.getElementById('close-food-scanner-modal-btn'),
+                  uploadPhotoInput = document.getElementById('upload-photo-input'),
+                  takePictureInput = document.getElementById('take-picture-input'),
+                  imagePreview = document.getElementById('image-preview'),
+                  imagePlaceholder = document.getElementById('image-placeholder'),
+                  aiGetMacrosFromImageBtn = document.getElementById('ai-get-macros-from-image-btn'),
+                  foodScannerStatus = document.getElementById('food-scanner-status'),
+                  // End New Food Scanner UI Elements
                   weightChartCanvas = document.getElementById('weight-chart'), 
                   smmChartCanvas = document.getElementById('smm-chart'),
                   bfmChartCanvas = document.getElementById('bfm-chart'),
@@ -1168,7 +1206,7 @@
             // --- ALL FUNCTIONS (defined with `function` for hoisting) ---
             
             function getApiUrl(model, action = 'generateContent') {
-                const apiKey = ""; 
+                const apiKey = "AIzaSyDY48xF1byvU05kS9qKvN8iyrIR3hheP8w"; 
                 return `https://generativelanguage.googleapis.com/v1beta/models/${model}:${action}?key=${apiKey}`;
             };
             
@@ -2217,31 +2255,138 @@
                     btn.querySelector('.loader').classList.add('hidden');
                 }
             });
-            scanBarcodeBtn.addEventListener('click', () => {
-                barcodeScannerModal.style.display = 'flex';
-                barcodeScannerStatus.textContent = 'Starting camera...';
-                if (!barcodeScanner) {
-                    barcodeScanner = new Html5Qrcode("barcode-reader");
-                }
-                barcodeScanner.start(
-                    { facingMode: "environment" },
-                    { fps: 10, qrbox: { width: 250, height: 250 } },
-                    (decodedText, decodedResult) => { // onBarcodeSuccess
-                        barcodeScannerStatus.textContent = `Scanned: ${decodedText}. Fetching data...`;
-                        showCustomAlert("Barcode Scanned", `Code: ${decodedText}. In a real app, this would look up the food item.`);
-                        closeBarcodeScannerModalBtn.click();
-                    },
-                    (errorMessage) => { /* console.log(errorMessage) */ }
-                ).catch((err) => {
-                    barcodeScannerStatus.textContent = "Could not start camera.";
+            
+            // --- New Food Scanner Listeners ---
+            function fileToGenerativePart(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const base64Data = reader.result.split(',')[1];
+                        resolve({
+                            inlineData: {
+                                mimeType: file.type,
+                                data: base64Data
+                            }
+                        });
+                    };
+                    reader.onerror = (err) => reject(err);
+                    reader.readAsDataURL(file);
                 });
-            });
-            closeBarcodeScannerModalBtn.addEventListener('click', async () => {
-                if(barcodeScanner && barcodeScanner.isScanning) {
-                   await barcodeScanner.stop();
+            }
+
+            function handleImageSelection(file) {
+                if (file) {
+                    scannedImageData = file;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        imagePreview.src = e.target.result;
+                        imagePreview.classList.remove('hidden');
+                        imagePlaceholder.classList.add('hidden');
+                    };
+                    reader.readAsDataURL(file);
                 }
-                barcodeScannerModal.style.display = 'none';
+            }
+            
+            scanFoodBtn.addEventListener('click', () => {
+                // Reset modal state
+                scannedImageData = null;
+                imagePreview.src = '';
+                imagePreview.classList.add('hidden');
+                imagePlaceholder.classList.remove('hidden');
+                document.getElementById('scanner-food-name').value = '';
+                document.getElementById('scanner-food-details').value = '';
+                foodScannerStatus.textContent = '';
+                foodScannerModal.style.display = 'flex';
             });
+
+            closeFoodScannerModalBtn.addEventListener('click', () => {
+                foodScannerModal.style.display = 'none';
+            });
+
+            uploadPhotoInput.addEventListener('change', (e) => handleImageSelection(e.target.files[0]));
+            takePictureInput.addEventListener('change', (e) => handleImageSelection(e.target.files[0]));
+            
+            aiGetMacrosFromImageBtn.addEventListener('click', async () => {
+                const foodName = document.getElementById('scanner-food-name').value.trim();
+                const foodDetails = document.getElementById('scanner-food-details').value.trim();
+
+                if (!scannedImageData) {
+                    foodScannerStatus.textContent = 'Please upload or take a photo.';
+                    return;
+                }
+                if (!foodName) {
+                    foodScannerStatus.textContent = 'Please enter a food name to help the AI.';
+                    return;
+                }
+
+                const btn = aiGetMacrosFromImageBtn;
+                btn.disabled = true;
+                btn.querySelector('.btn-text').style.display = 'none';
+                btn.querySelector('.loader').classList.remove('hidden');
+                foodScannerStatus.textContent = 'Analyzing image...';
+
+                try {
+                    const imagePart = await fileToGenerativePart(scannedImageData);
+                    const prompt = `Analyze the food in this image. The user has identified it as "${foodName}". Additional details: "${foodDetails}". Estimate the total grams and the nutritional information (calories, protein, carbs, fat) for the entire portion shown. Respond ONLY with a valid JSON object with the keys "grams", "calories", "protein", "carbs", and "fat".`;
+
+                    const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
+                    const payload = {
+                        contents: [{
+                            parts: [{ text: prompt }, imagePart]
+                        }],
+                        generationConfig: {
+                            responseMimeType: "application/json",
+                            responseSchema: {
+                                type: "OBJECT",
+                                properties: {
+                                    grams: { type: "NUMBER" },
+                                    calories: { type: "NUMBER" },
+                                    protein: { type: "NUMBER" },
+                                    carbs: { type: "NUMBER" },
+                                    fat: { type: "NUMBER" }
+                                }
+                            }
+                        }
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) throw new Error(`API Error: ${response.status} ${await response.text()}`);
+                    const result = await response.json();
+                    
+                    if (!result.candidates || !result.candidates[0].content.parts[0].text) {
+                        throw new Error("Invalid API response format.");
+                    }
+                    
+                    const data = JSON.parse(result.candidates[0].content.parts[0].text);
+
+                    // Populate the main form
+                    foodNameInput.value = foodName;
+                    foodGramsInput.value = data.grams.toFixed(0);
+                    document.getElementById('food-servings-input').value = 1; // It's for the whole portion
+                    document.getElementById('food-calories-input').value = data.calories.toFixed(1);
+                    document.getElementById('food-protein-input').value = data.protein.toFixed(1);
+                    document.getElementById('food-carbs-input').value = data.carbs.toFixed(1);
+                    document.getElementById('food-fat-input').value = data.fat.toFixed(1);
+                    
+                    foodScannerModal.style.display = 'none';
+                    showCustomAlert('Success!', 'Macros have been estimated and populated in the form.');
+
+                } catch (error) {
+                    console.error("AI Image Scan Error:", error);
+                    foodScannerStatus.textContent = "Error analyzing image. Please try again.";
+                } finally {
+                    btn.disabled = false;
+                    btn.querySelector('.btn-text').style.display = 'inline';
+                    btn.querySelector('.loader').classList.add('hidden');
+                }
+            });
+
+
             document.getElementById('sleep-start-time').addEventListener('change', (e) => {
                 const startTime = e.target.value;
                 if(startTime) {

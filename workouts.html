@@ -263,12 +263,15 @@
                 <p class="text-gray-400 mt-2">Push, Pull, Legs split.</p>
             </div>
             
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 <!-- Left Column: Main Interactive View -->
                 <div class="lg:col-span-2 content-card">
                     <div class="flex justify-between items-center mb-4">
                          <div class="flex-1">
-                             <h4 id="day-view-title" class="text-2xl font-semibold">Select a day</h4>
+                             <button id="day-view-date-display-btn" class="text-left hover:bg-input-bg px-4 py-2 rounded-lg transition-colors">
+                                <span id="day-view-title-span" class="text-2xl font-semibold block"></span>
+                                <span id="day-view-date-span" class="text-base text-secondary-text"></span>
+                            </button>
                         </div>
                         <div class="flex items-center gap-2">
                              <button id="back-to-today-btn" class="btn btn-secondary !p-2" title="Go to Today">
@@ -295,7 +298,7 @@
                     
                     <div class="flex items-center justify-center gap-4 mb-6">
                         <button id="prev-day-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-                        <button id="day-view-date-display-btn" class="text-lg font-semibold text-center w-48 hover:bg-input-bg px-4 py-2 rounded-lg transition-colors"></button>
+                        <div class="flex-grow"></div>
                         <button id="next-day-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
                     </div>
 
@@ -319,33 +322,50 @@
                 </div>
 
                 <!-- Right Column: Supporting Info -->
-                <div class="space-y-8">
-                    <div class="content-card">
-                        <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-                            <h3 class="text-2xl font-semibold">Progression</h3>
-                            <select id="progress-exercise-select" class="w-full sm:w-auto form-input">
-                                <option value="">Select an exercise</option>
-                            </select>
-                        </div>
-                        <div class="w-full h-80 flex items-center justify-center">
-                            <canvas id="progress-chart"></canvas>
-                        </div>
+                <div class="content-card">
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+                        <h3 class="text-2xl font-semibold">Progression</h3>
+                        <select id="progress-exercise-select" class="w-full sm:w-auto form-input">
+                            <!-- Options will be populated by JS -->
+                        </select>
                     </div>
-                     <div class="content-card">
-                        <h3 class="text-2xl font-semibold mb-4 text-center">AI Coach: Progression Advice</h3>
-                        <div class="max-w-md mx-auto">
-                             <p class="text-gray-400 text-sm mb-3 text-center">Select an exercise to get science-based advice on when to add weight or reps.</p>
-                             <div class="flex gap-2">
-                                <select id="ai-advice-exercise-select" class="w-full form-input">
-                                    <option value="">Select an exercise...</option>
-                                </select>
-                                <button id="get-ai-advice-btn" class="btn btn-secondary">
-                                    <span class="btn-text">Get Advice</span>
-                                     <div class="loader hidden ml-2"></div>
-                                </button>
-                             </div>
-                             <div id="ai-advice-output" class="mt-4 p-3 bg-black/30 rounded-md text-sm min-h-[50px]"></div>
+                    <div class="w-full h-80 flex items-center justify-center">
+                        <canvas id="progress-chart"></canvas>
+                    </div>
+                </div>
+                 <div class="content-card">
+                    <h3 class="text-2xl font-semibold mb-4 text-center">AI Coach</h3>
+                    
+                    <!-- Tab buttons -->
+                    <div class="flex border-b border-border-color mb-4">
+                        <button id="ai-tab-specific" class="flex-1 py-2 text-center font-semibold border-b-2 border-accent text-primary-text">Specific Advice</button>
+                        <button id="ai-tab-general" class="flex-1 py-2 text-center font-semibold border-b-2 border-transparent text-secondary-text">General Chat</button>
+                    </div>
+
+                    <!-- Specific Advice Content -->
+                    <div id="ai-panel-specific">
+                        <p class="text-gray-400 text-sm mb-3 text-center">Select an exercise to get science-based advice on when to add weight or reps.</p>
+                        <div class="flex gap-2">
+                            <select id="ai-advice-exercise-select" class="w-full form-input">
+                                <option value="">Select an exercise...</option>
+                            </select>
+                            <button id="get-ai-advice-btn" class="btn btn-secondary">
+                                <span class="btn-text">Get Advice</span>
+                                <div class="loader hidden ml-2"></div>
+                            </button>
                         </div>
+                        <div id="ai-advice-output" class="mt-4 p-3 bg-black/30 rounded-md text-sm min-h-[50px]"></div>
+                    </div>
+
+                    <!-- General Chat Content -->
+                    <div id="ai-panel-general" class="hidden">
+                        <p class="text-gray-400 text-sm mb-3 text-center">Ask the AI anything about your workout data. It will use your recent history to give a personalized answer.</p>
+                        <textarea id="ai-general-prompt" class="form-input" rows="3" placeholder="e.g., 'Am I doing enough volume for my back?' or 'Suggest a different bicep exercise.'"></textarea>
+                        <button id="get-ai-general-advice-btn" class="btn btn-secondary w-full mt-2">
+                            <span class="btn-text">Ask AI</span>
+                            <div class="loader hidden ml-2"></div>
+                        </button>
+                        <div id="ai-general-output" class="mt-4 p-3 bg-black/30 rounded-md text-sm min-h-[50px]"></div>
                     </div>
                 </div>
             </div>
@@ -354,7 +374,8 @@
 
     <!-- Modals -->
     <div id="date-picker-modal" class="modal-backdrop">
-        <div class="modal-content !max-w-sm">
+        <div class="modal-content !max-w-sm relative">
+            <button id="close-date-picker-modal-btn" class="absolute top-2 right-4 text-gray-400 hover:text-white text-3xl">&times;</button>
              <div class="flex justify-between items-center mb-4">
                 <button id="modal-prev-month-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
                 <h4 id="modal-month-year-display" class="text-lg font-semibold"></h4>
@@ -383,6 +404,7 @@
             let confirmCallback = null;
             let viewDate = new Date(); // Central state for the currently viewed date
             let modalCalendarDate = new Date();
+            let isLogging = false; // Flag to check if workout modal is open
             
             // --- Set viewDate to today, ignoring time
             viewDate.setHours(0,0,0,0);
@@ -410,30 +432,30 @@
             };
 
             const defaultExerciseDB = [
-                { name: "Seated leg curl", group: "Hamstrings", type: "Machine", instructions: ["Sit in the machine with your back against the pad and the ankle pad just above your heels.", "Adjust the lap pad to fit snugly on your thighs.", "Curl your legs down as far as possible, squeezing your hamstrings.", "Slowly return to the starting position."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Straight Calf extension", group: "Calves", type: "Machine", instructions: ["Use a standing or seated calf raise machine.", "Place the balls of your feet on the platform, with your heels hanging off.", "Press through the balls of your feet to raise your heels as high as possible.", "Hold the peak contraction, then slowly lower your heels below the platform level."], repRange: "10-20 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Barbell Squats", group: "Abductors", type: "Barbell", instructions: ["Set a barbell in a squat rack at shoulder height.", "Step under the bar and rest it across your upper back.", "Lift the bar off the rack, take a step back, and stand with feet shoulder-width apart.", "Keeping your chest up and back straight, lower your hips as if sitting in a chair.", "Go as deep as you comfortably can, ideally until your thighs are parallel to the floor.", "Push through your heels to return to the starting position."], repRange: "6-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Smith Machine squats", group: "Abductors", type: "Machine", instructions: ["Set the bar on the Smith machine to shoulder height.", "Position yourself under the bar with feet shoulder-width apart.", "Un-rack the bar and lower down by bending your knees and hips.", "Keep your back straight and chest up.", "Push through your heels to return to the start."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Romanian Deadlift", group: "Glutes", type: "Barbell", instructions: ["Hold a barbell with an overhand grip, hands just outside your thighs.", "Stand tall with a slight bend in your knees.", "Hinge at your hips, pushing your butt back while keeping your back straight.", "Lower the bar down your shins until you feel a deep stretch in your hamstrings.", "Squeeze your glutes to return to the starting position."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Hip thrusts", group: "Glutes", type: "Barbell", instructions: ["Sit on the floor with your upper back against a bench.", "Roll a barbell over your legs and position it in the crease of your hips.", "Place your feet flat on the floor, shoulder-width apart.", "Drive through your heels to lift your hips until your body forms a straight line from shoulders to knees.", "Squeeze your glutes at the top, then lower your hips back down."], repRange: "8-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Leg Extension", group: "Quads", type: "Machine", instructions: ["Sit in the leg extension machine with your legs under the pad.", "Align your knees with the machine's pivot point.", "Extend your legs to lift the weight until they are straight.", "Squeeze your quads at the top.", "Slowly lower the weight back to the starting position."], repRange: "12-20 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Cable Crunch", group: "Abs", type: "Machine", instructions: ["Kneel below a high pulley with a rope attachment.", "Grab the rope and pull it down until your hands are placed on either side of your head.", "Flex your hips slightly and allow the weight to hyperextend your lower back.", "Keeping your hips stationary, flex your waist as you contract your abs so that your elbows travel towards the middle of your thighs.", "Hold the contraction for a second and then slowly return to the starting position."], repRange: "10-20 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Bent Knee Raises", group: "Abs", type: "Bodyweight", instructions: ["Lie flat on your back on a mat with your legs straight.", "Place your hands under your lower back for support.", "Bend your knees and pull your upper thighs into your midsection.", "Hold the contraction for a second and then slowly lower your legs back to the starting position."], repRange: "15-25 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "High-to-low crossover", group: "Chest", type: "Machine", instructions: ["Set pulleys to the highest position.","Grab handles with palms facing down, step forward to create tension.","With a slight bend in your elbows, pull handles down and across your body until they meet in front of your lower chest.","Squeeze your chest muscles at the peak contraction.","Slowly return to the starting position."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Dumbbell Press", group: "Chest", type: "Dumbbell", instructions: ["Lie on a flat bench with a dumbbell in each hand, resting on your thighs.","Use your thighs to help push the dumbbells up one at a time so you can hold them at shoulder-width.","Rotate your wrists so your palms are facing away from you.","Press the dumbbells up until your arms are fully extended, but not locked at the elbow.","Slowly lower the dumbbells back to the starting position."], repRange: "6-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Machine Chest Press", group: "Chest", type: "Machine", instructions: ["Sit on the machine with your back flat against the pad.","Adjust the seat height so the handles are level with your mid-chest.","Grab the handles with a full grip, keeping your wrists straight.","Press the handles forward until your arms are fully extended, but not locked at the elbow.","Slowly return to the starting position, feeling a stretch in your chest."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Cable overhead extension", group: "Triceps", type: "Machine", instructions: ["Attach a rope handle to a low pulley.","Face away from the machine, grab the rope, and extend your arms fully overhead.","Keeping your upper arms stationary, lower the rope behind your head by bending your elbows.","Extend your arms to lift the rope back to the starting position, flexing your triceps."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Cable kickback", group: "Triceps", type: "Machine", instructions: ["Set a pulley to a low position. Hinge at your hips so your torso is nearly parallel to the floor.","Grab the handle and pull your elbow up so your upper arm is parallel to the floor.","Keeping your upper arm still, extend your forearm back until your arm is straight.","Squeeze your tricep at the top, then slowly return to the start."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Cable lateral raises/ lateral crossover", group: "Shoulders", type: "Machine", instructions: ["Set pulleys on both sides to the lowest position.","Stand in the middle and grab the left handle with your right hand, and the right handle with your left hand.","With a slight bend in your elbows, raise your arms out to your sides until they are parallel to the floor.","Control the weight as you slowly lower your arms back down."], repRange: "12-20 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Reverse Pec deck", group: "Shoulders", type: "Machine", instructions: ["Sit facing the machine, with your chest against the pad.","Set the handles to the rearmost position.","Grab the handles with a neutral or overhand grip.","Keeping your arms slightly bent, squeeze your shoulder blades together to pull the handles back.","Slowly return to the starting position."], repRange: "12-20 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Close Grip Lat Pulldown", group: "Back", type: "Machine", instructions: ["Sit at a lat pulldown machine and grab the bar with a close, underhand grip (palms facing you).","Keep your chest up and your back straight.","Pull the bar down to your upper chest, squeezing your back muscles.","Hold the contraction for a moment before slowly returning the bar to the starting position."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Chest Supported Rows", group: "Back", type: "Machine", instructions: ["Set up on a chest-supported row machine, with your chest firmly against the pad.","Grab the handles with a neutral or overhand grip.","Pull the handles towards your torso, squeezing your shoulder blades together.","Focus on using your back muscles, not your biceps.","Slowly extend your arms back to the starting position."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Seated Cable Rows", group: "Back", type: "Machine", instructions: ["Sit at a cable row machine with your feet on the platform and knees slightly bent.","Grab the handle with a neutral grip.","Keeping your back straight, pull the handle towards your lower abdomen.","Squeeze your back muscles at the peak of the movement.","Slowly return to the starting position."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Wide Grip Cable Rows", group: "Back", type: "Machine", instructions: ["Attach a long bar to the seated row machine.","Grab the bar with a wide, overhand grip.","Pull the bar towards your upper abdomen/lower chest, keeping your elbows flared out.","Focus on squeezing your upper back and rear delts.","Slowly return to the starting position."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Bayesian Cable Curls", group: "Biceps", type: "Machine", instructions: ["Stand facing a cable machine with the pulley set to the lowest position.","Hold a straight bar attachment with an underhand grip, hands shoulder-width apart.","Step back to create tension. Keep your elbows pinned to your sides.","Curl the bar up towards your chest, squeezing your biceps.","Slowly lower the bar back down."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Cable Hammer Curls", group: "Biceps", type: "Machine", instructions: ["Attach a rope handle to a low pulley on a cable machine.","Grab the rope with a neutral (hammer) grip, palms facing each other.","Keep your elbows close to your body and curl the rope up.","Squeeze your biceps and forearms at the top.","Slowly lower the rope back to the starting position."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Straight Bar Curl", group: "Forearms", type: "Barbell", instructions: ["Stand holding a barbell with an underhand grip, hands shoulder-width apart.","Keep your elbows close to your torso.","Curl the weight forward while contracting your biceps. Only your forearms should move.","Continue until your biceps are fully contracted and the bar is at shoulder level.","Slowly bring the barbell back to starting position."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" },
-                { name: "Reverse Arm Curl", group: "Forearms", type: "Dumbbell", instructions: ["Stand holding a dumbbell in each hand with an overhand grip (palms facing down).","Keep your elbows close to your torso.","Curl the weight up, keeping your palms facing down. Focus on using your forearm muscles.","Slowly lower the dumbbells back to the starting position."], repRange: "12-20 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "" }
+                { name: "Seated leg curl", group: "Hamstrings", type: "Machine", instructions: ["Sit in the machine with your back against the pad and the ankle pad just above your heels.", "Adjust the lap pad to fit snugly on your thighs.", "Curl your legs down as far as possible, squeezing your hamstrings.", "Slowly return to the starting position."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Straight Calf extension", group: "Calves", type: "Machine", instructions: ["Use a standing or seated calf raise machine.", "Place the balls of your feet on the platform, with your heels hanging off.", "Press through the balls of your feet to raise your heels as high as possible.", "Hold the peak contraction, then slowly lower your heels below the platform level."], repRange: "10-20 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Barbell Squats", group: "Abductors", type: "Barbell", instructions: ["Set a barbell in a squat rack at shoulder height.", "Step under the bar and rest it across your upper back.", "Lift the bar off the rack, take a step back, and stand with feet shoulder-width apart.", "Keeping your chest up and back straight, lower your hips as if sitting in a chair.", "Go as deep as you comfortably can, ideally until your thighs are parallel to the floor.", "Push through your heels to return to the starting position."], repRange: "6-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Smith Machine squats", group: "Abductors", type: "Machine", instructions: ["Set the bar on the Smith machine to shoulder height.", "Position yourself under the bar with feet shoulder-width apart.", "Un-rack the bar and lower down by bending your knees and hips.", "Keep your back straight and chest up.", "Push through your heels to return to the start."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Romanian Deadlift", group: "Glutes", type: "Barbell", instructions: ["Hold a barbell with an overhand grip, hands just outside your thighs.", "Stand tall with a slight bend in your knees.", "Hinge at your hips, pushing your butt back while keeping your back straight.", "Lower the bar down your shins until you feel a deep stretch in your hamstrings.", "Squeeze your glutes to return to the starting position."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Hip thrusts", group: "Glutes", type: "Barbell", instructions: ["Sit on the floor with your upper back against a bench.", "Roll a barbell over your legs and position it in the crease of your hips.", "Place your feet flat on the floor, shoulder-width apart.", "Drive through your heels to lift your hips until your body forms a straight line from shoulders to knees.", "Squeeze your glutes at the top, then lower your hips back down."], repRange: "8-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Leg Extension", group: "Quads", type: "Machine", instructions: ["Sit in the leg extension machine with your legs under the pad.", "Align your knees with the machine's pivot point.", "Extend your legs to lift the weight until they are straight.", "Squeeze your quads at the top.", "Slowly lower the weight back to the starting position."], repRange: "12-20 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Cable Crunch", group: "Abs", type: "Machine", instructions: ["Kneel below a high pulley with a rope attachment.", "Grab the rope and pull it down until your hands are placed on either side of your head.", "Flex your hips slightly and allow the weight to hyperextend your lower back.", "Keeping your hips stationary, flex your waist as you contract your abs so that your elbows travel towards the middle of your thighs.", "Hold the contraction for a second and then slowly return to the starting position."], repRange: "10-20 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Bent Knee Raises", group: "Abs", type: "Bodyweight", instructions: ["Lie flat on your back on a mat with your legs straight.", "Place your hands under your lower back for support.", "Bend your knees and pull your upper thighs into your midsection.", "Hold the contraction for a second and then slowly lower your legs back to the starting position."], repRange: "15-25 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "High-to-low crossover", group: "Chest", type: "Machine", instructions: ["Set pulleys to the highest position.","Grab handles with palms facing down, step forward to create tension.","With a slight bend in your elbows, pull handles down and across your body until they meet in front of your lower chest.","Squeeze your chest muscles at the peak contraction.","Slowly return to the starting position."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Dumbbell Press", group: "Chest", type: "Dumbbell", instructions: ["Lie on a flat bench with a dumbbell in each hand, resting on your thighs.","Use your thighs to help push the dumbbells up one at a time so you can hold them at shoulder-width.","Rotate your wrists so your palms are facing away from you.","Press the dumbbells up until your arms are fully extended, but not locked at the elbow.","Slowly lower the dumbbells back to the starting position."], repRange: "6-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Machine Chest Press", group: "Chest", type: "Machine", instructions: ["Sit on the machine with your back flat against the pad.","Adjust the seat height so the handles are level with your mid-chest.","Grab the handles with a full grip, keeping your wrists straight.","Press the handles forward until your arms are fully extended, but not locked at the elbow.","Slowly return to the starting position, feeling a stretch in your chest."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Cable overhead extension", group: "Triceps", type: "Machine", instructions: ["Attach a rope handle to a low pulley.","Face away from the machine, grab the rope, and extend your arms fully overhead.","Keeping your upper arms stationary, lower the rope behind your head by bending your elbows.","Extend your arms to lift the rope back to the starting position, flexing your triceps."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Cable kickback", group: "Triceps", type: "Machine", instructions: ["Set a pulley to a low position. Hinge at your hips so your torso is nearly parallel to the floor.","Grab the handle and pull your elbow up so your upper arm is parallel to the floor.","Keeping your upper arm still, extend your forearm back until your arm is straight.","Squeeze your tricep at the top, then slowly return to the start."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Cable lateral raises/ lateral crossover", group: "Shoulders", type: "Machine", instructions: ["Set pulleys on both sides to the lowest position.","Stand in the middle and grab the left handle with your right hand, and the right handle with your left hand.","With a slight bend in your elbows, raise your arms out to your sides until they are parallel to the floor.","Control the weight as you slowly lower your arms back down."], repRange: "12-20 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Reverse Pec deck", group: "Shoulders", type: "Machine", instructions: ["Sit facing the machine, with your chest against the pad.","Set the handles to the rearmost position.","Grab the handles with a neutral or overhand grip.","Keeping your arms slightly bent, squeeze your shoulder blades together to pull the handles back.","Slowly return to the starting position."], repRange: "12-20 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Close Grip Lat Pulldown", group: "Back", type: "Machine", instructions: ["Sit at a lat pulldown machine and grab the bar with a close, underhand grip (palms facing you).","Keep your chest up and your back straight.","Pull the bar down to your upper chest, squeezing your back muscles.","Hold the contraction for a moment before slowly returning the bar to the starting position."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Chest Supported Rows", group: "Back", type: "Machine", instructions: ["Set up on a chest-supported row machine, with your chest firmly against the pad.","Grab the handles with a neutral or overhand grip.","Pull the handles towards your torso, squeezing your shoulder blades together.","Focus on using your back muscles, not your biceps.","Slowly extend your arms back to the starting position."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Seated Cable Rows", group: "Back", type: "Machine", instructions: ["Sit at a cable row machine with your feet on the platform and knees slightly bent.","Grab the handle with a neutral grip.","Keeping your back straight, pull the handle towards your lower abdomen.","Squeeze your back muscles at the peak of the movement.","Slowly return to the starting position."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Wide Grip Cable Rows", group: "Back", type: "Machine", instructions: ["Attach a long bar to the seated row machine.","Grab the bar with a wide, overhand grip.","Pull the bar towards your upper abdomen/lower chest, keeping your elbows flared out.","Focus on squeezing your upper back and rear delts.","Slowly return to the starting position."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Bayesian Cable Curls", group: "Biceps", type: "Machine", instructions: ["Stand facing a cable machine with the pulley set to the lowest position.","Hold a straight bar attachment with an underhand grip, hands shoulder-width apart.","Step back to create tension. Keep your elbows pinned to your sides.","Curl the bar up towards your chest, squeezing your biceps.","Slowly lower the bar back down."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Cable Hammer Curls", group: "Biceps", type: "Machine", instructions: ["Attach a rope handle to a low pulley on a cable machine.","Grab the rope with a neutral (hammer) grip, palms facing each other.","Keep your elbows close to your body and curl the rope up.","Squeeze your biceps and forearms at the top.","Slowly lower the rope back to the starting position."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Straight Bar Curl", group: "Forearms", type: "Barbell", instructions: ["Stand holding a barbell with an underhand grip, hands shoulder-width apart.","Keep your elbows close to your torso.","Curl the weight forward while contracting your biceps. Only your forearms should move.","Continue until your biceps are fully contracted and the bar is at shoulder level.","Slowly bring the barbell back to starting position."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Reverse Arm Curl", group: "Forearms", type: "Dumbbell", instructions: ["Stand holding a dumbbell in each hand with an overhand grip (palms facing down).","Keep your elbows close to your torso.","Curl the weight up, keeping your palms facing down. Focus on using your forearm muscles.","Slowly lower the dumbbells back to the starting position."], repRange: "12-20 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false }
             ];
 
             // --- UI ELEMENTS ---
@@ -484,8 +506,7 @@
                 warmupInstructionsInput: document.getElementById('warmup-instructions'),
                 saveWarmupBtn: document.getElementById('save-warmup-btn'),
                 backToTodayBtn: document.getElementById('back-to-today-btn'),
-                dayViewTitleBtn: document.getElementById('day-view-date-display-btn'),
-                dayViewTitle: document.getElementById('day-view-title'),
+                dayViewDateDisplayBtn: document.getElementById('day-view-date-display-btn'),
                 dayViewStatus: document.getElementById('day-view-status'),
                 dayViewDateDisplay: document.getElementById('day-view-date-display-btn'),
                 workoutPlanForDay: document.getElementById('workout-plan-for-day'),
@@ -493,12 +514,20 @@
                 workoutActionsBtn: document.getElementById('workout-actions-btn'),
                 workoutActionsDropdown: document.getElementById('workout-actions-dropdown'),
                 datePickerModal: document.getElementById('date-picker-modal'),
+                closeDatePickerModalBtn: document.getElementById('close-date-picker-modal-btn'),
                 modalCalendarGrid: document.getElementById('modal-calendar-grid'),
                 modalMonthYearDisplay: document.getElementById('modal-month-year-display'),
                 modalPrevMonthBtn: document.getElementById('modal-prev-month-btn'),
                 modalNextMonthBtn: document.getElementById('modal-next-month-btn'),
                 prevDayBtn: document.getElementById('prev-day-btn'),
                 nextDayBtn: document.getElementById('next-day-btn'),
+                aiTabSpecific: document.getElementById('ai-tab-specific'),
+                aiTabGeneral: document.getElementById('ai-tab-general'),
+                aiPanelSpecific: document.getElementById('ai-panel-specific'),
+                aiPanelGeneral: document.getElementById('ai-panel-general'),
+                aiGeneralPrompt: document.getElementById('ai-general-prompt'),
+                getAIGeneralAdviceBtn: document.getElementById('get-ai-general-advice-btn'),
+                aiGeneralOutput: document.getElementById('ai-general-output'),
             };
 
             // --- CHART.JS SETUP ---
@@ -531,7 +560,13 @@
             
             function loadData() {
                 workoutHistory = JSON.parse(localStorage.getItem('fitTrackAI_workoutHistory')) || [];
-                exerciseDB = JSON.parse(localStorage.getItem('fitTrackAI_exerciseDB')) || JSON.parse(JSON.stringify(defaultExerciseDB));
+                const loadedExerciseDB = JSON.parse(localStorage.getItem('fitTrackAI_exerciseDB'));
+                if (loadedExerciseDB) {
+                    // Ensure all exercises have the 'favorite' property
+                    exerciseDB = loadedExerciseDB.map(ex => ({ ...ex, favorite: ex.favorite || false }));
+                } else {
+                    exerciseDB = JSON.parse(JSON.stringify(defaultExerciseDB));
+                }
                 warmups = JSON.parse(localStorage.getItem('fitTrackAI_warmups')) || JSON.parse(JSON.stringify(defaultWarmups));
             }
 
@@ -554,12 +589,13 @@
             function updateUI() {
                 updateDayView(viewDate);
                 populateProgressSelect();
-                renderProgressionChart(ui.progressExerciseSelect.value);
+                renderProgressionChart(ui.progressExerciseSelect.value || 'general');
             }
 
             // --- WORKOUT SPECIFIC FUNCTIONS ---
             
             function openWorkoutModal(exerciseName) {
+                isLogging = true; // Set flag for unload protection
                 editingWorkoutLogIndex = null;
                 currentlyLoggingExercise = exerciseName;
                 ui.modalTitle.textContent = `Log: ${exerciseName}`;
@@ -588,7 +624,7 @@
             };
 
             function addWeightRepPart(container, weight='', reps='', isPartial=false) {
-                const partHtml = `<div class="set-part-row grid grid-cols-12 gap-2 items-center"><input type="number" step="0.25" min="0" placeholder="Weight (kg)" value="${weight}" class="form-input !py-2 col-span-5 set-weight"><span class="text-center col-span-1">x</span><input type="number" min="1" step="1" placeholder="Reps" value="${reps}" class="form-input !py-2 col-span-2 set-reps"><div class="col-span-3 flex items-center justify-center"><input type="checkbox" ${isPartial ? 'checked' : ''} class="form-checkbox h-5 w-5 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500 set-partial"><label class="ml-2 text-sm">Partial</label></div><button type="button" class="remove-part-btn text-gray-500 hover:text-red-400 p-1 col-span-1"><i data-lucide="x-circle" class="w-4 h-4"></i></button></div>`;
+                const partHtml = `<div class="set-part-row grid grid-cols-12 gap-2 items-center"><input type="number" step="any" min="0" placeholder="Weight (kg)" value="${weight}" class="form-input !py-2 col-span-5 set-weight"><span class="text-center col-span-1">x</span><input type="number" min="1" step="1" placeholder="Reps" value="${reps}" class="form-input !py-2 col-span-2 set-reps"><div class="col-span-3 flex items-center justify-center"><input type="checkbox" ${isPartial ? 'checked' : ''} class="form-checkbox h-5 w-5 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500 set-partial"><label class="ml-2 text-sm">Partial</label></div><button type="button" class="remove-part-btn text-gray-500 hover:text-red-400 p-1 col-span-1"><i data-lucide="x-circle" class="w-4 h-4"></i></button></div>`;
                 container.insertAdjacentHTML('beforeend', partHtml);
                 lucide.createIcons();
             };
@@ -645,8 +681,10 @@
                 viewDate = date; // Update central state
                 renderWorkoutPlanForDate(date);
                 renderHistoryForDate(date);
-                ui.dayViewTitle.textContent = date.toLocaleDateString(undefined, { weekday: 'long' });
-                ui.dayViewDateDisplay.textContent = date.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
+                const titleSpan = ui.dayViewDateDisplay.querySelector('#day-view-title-span');
+                const dateSpan = ui.dayViewDateDisplay.querySelector('#day-view-date-span');
+                titleSpan.textContent = date.toLocaleDateString(undefined, { weekday: 'long' });
+                dateSpan.textContent = date.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
 
                 lucide.createIcons();
             }
@@ -663,6 +701,22 @@
                 const isFutureDay = date > today;
 
                 let exercisesHtml = '';
+
+                const renderExerciseList = (exercises) => {
+                    return exercises.map(ex => `<li class="text-base text-gray-300 exercise-item flex justify-between items-center group">
+                        <div class="flex-grow flex items-center">
+                            <button class="p-1 favorite-toggle-btn" data-name="${ex.name}" title="Toggle Favorite">
+                                <i data-lucide="star" class="w-4 h-4 pointer-events-none ${ex.favorite ? 'text-yellow-400 fill-yellow-400' : 'text-gray-500 hover:text-yellow-400'}"></i>
+                            </button>
+                            <button class="flex-grow text-left p-1 rounded hover:bg-black/30 log-workout-btn" data-name="${ex.name}" ${isFutureDay ? 'disabled' : ''}>${ex.name}</button>
+                        </div>
+                        <span class="exercise-item-controls items-center gap-1 pl-1">
+                            <button class="edit-exercise-btn p-1" data-name="${ex.name}" title="Edit Exercise"><i data-lucide="pencil" class="w-4 h-4 text-gray-500 hover:text-yellow-400 pointer-events-none"></i></button>
+                            <button class="delete-exercise-btn p-1" data-name="${ex.name}" title="Delete Exercise"><i data-lucide="trash-2" class="w-4 h-4 text-gray-500 hover:text-red-500 pointer-events-none"></i></button>
+                        </span>
+                    </li>`).join('');
+                };
+
                 if (item.type === 'Rest') {
                     exercisesHtml = `<div class="flex flex-col items-center justify-center h-full text-center p-4"><i data-lucide="bed-double" class="w-12 h-12 text-gray-500 mb-2"></i><p class="text-gray-500 italic mt-2">Rest Day</p></div>`;
                 } else {
@@ -676,7 +730,7 @@
                     for(const group of groupsForDay) {
                         const exercisesForGroup = exerciseDB.filter(ex => ex.group === group);
                         if(exercisesForGroup.length > 0) {
-                            exercisesHtml += `<div><h5 class="font-semibold text-blue-400 text-sm mb-1">${group}</h5><ul class="space-y-1">${exercisesForGroup.map(ex => `<li class="text-base text-gray-300 exercise-item flex justify-between items-center group"><button class="flex-grow text-left p-1 rounded hover:bg-black/30 log-workout-btn" data-name="${ex.name}" ${isFutureDay ? 'disabled' : ''}>${ex.name}</button><span class="exercise-item-controls items-center gap-1 pl-1"><button class="edit-exercise-btn p-1" data-name="${ex.name}" title="Edit Exercise"><i data-lucide="pencil" class="w-4 h-4 text-gray-500 hover:text-yellow-400 pointer-events-none"></i></button><button class="delete-exercise-btn p-1" data-name="${ex.name}" title="Delete Exercise"><i data-lucide="trash-2" class="w-4 h-4 text-gray-500 hover:text-red-500 pointer-events-none"></i></button></span></li>`).join('')}</ul></div>`;
+                            exercisesHtml += `<div><h5 class="font-semibold text-blue-400 text-sm mb-1">${group}</h5><ul class="space-y-1">${renderExerciseList(exercisesForGroup)}</ul></div>`;
                         }
                     }
                 }
@@ -684,7 +738,14 @@
             }
 
             function renderHistoryForDate(date) {
-                const logsForDay = workoutHistory.filter(log => new Date(log.date.replace(/-/g, '/')).toDateString() === date.toDateString());
+                const logsForDay = workoutHistory
+                    .map((log, index) => ({ ...log, originalIndex: index })) // Add original index
+                    .filter(log => {
+                        const logDate = new Date(log.date);
+                        return logDate.getFullYear() === date.getFullYear() &&
+                               logDate.getMonth() === date.getMonth() &&
+                               logDate.getDate() === date.getDate();
+                    });
 
                 if (logsForDay.length === 0) {
                     ui.historyDayContent.innerHTML = `<p class="text-secondary-text">No workouts logged.</p>`;
@@ -694,7 +755,16 @@
 
                 ui.historyDayContent.innerHTML = logsForDay.map(log => {
                      const setsHtml = log.sets.map((setParts, i) => `<span><strong>Set ${i+1}:</strong> ${setParts.map(p => `${p.weight}kg x ${p.reps}r ${p.partial ? '(P)' : ''}`).join(', ')}</span>`).join('<br>');
-                     return `<div class="bg-black/30 p-2 rounded-md"><strong class="text-primary-text">${log.name}</strong><div class="text-sm text-secondary-text mt-1">${setsHtml}</div></div>`;
+                     return `<div class="bg-black/30 p-2 rounded-md">
+                        <div class="flex justify-between items-start">
+                             <strong class="text-primary-text">${log.name}</strong>
+                             <div class="flex items-center gap-1">
+                                <button class="edit-history-btn p-1 text-gray-500 hover:text-yellow-400 rounded-md" data-index="${log.originalIndex}" title="Edit Log"><i data-lucide="pencil" class="w-4 h-4 pointer-events-none"></i></button>
+                                <button class="delete-history-btn p-1 text-gray-500 hover:text-red-400 rounded-md" data-index="${log.originalIndex}" title="Delete Log"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
+                             </div>
+                        </div>
+                        <div class="text-sm text-secondary-text mt-1">${setsHtml}</div>
+                     </div>`;
                 }).join('');
 
                 const schedule = [ { day: "Monday", type: "Push" }, { day: "Tuesday", type: "Pull" }, { day: "Wednesday", type: "Legs" }, { day: "Thursday", type: "Push" }, { day: "Friday", type: "Pull" }, { day: "Saturday", type: "Legs" }, { day: "Sunday", type: "Rest" }];
@@ -751,7 +821,10 @@
             ui.addExerciseBtn.addEventListener('click', () => populateExerciseModal());
             ui.closeExerciseModalBtn.addEventListener('click', () => hideModal(ui.exerciseModal));
             ui.getAIAdviceBtn.addEventListener('click', getAIWorkoutAdvice);
-            ui.closeModalBtn.addEventListener('click', () => hideModal(ui.workoutModal));
+            ui.closeModalBtn.addEventListener('click', () => {
+                hideModal(ui.workoutModal);
+                isLogging = false;
+            });
             ui.addSetBtn.addEventListener('click', () => addSetRow());
             ui.alertModalOkBtn.addEventListener('click', () => hideModal(ui.alertModal));
             ui.confirmModalCancelBtn.addEventListener('click', () => hideModal(ui.confirmModal));
@@ -759,12 +832,26 @@
             ui.progressExerciseSelect.addEventListener('change', (e) => renderProgressionChart(e.target.value));
             
             function populateProgressSelect() {
+                const currentSelection = ui.progressExerciseSelect.value;
                 const exercisedNames = [...new Set(workoutHistory.map(log => log.name))].sort();
-                const options = '<option value="">Select an exercise...</option>' + exercisedNames.map(name => `<option value="${name}">${name}</option>`).join('');
-                ui.progressExerciseSelect.innerHTML = options;
-                ui.aiAdviceExerciseSelect.innerHTML = options;
+                const singleExerciseOptions = exercisedNames.map(name => `<option value="${name}">${name}</option>`).join('');
+                
+                ui.progressExerciseSelect.innerHTML = `
+                    <option value="general">General Progression</option>
+                    <optgroup label="Specific Exercises">
+                        ${singleExerciseOptions}
+                    </optgroup>
+                `;
+                ui.progressExerciseSelect.value = currentSelection || 'general';
+
+                ui.aiAdviceExerciseSelect.innerHTML = '<option value="">Select an exercise...</option>' + singleExerciseOptions;
             };
+
             function renderProgressionChart(exerciseName) {
+                if (exerciseName === "general") {
+                    renderGeneralProgressionChart();
+                    return;
+                }
                 if (!exerciseName) {
                     progressChart.data.labels = [];
                     progressChart.data.datasets = [];
@@ -773,7 +860,10 @@
                 }
                 const exerciseLogs = workoutHistory.filter(log => log.name === exerciseName).sort((a,b) => new Date(a.date) - new Date(b.date));
                 
-                const labels = exerciseLogs.map(log => new Date(log.date.replace(/-/g, '/')).toLocaleDateString());
+                const labels = exerciseLogs.map(log => {
+                    const [y,m,d] = log.date.split('-').map(Number);
+                    return new Date(y, m-1, d).toLocaleDateString();
+                });
                 const maxWeightData = exerciseLogs.map(log => Math.max(...log.sets.flatMap(set => set.map(s => s.weight || 0))));
                 const volumeData = exerciseLogs.map(log => log.sets.flat().reduce((total, s) => total + (s.weight * s.reps), 0));
 
@@ -784,8 +874,48 @@
                 ];
                 progressChart.update();
             };
+
+            function renderGeneralProgressionChart() {
+                if (workoutHistory.length === 0) {
+                    progressChart.data.labels = [];
+                    progressChart.data.datasets = [];
+                    progressChart.update();
+                    return;
+                }
+
+                const volumeByDay = {};
+                workoutHistory.forEach(log => {
+                    const dateKey = log.date;
+                    const logVolume = log.sets.flat().reduce((total, s) => total + (s.weight * s.reps), 0);
+                    if (!volumeByDay[dateKey]) {
+                        volumeByDay[dateKey] = 0;
+                    }
+                    volumeByDay[dateKey] += logVolume;
+                });
+
+                const sortedDates = Object.keys(volumeByDay).sort((a, b) => new Date(a) - new Date(b));
+                
+                const labels = sortedDates.map(dateStr => {
+                     const [y,m,d] = dateStr.split('-').map(Number);
+                     return new Date(y, m-1, d).toLocaleDateString();
+                });
+                const volumeData = sortedDates.map(date => volumeByDay[date]);
+
+                progressChart.data.labels = labels;
+                progressChart.data.datasets = [
+                    {
+                        label: 'Total Daily Volume (kg)',
+                        data: volumeData,
+                        borderColor: '#a78bfa',
+                        backgroundColor: '#a78bfa',
+                        tension: 0.1
+                    }
+                ];
+                progressChart.update();
+            }
             
             function openEditWorkoutModal(index) {
+                isLogging = true;
                 editingWorkoutLogIndex = index;
                 const logEntry = workoutHistory[index];
                 currentlyLoggingExercise = logEntry.name;
@@ -812,7 +942,11 @@
                 const exerciseLogs = workoutHistory.filter(log => log.name === exerciseName).slice(-3);
 
                 const prompt = `Act as an expert fitness coach grounded in science. A user has performed these recent sessions for ${exerciseName}:
-                ${exerciseLogs.map((log, i) => `Session ${i+1} (${new Date(log.date.replace(/-/g, '/')).toLocaleDateString()}): ${log.sets.map(set => set.map(part => `${part.weight}kg x ${part.reps} reps`).join(' + ')).join(', ')}`).join('\n')}
+                ${exerciseLogs.map((log, i) => {
+                    const [y,m,d] = log.date.split('-').map(Number);
+                    const logDate = new Date(y,m-1,d).toLocaleDateString();
+                    return `Session ${i+1} (${logDate}): ${log.sets.map(set => set.map(part => `${part.weight}kg x ${part.reps} reps`).join(' + ')).join(', ')}`
+                }).join('\n')}
                 Based on progressive overload, give a clear, actionable recommendation for their *next* session. Be specific (e.g., "Aim for 6-8 reps with 52.5kg"). Keep it under 75 words.`;
 
                 const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
@@ -826,6 +960,63 @@
                 } catch (error) {
                     console.error("AI Workout Advice Error:", error);
                     ui.aiAdviceOutput.innerHTML = `<p class="text-red-400">Could not get AI advice.</p>`;
+                } finally {
+                    btn.disabled = false;
+                    btn.querySelector('.btn-text').style.display = 'inline';
+                    btn.querySelector('.loader').classList.add('hidden');
+                }
+            }
+
+            async function getAIGeneralAdvice() {
+                const userPrompt = ui.aiGeneralPrompt.value.trim();
+                if (!userPrompt) {
+                    ui.aiGeneralOutput.innerHTML = `<p class="text-yellow-400">Please enter a question.</p>`;
+                    return;
+                }
+
+                const btn = ui.getAIGeneralAdviceBtn;
+                btn.disabled = true;
+                btn.querySelector('.btn-text').style.display = 'none';
+                btn.querySelector('.loader').classList.remove('hidden');
+                ui.aiGeneralOutput.innerHTML = '';
+
+                const twoWeeksAgo = new Date();
+                twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+                const recentHistory = workoutHistory
+                    .filter(log => new Date(log.date) >= twoWeeksAgo)
+                    .map(log => {
+                        const [y,m,d] = log.date.split('-').map(Number);
+                        const logDate = new Date(y,m-1,d).toLocaleDateString();
+                        return `On ${logDate}: ${log.name} - ${log.sets.map(s => s.map(p => `${p.weight}kg x ${p.reps}r`).join('/')).join(', ')}`;
+                    })
+                    .join('; ');
+                
+                const fullExerciseList = exerciseDB.map(ex => `${ex.name} (${ex.group})`).join(', ');
+
+                const systemPrompt = `You are FitTrack AI, an expert fitness coach. Your answers must be encouraging, evidence-based, and concise.
+                Here is a summary of the user's workout data from the last 14 days:
+                ${recentHistory || "No workouts logged in the last 14 days."}
+                
+                Here is the user's full list of available exercises:
+                ${fullExerciseList}
+
+                Use this data to answer the user's question precisely and personally. Do not mention that you are using their data unless it is necessary to explain your reasoning. Keep responses under 150 words.`;
+                
+                const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
+                const payload = {
+                    contents: [{ parts: [{ text: userPrompt }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                    const result = await response.json();
+                    let text = result.candidates[0].content.parts[0].text;
+                    ui.aiGeneralOutput.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`;
+                } catch (error) {
+                    console.error("AI General Advice Error:", error);
+                    ui.aiGeneralOutput.innerHTML = `<p class="text-red-400">Could not get AI advice.</p>`;
                 } finally {
                     btn.disabled = false;
                     btn.querySelector('.btn-text').style.display = 'inline';
@@ -883,9 +1074,19 @@
             ui.workoutPlanForDay.addEventListener('click', (e) => {
                 const logBtn = e.target.closest('.log-workout-btn'), editBtn = e.target.closest('.edit-exercise-btn'),
                       deleteBtn = e.target.closest('.delete-exercise-btn'), warmupBtn = e.target.closest('.warmup-detail-btn'),
-                      editWarmupBtn = e.target.closest('.edit-warmup-btn'), deleteWarmupBtn = e.target.closest('.delete-warmup-btn');
-
-                if (logBtn && !logBtn.disabled) openExerciseDetailModal(logBtn.dataset.name, 'exercise');
+                      editWarmupBtn = e.target.closest('.edit-warmup-btn'), deleteWarmupBtn = e.target.closest('.delete-warmup-btn'),
+                      favBtn = e.target.closest('.favorite-toggle-btn');
+                
+                if (favBtn) {
+                    const exName = favBtn.dataset.name;
+                    const exercise = exerciseDB.find(ex => ex.name === exName);
+                    if (exercise) {
+                        exercise.favorite = !exercise.favorite;
+                        saveData();
+                        updateDayView(viewDate);
+                    }
+                }
+                else if (logBtn && !logBtn.disabled) openExerciseDetailModal(logBtn.dataset.name, 'exercise');
                 else if (warmupBtn) openExerciseDetailModal(warmupBtn.dataset.name, 'warmup', warmupBtn.dataset.dayType);
                 else if (editBtn) { const ex = exerciseDB.find(e => e.name === editBtn.dataset.name); if(ex) populateExerciseModal(ex); }
                 else if (deleteBtn) { const name = deleteBtn.dataset.name; showConfirmModal('Delete Exercise?', `This will remove "${name}".`, () => { const i = exerciseDB.findIndex(ex => ex.name === name); if (i > -1) { exerciseDB.splice(i, 1); saveData(); updateUI(); } }); }
@@ -893,6 +1094,24 @@
                 else if (deleteWarmupBtn) { const day = deleteWarmupBtn.dataset.dayType, name = deleteWarmupBtn.dataset.name; showConfirmModal('Delete Warm-up?', `Delete "${name}"?`, () => { if(warmups[day]) { const i = warmups[day].findIndex(w => w.name === name); if (i > -1) { warmups[day].splice(i, 1); saveData(); updateUI(); }} }); }
             });
            
+            ui.historyDayContent.addEventListener('click', (e) => {
+                const editBtn = e.target.closest('.edit-history-btn');
+                const deleteBtn = e.target.closest('.delete-history-btn');
+
+                if (editBtn) {
+                    const index = parseInt(editBtn.dataset.index, 10);
+                    openEditWorkoutModal(index);
+                }
+                if (deleteBtn) {
+                    const index = parseInt(deleteBtn.dataset.index, 10);
+                    showConfirmModal('Delete Log?', 'Are you sure you want to delete this workout log entry?', () => {
+                        workoutHistory.splice(index, 1);
+                        saveData();
+                        updateUI();
+                    });
+                }
+            });
+
             ui.closeExerciseDetailModalBtn.addEventListener('click', () => hideModal(ui.exerciseDetailModal));
             ui.logFromDetailBtn.addEventListener('click', () => { hideModal(ui.exerciseDetailModal); openWorkoutModal(currentlyLoggingExercise); });
             ui.saveExerciseNotesBtn.addEventListener('click', () => { const ex = exerciseDB.find(e => e.name === currentlyLoggingExercise); if (ex) { ex.notes = ui.exerciseDetailNotes.value; saveData(); const btn = ui.saveExerciseNotesBtn; btn.textContent = 'Saved!'; setTimeout(() => { btn.textContent = 'Save Notes'; }, 2000); }});
@@ -921,7 +1140,7 @@
                     }
                 } else {
                     if (exerciseDB.some(ex => ex.name.toLowerCase() === name.toLowerCase())) return showCustomAlert('Error', 'Name already exists.');
-                    exerciseDB.push({ name, group, type, instructions: ["No instructions added."], repRange: "N/A", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=No+Video", notes: "" });
+                    exerciseDB.push({ name, group, type, instructions: ["No instructions added."], repRange: "N/A", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=No+Video", notes: "", favorite: false });
                 }
                 editingExerciseName = null; hideModal(ui.exerciseModal); saveData(); updateUI();
             });
@@ -962,7 +1181,8 @@
                 document.querySelectorAll('.set-row').forEach(row => {
                     const setParts = [];
                      row.querySelectorAll('.set-part-row').forEach(partRow => {
-                        const weight = parseFloat(partRow.querySelector('.set-weight').value) || 0;
+                        const rawWeight = parseFloat(partRow.querySelector('.set-weight').value) || 0;
+                        const weight = parseFloat(rawWeight.toFixed(2));
                         const reps = parseInt(partRow.querySelector('.set-reps').value) || 0;
                         const partial = partRow.querySelector('.set-partial').checked;
                         if(reps > 0) setParts.push({ weight, reps, partial });
@@ -972,14 +1192,21 @@
 
                 if(sets.length === 0) return showCustomAlert('Empty Workout', 'Please log at least one valid set.');
                 
-                const year = viewDate.getFullYear();
-                const month = String(viewDate.getMonth() + 1).padStart(2, '0');
-                const day = String(viewDate.getDate()).padStart(2, '0');
-                const dateString = `${year}-${month}-${day}`;
+                const dateString = viewDate.toISOString().split('T')[0];
 
                 const newLog = { name: currentlyLoggingExercise, date: dateString, sets: sets };
-                workoutHistory.push(newLog);
-                saveData(); updateUI(); hideModal(ui.workoutModal);
+                
+                if (editingWorkoutLogIndex !== null) {
+                    workoutHistory[editingWorkoutLogIndex] = newLog;
+                } else {
+                    workoutHistory.push(newLog);
+                }
+
+                editingWorkoutLogIndex = null;
+                saveData(); 
+                updateUI(); 
+                hideModal(ui.workoutModal);
+                isLogging = false;
             });
             ui.setsContainer.addEventListener('click', (e) => {
                 const removeSetBtn = e.target.closest('.remove-set-btn'), removePartBtn = e.target.closest('.remove-part-btn');
@@ -1016,11 +1243,12 @@
                 }
             });
 
-            ui.dayViewDateDisplay.addEventListener('click', () => {
+            ui.dayViewDateDisplayBtn.addEventListener('click', () => {
                 modalCalendarDate = new Date(viewDate);
                 renderCalendar(ui.modalCalendarGrid, modalCalendarDate, true);
                 showModal(ui.datePickerModal);
             });
+            ui.closeDatePickerModalBtn.addEventListener('click', () => hideModal(ui.datePickerModal));
             ui.modalPrevMonthBtn.addEventListener('click', () => {
                 modalCalendarDate.setMonth(modalCalendarDate.getMonth() - 1);
                 renderCalendar(ui.modalCalendarGrid, modalCalendarDate, true);
@@ -1034,13 +1262,40 @@
             ui.modalCalendarGrid.addEventListener('click', (e) => {
                 const dayEl = e.target.closest('.calendar-day');
                 if (dayEl && dayEl.dataset.date) {
-                    const newDate = new Date(dayEl.dataset.date.replace(/-/g, '/'));
+                    const [year, month, day] = dayEl.dataset.date.split('-').map(Number);
+                    const newDate = new Date(year, month - 1, day);
                     viewDate = newDate;
                     updateUI();
                     hideModal(ui.datePickerModal);
                 }
             });
+            
+            // AI Coach Tab Listeners
+            ui.aiTabSpecific.addEventListener('click', () => {
+                ui.aiTabSpecific.classList.add('border-accent', 'text-primary-text');
+                ui.aiTabSpecific.classList.remove('border-transparent', 'text-secondary-text');
+                ui.aiTabGeneral.classList.add('border-transparent', 'text-secondary-text');
+                ui.aiTabGeneral.classList.remove('border-accent', 'text-primary-text');
+                ui.aiPanelSpecific.classList.remove('hidden');
+                ui.aiPanelGeneral.classList.add('hidden');
+            });
+            ui.aiTabGeneral.addEventListener('click', () => {
+                ui.aiTabGeneral.classList.add('border-accent', 'text-primary-text');
+                ui.aiTabGeneral.classList.remove('border-transparent', 'text-secondary-text');
+                ui.aiTabSpecific.classList.add('border-transparent', 'text-secondary-text');
+                ui.aiTabSpecific.classList.remove('border-accent', 'text-primary-text');
+                ui.aiPanelGeneral.classList.remove('hidden');
+                ui.aiPanelSpecific.classList.add('hidden');
+            });
+            ui.getAIGeneralAdviceBtn.addEventListener('click', getAIGeneralAdvice);
 
+            // Unload protection
+            window.addEventListener('beforeunload', (event) => {
+                if (isLogging) {
+                    event.preventDefault();
+                    event.returnValue = 'You have an unsaved workout. Are you sure you want to leave?';
+                }
+            });
 
             // --- INITIALIZATION ---
             loadData();

@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack AI | Nutrition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --background: #000000;
+            --primary-text: #eaeaea;
+            --secondary-text: #888888;
+            --card-bg: #111111;
+            --input-bg: #191919;
+            --border-color: #222222;
+            --accent: #FFFFFF;
+            --accent-hover: #DDDDDD;
+            --danger: #E53E3E;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--primary-text);
+            font-family: 'Manrope', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+            border-bottom: 2px solid transparent;
+            color: var(--secondary-text);
+            padding-bottom: 4px;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-text);
+        }
+
+        .nav-link.active {
+            color: var(--primary-text);
+            border-bottom-color: var(--primary-text);
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+        }
+
+        .form-input {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--primary-text);
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+
+        .form-label {
+            color: var(--secondary-text);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .btn {
+            border-radius: 0.5rem;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transform: translateY(0);
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: var(--background);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--primary-text);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: var(--border-color);
+            border-color: var(--accent);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--primary-text);
+        }
+        
+        .btn-danger:hover:not(:disabled) {
+             background-color: #C53030;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-content {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .loader {
+            border: 2px solid #333;
+            border-top: 2px solid var(--accent);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: var(--input-bg); border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #666; }
+        
+        .recipe-ingredients-details { display: none; }
+
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto max-w-7xl px-4 py-8">
+
+        <!-- Header -->
+        <header class="flex flex-col sm:flex-row items-center justify-between mb-16 pb-4 border-b border-gray-900">
+            <a href="index.html" class="flex items-center gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
+                <h1 class="text-2xl font-bold">FitTrack AI</h1>
+            </a>
+            <nav class="mt-4 sm:mt-0">
+                <ul class="flex items-center space-x-4 sm:space-x-6 text-base font-medium">
+                    <li><a href="index.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="nutrition.html" class="nav-link active">Nutrition</a></li>
+                    <li><a href="workouts.html" class="nav-link">Workouts</a></li>
+                    <li><a href="goals.html" class="nav-link">Goals</a></li>
+                    <li><a href="sleep.html" class="nav-link">Sleep</a></li>
+                    <li><a href="settings.html" class="nav-link">Settings</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Left Column -->
+                <div class="space-y-8">
+                    <div class="content-card">
+                        <h3 class="text-2xl font-bold mb-6">Log Your Meal</h3>
+                        <form id="log-meal-form" class="space-y-4">
+                            <div>
+                                <label for="food-name-input" class="form-label">Food Name *</label>
+                                <input type="text" id="food-name-input" list="favorite-foods-datalist" placeholder="e.g., Chicken Breast" class="form-input mt-1">
+                                <datalist id="favorite-foods-datalist"></datalist>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="food-servings-input" class="form-label">Servings *</label>
+                                    <input type="number" id="food-servings-input" value="1" min="1" class="form-input mt-1">
+                                </div>
+                                <div>
+                                    <label for="food-brand-input" class="form-label">Brand (Optional)</label>
+                                    <input type="text" id="food-brand-input" placeholder="e.g., Tesco" class="form-input mt-1">
+                                </div>
+                            </div>
+
+                            <details class="pt-2">
+                                <summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between">
+                                    <span>Manual Macro Entry</span>
+                                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                                </summary>
+                                <div class="space-y-4 pt-4 mt-4 border-t border-gray-800">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="food-grams-input" class="form-label">Grams per Serving</label>
+                                            <input type="number" id="food-grams-input" placeholder="0" class="form-input mt-1">
+                                        </div>
+                                         <div>
+                                            <label for="food-calories-input" class="form-label">Calories (kcal)</label>
+                                            <input type="number" step="0.1" id="food-calories-input" placeholder="0" class="form-input mt-1 macro-input">
+                                        </div>
+                                    </div>
+                                     <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="food-protein-input" class="form-label">Protein (g)</label>
+                                            <input type="number" step="0.1" id="food-protein-input" placeholder="0" class="form-input mt-1 macro-input">
+                                        </div>
+                                        <div>
+                                            <label for="food-carbs-input" class="form-label">Carbs (g)</label>
+                                            <input type="number" step="0.1" id="food-carbs-input" placeholder="0" class="form-input mt-1 macro-input">
+                                        </div>
+                                    </div>
+                                     <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="food-fat-input" class="form-label">Fat (g)</label>
+                                            <input type="number" step="0.1" id="food-fat-input" placeholder="0" class="form-input mt-1 macro-input">
+                                        </div>
+                                        <div>
+                                            <label for="food-sugar-input" class="form-label">Sugar (g)</label>
+                                            <input type="number" step="0.1" id="food-sugar-input" placeholder="0" class="form-input mt-1 macro-input">
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="food-sodium-input" class="form-label">Sodium (mg)</label>
+                                            <input type="number" step="0.1" id="food-sodium-input" placeholder="0" class="form-input mt-1 macro-input">
+                                        </div>
+                                         <div>
+                                            <label for="food-potassium-input" class="form-label">Potassium (mg)</label>
+                                            <input type="number" step="0.1" id="food-potassium-input" placeholder="0" class="form-input mt-1 macro-input">
+                                        </div>
+                                    </div>
+                                </div>
+                            </details>
+                            
+                            <div class="bg-black/30 p-3 rounded-lg mt-4">
+                                <p class="text-sm text-gray-400">Total Macros for <span id="total-servings-display">1</span> Serving(s):</p>
+                                <p id="total-macros-display" class="font-semibold mt-1">0kcal | 0p | 0c | 0f | 0s | 0na | 0k</p>
+                            </div>
+                            <button id="ai-get-macros-btn" type="button" class="btn btn-secondary w-full !mt-6">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                                <span class="btn-text">Get Macros with AI</span>
+                                <div class="loader hidden"></div>
+                            </button>
+                            
+                            <div class="flex gap-4 pt-2">
+                                <button id="add-food-btn" type="button" class="btn btn-primary w-full">
+                                    <span class="btn-text">Add Food</span>
+                                    <div class="loader hidden"></div>
+                                </button>
+                                <button id="create-recipe-btn" type="button" class="btn btn-secondary !p-3" title="Create Recipe"><i data-lucide="notebook-tabs"></i></button>
+                                <button id="scan-food-btn" type="button" class="btn btn-secondary !p-3" title="Scan Food Image"><i data-lucide="camera"></i></button>
+                            </div>
+                            <div id="add-food-error" class="text-red-400 text-sm mt-2 h-4"></div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-8">
+                    <div class="content-card">
+                         <h3 class="text-2xl font-bold mb-4">Daily Summary</h3>
+                        <div class="flex items-center gap-6">
+                            <div class="w-24 h-24 flex-shrink-0">
+                                <canvas id="macro-chart"></canvas>
+                            </div>
+                            <div class="w-full grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                                <div class="flex justify-between items-baseline"><span class="text-gray-400">Calories:</span> <span class="font-semibold"><span id="current-calories">0</span> / <span id="goal-calories">2000</span></span></div>
+                                <div class="flex justify-between items-baseline"><span class="text-gray-400">Protein:</span> <span class="font-semibold"><span id="current-protein">0</span> / <span id="goal-protein">150</span> g</span></div>
+                                <div class="flex justify-between items-baseline"><span class="text-gray-400">Carbs:</span> <span class="font-semibold"><span id="current-carbs">0</span> / <span id="goal-carbs">225</span> g</span></div>
+                                <div class="flex justify-between items-baseline"><span class="text-gray-400">Fat:</span> <span class="font-semibold"><span id="current-fat">0</span> / <span id="goal-fat">60</span> g</span></div>
+                                <div class="flex justify-between items-baseline"><span class="text-gray-400">Sugar:</span> <span class="font-semibold"><span id="current-sugar">0</span> / <span id="goal-sugar">50</span> g</span></div>
+                                <div class="flex justify-between items-baseline"><span class="text-gray-400">Sodium:</span> <span class="font-semibold"><span id="current-sodium">0</span> / <span id="goal-sodium">2300</span> mg</span></div>
+                                <div class="flex justify-between items-baseline"><span class="text-gray-400">Potassium:</span> <span class="font-semibold"><span id="current-potassium">0</span> / <span id="goal-potassium">3500</span> mg</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <h3 class="text-2xl font-bold mb-4">Today's Log</h3>
+                        <div id="daily-log" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"><p class="text-gray-500">No food logged yet.</p></div>
+                    </div>
+                    
+                    <div class="content-card">
+                        <h3 class="text-2xl font-bold mb-4">Saved Recipes</h3>
+                        <div id="saved-recipes-list" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-2"></div>
+                    </div>
+
+                    <div class="content-card">
+                        <h3 class="text-2xl font-bold mb-4">Favorite Foods</h3>
+                        <div id="favorite-foods-list" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-2"></div>
+                    </div>
+                </div>
+
+                <!-- AI Suggestions moved to the bottom -->
+                <div class="content-card lg:col-span-2">
+                    <h3 class="text-2xl font-bold mb-4">AI Meal Suggestions</h3>
+                    <p class="text-gray-400 mb-4 text-sm">Enter ingredients you have, and the AI will suggest a quick, healthy meal.</p>
+                     <div>
+                        <label for="ai-ingredients" class="form-label">Your Ingredients</label>
+                        <textarea id="ai-ingredients" rows="3" class="form-input mt-1" placeholder="e.g., chicken breast, rice, broccoli, olive oil"></textarea>
+                    </div>
+                    <button id="ai-suggestion-btn" class="btn btn-secondary w-full mt-4">
+                        <span class="btn-text">Generate Ideas</span>
+                        <div class="loader hidden"></div>
+                    </button>
+                    <div id="ai-suggestions-output" class="mt-4 space-y-3"></div>
+                </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="food-scanner-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">Scan Food with AI</h2><button id="close-food-scanner-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-gray-800"><img id="image-preview" src="" class="hidden w-full h-full object-contain"><p id="image-placeholder" class="text-gray-400">Upload or take a photo</p></div><div class="grid grid-cols-2 gap-4"><label for="upload-photo-input" class="btn btn-secondary cursor-pointer"><i data-lucide="upload"></i>Upload</label><input type="file" id="upload-photo-input" class="hidden" accept="image/*"><label for="take-picture-input" class="btn btn-secondary cursor-pointer"><i data-lucide="camera"></i>Take Photo</label><input type="file" id="take-picture-input" class="hidden" accept="image/*" capture="environment"></div><div><label for="scanner-food-name" class="form-label">Food Name</label><input type="text" id="scanner-food-name" placeholder="e.g., 'bowl of oatmeal with berries'" class="form-input mt-1" required></div><div><label for="scanner-brand-input" class="form-label">Brand (Optional)</label><input type="text" id="scanner-brand-input" placeholder="e.g., Quaker" class="form-input mt-1"></div><details class="pt-2"><summary class="cursor-pointer text-sm text-gray-400 hover:text-white">Manual Macro Override</summary><div class="space-y-4 mt-4 border-t border-gray-800 pt-4"><div class="grid grid-cols-2 gap-4"><div><label for="scanner-food-grams" class="form-label">Grams (g)</label><input type="number" id="scanner-food-grams" placeholder="e.g., 250" class="form-input mt-1"></div><div><label class="form-label">Calories</label><input type="number" id="scanner-calories" class="form-input mt-1"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Protein (g)</label><input type="number" id="scanner-protein" class="form-input mt-1"></div><div><label class="form-label">Carbs (g)</label><input type="number" id="scanner-carbs" class="form-input mt-1"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Fat (g)</label><input type="number" id="scanner-fat" class="form-input mt-1"></div><div><label class="form-label">Sugar (g)</label><input type="number" id="scanner-sugar" class="form-input mt-1"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Sodium (mg)</label><input type="number" id="scanner-sodium" class="form-input mt-1"></div><div><label class="form-label">Potassium (mg)</label><input type="number" id="scanner-potassium" class="form-input mt-1"></div></div></div></details><button id="ai-get-macros-from-image-btn" class="btn btn-primary w-full"><span class="btn-text">Get Macros & Log</span><div class="loader hidden"></div></button><p id="food-scanner-status" class="text-center text-sm text-gray-400 mt-2 h-5"></p></div></div></div>
+    <div id="confirm-modal" class="modal-backdrop"><div class="modal-content"><h2 id="confirm-modal-title" class="text-xl font-bold mb-4">Are you sure?</h2><p id="confirm-modal-text" class="text-gray-300 mb-6">This action cannot be undone.</p><div class="flex justify-end gap-4"><button id="confirm-modal-cancel-btn" class="btn btn-secondary">Cancel</button><button id="confirm-modal-confirm-btn" class="btn btn-danger">Confirm</button></div></div></div>
+    <div id="alert-modal" class="modal-backdrop"><div class="modal-content"><h2 id="alert-modal-title" class="text-xl font-bold mb-4">Alert</h2><p id="alert-modal-text" class="text-gray-300 mb-6"></p><div class="flex justify-end"><button id="alert-modal-ok-btn" class="btn btn-primary">OK</button></div></div></div>
+    <div id="compound-food-modal" class="modal-backdrop"><div class="modal-content !max-w-3xl"><div class="flex justify-between items-center mb-6"><h2 id="compound-food-modal-title" class="text-2xl font-bold">Create a Recipe</h2><button id="close-compound-food-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="compound-food-form" class="space-y-6"><div><label for="recipe-name-input" class="form-label">Recipe Name</label><input type="text" id="recipe-name-input" class="form-input mt-1" required placeholder="e.g., Turkey Sandwich"></div><div class="border-t border-b border-gray-800 py-4"><h3 class="text-lg font-semibold mb-3">Ingredients</h3><div id="ingredient-list-container" class="space-y-4 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary w-full mt-4"><i data-lucide="plus"></i>Add Ingredient</button></div><div><h3 class="text-lg font-semibold mb-3">Total Macros</h3><div id="recipe-totals" class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center"><div><p class="text-sm text-gray-400">Calories</p><p id="recipe-total-calories" class="font-bold text-xl">0</p></div><div><p class="text-sm text-gray-400">Protein</p><p class="font-bold text-xl"><span id="recipe-total-protein">0</span>g</p></div><div><p class="text-sm text-gray-400">Carbs</p><p class="font-bold text-xl"><span id="recipe-total-carbs">0</span>g</p></div><div><p class="text-sm text-gray-400">Fat</p><p class="font-bold text-xl"><span id="recipe-total-fat">0</span>g</p></div></div><p class="text-center text-sm text-gray-400 mt-2">Total Weight: <span id="recipe-total-grams" class="font-bold">0</span>g</p></div><button type="submit" id="save-recipe-btn" class="btn btn-primary w-full">Save & Log Recipe</button></form></div></div>
+    <div id="prompt-modal" class="modal-backdrop"><div class="modal-content"><h2 id="prompt-modal-title" class="text-xl font-bold mb-4">Input Required</h2><p id="prompt-modal-text" class="text-gray-300 mb-4"></p><input type="number" id="prompt-modal-input" class="form-input mb-6"><div class="flex justify-end gap-4"><button id="prompt-modal-cancel-btn" class="btn btn-secondary">Cancel</button><button id="prompt-modal-ok-btn" class="btn btn-primary">OK</button></div></div></div>
+    <div id="edit-favorite-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">Edit Favorite Food</h2><button id="close-edit-favorite-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="edit-favorite-form" class="space-y-4"><p class="text-sm text-gray-400">All values should be per 100g.</p><div><label for="edit-fav-food-name" class="form-label">Food Name</label><input type="text" id="edit-fav-food-name" class="form-input mt-1" required></div><div class="grid grid-cols-2 gap-4"><div><label for="edit-fav-food-calories" class="form-label">Calories (kcal)</label><input type="number" step="0.1" id="edit-fav-food-calories" class="form-input mt-1" required></div><div><label for="edit-fav-food-protein" class="form-label">Protein (g)</label><input type="number" step="0.1" id="edit-fav-food-protein" class="form-input mt-1" required></div></div><div class="grid grid-cols-2 gap-4"><div><label for="edit-fav-food-carbs" class="form-label">Carbs (g)</label><input type="number" step="0.1" id="edit-fav-food-carbs" class="form-input mt-1" required></div><div><label for="edit-fav-food-fat" class="form-label">Fat (g)</label><input type="number" step="0.1" id="edit-fav-food-fat" class="form-input mt-1" required></div></div><button type="submit" class="btn btn-primary w-full">Update Favorite</button></form></div></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- STATE MANAGEMENT ---
+            let dailyLog = [];
+            let goals = { calories: 2000, protein: 150, carbs: 225, fat: 60, sugar: 50, sodium: 2300, potassium: 3500 };
+            let userProfile = { goal: 'maintain weight' };
+            let favoriteFoods = [];
+            let savedRecipes = [];
+            let editingFoodLogIndex = null;
+            let scannedImageData = null;
+            let editingFavoriteFoodName = null;
+            let editingRecipeIndex = null;
+            let confirmCallback = null;
+            let promptCallback = null;
+            let scanningIngredientRow = null; // Context for recipe scanner
+
+            // --- UI ELEMENT DEFINITIONS ---
+            const ui = {
+                foodNameInput: document.getElementById('food-name-input'),
+                foodBrandInput: document.getElementById('food-brand-input'),
+                foodServingsInput: document.getElementById('food-servings-input'),
+                foodGramsInput: document.getElementById('food-grams-input'),
+                logMealForm: document.getElementById('log-meal-form'),
+                addFoodBtn: document.getElementById('add-food-btn'),
+                addFoodError: document.getElementById('add-food-error'),
+                dailyLogDiv: document.getElementById('daily-log'),
+                aiSuggestionBtn: document.getElementById('ai-suggestion-btn'),
+                aiSuggestionsOutput: document.getElementById('ai-suggestions-output'),
+                aiGetMacrosBtn: document.getElementById('ai-get-macros-btn'),
+                scanFoodBtn: document.getElementById('scan-food-btn'),
+                foodScannerModal: document.getElementById('food-scanner-modal'),
+                closeFoodScannerModalBtn: document.getElementById('close-food-scanner-modal-btn'),
+                uploadPhotoInput: document.getElementById('upload-photo-input'),
+                takePictureInput: document.getElementById('take-picture-input'),
+                imagePreview: document.getElementById('image-preview'),
+                imagePlaceholder: document.getElementById('image-placeholder'),
+                aiGetMacrosFromImageBtn: document.getElementById('ai-get-macros-from-image-btn'),
+                foodScannerStatus: document.getElementById('food-scanner-status'),
+                confirmModal: document.getElementById('confirm-modal'),
+                confirmModalTitle: document.getElementById('confirm-modal-title'),
+                confirmModalText: document.getElementById('confirm-modal-text'),
+                confirmModalCancelBtn: document.getElementById('confirm-modal-cancel-btn'),
+                confirmModalConfirmBtn: document.getElementById('confirm-modal-confirm-btn'),
+                alertModal: document.getElementById('alert-modal'),
+                alertModalTitle: document.getElementById('alert-modal-title'),
+                alertModalText: document.getElementById('alert-modal-text'),
+                alertModalOkBtn: document.getElementById('alert-modal-ok-btn'),
+                createRecipeBtn: document.getElementById('create-recipe-btn'),
+                compoundFoodModal: document.getElementById('compound-food-modal'),
+                closeCompoundFoodModalBtn: document.getElementById('close-compound-food-modal-btn'),
+                compoundFoodForm: document.getElementById('compound-food-form'),
+                recipeNameInput: document.getElementById('recipe-name-input'),
+                ingredientListContainer: document.getElementById('ingredient-list-container'),
+                addIngredientBtn: document.getElementById('add-ingredient-btn'),
+                saveRecipeBtn: document.getElementById('save-recipe-btn'),
+                favoriteFoodsListDiv: document.getElementById('favorite-foods-list'),
+                savedRecipesListDiv: document.getElementById('saved-recipes-list'),
+                promptModal: document.getElementById('prompt-modal'),
+                promptModalTitle: document.getElementById('prompt-modal-title'),
+                promptModalText: document.getElementById('prompt-modal-text'),
+                promptModalInput: document.getElementById('prompt-modal-input'),
+                promptModalCancelBtn: document.getElementById('prompt-modal-cancel-btn'),
+                promptModalOkBtn: document.getElementById('prompt-modal-ok-btn'),
+                editFavoriteModal: document.getElementById('edit-favorite-modal'),
+                closeEditFavoriteModalBtn: document.getElementById('close-edit-favorite-modal-btn'),
+                editFavoriteForm: document.getElementById('edit-favorite-form'),
+                totalServingsDisplay: document.getElementById('total-servings-display'),
+                totalMacrosDisplay: document.getElementById('total-macros-display'),
+                macroInputs: document.querySelectorAll('.macro-input'),
+            };
+
+            // --- CHART.JS SETUP ---
+            const macroCtx = document.getElementById('macro-chart').getContext('2d');
+            let macroChart = new Chart(macroCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Protein', 'Carbs', 'Fat'],
+                    datasets: [{
+                        data: [1, 1, 1],
+                        backgroundColor: ['#3b82f6', '#10b981', '#ef4444'],
+                        borderColor: 'var(--card-bg)',
+                        borderWidth: 5,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // --- CORE & HELPER FUNCTIONS ---
+            const getApiUrl = (model, action = 'generateContent') => {
+                const apiKey = ""; // Leave as-is, will be injected by the environment
+                return `https://generativelanguage.googleapis.com/v1beta/models/${model}:${action}?key=${apiKey}`;
+            };
+            
+            function showModal(modalElement) { modalElement.style.display = 'flex'; }
+            function hideModal(modalElement) { modalElement.style.display = 'none'; }
+            
+            function showCustomAlert(title, text) {
+                ui.alertModalTitle.textContent = title;
+                ui.alertModalText.textContent = text;
+                showModal(ui.alertModal);
+            }
+
+            function showConfirmModal(title, text, onConfirm) {
+                ui.confirmModalTitle.textContent = title;
+                ui.confirmModalText.textContent = text;
+                confirmCallback = onConfirm;
+                showModal(ui.confirmModal);
+            }
+             function showPromptModal(title, text, defaultValue, onConfirm) {
+                ui.promptModalTitle.textContent = title;
+                ui.promptModalText.textContent = text;
+                ui.promptModalInput.value = defaultValue;
+                promptCallback = onConfirm;
+                showModal(ui.promptModal);
+                ui.promptModalInput.focus();
+                ui.promptModalInput.select();
+            }
+
+            function saveData() {
+                localStorage.setItem('fitTrackAI_dailyLog', JSON.stringify(dailyLog));
+                localStorage.setItem('fitTrackAI_userProfile', JSON.stringify(userProfile));
+                localStorage.setItem('fitTrackAI_favoriteFoods', JSON.stringify(favoriteFoods));
+                localStorage.setItem('fitTrackAI_savedRecipes', JSON.stringify(savedRecipes));
+                localStorage.setItem('fitTrackAI_goals', JSON.stringify(goals));
+            }
+
+            function loadData() {
+                dailyLog = JSON.parse(localStorage.getItem('fitTrackAI_dailyLog')) || [];
+                userProfile = JSON.parse(localStorage.getItem('fitTrackAI_userProfile')) || { goal: 'maintain weight' };
+                goals = JSON.parse(localStorage.getItem('fitTrackAI_goals')) || { calories: 2000, protein: 150, carbs: 225, fat: 60, sugar: 50, sodium: 2300, potassium: 3500 };
+                savedRecipes = JSON.parse(localStorage.getItem('fitTrackAI_savedRecipes')) || [];
+                favoriteFoods = JSON.parse(localStorage.getItem('fitTrackAI_favoriteFoods')) || [];
+            }
+
+            function updateSummary() {
+                const totals = dailyLog.reduce((acc, item) => {
+                    acc.calories += item.calories || 0;
+                    acc.protein += item.protein || 0;
+                    acc.carbs += item.carbs || 0;
+                    acc.fat += item.fat || 0;
+                    acc.sugar += item.sugar || 0;
+                    acc.sodium += item.sodium || 0;
+                    acc.potassium += item.potassium || 0;
+                    return acc;
+                }, { calories: 0, protein: 0, carbs: 0, fat: 0, sugar: 0, sodium: 0, potassium: 0 });
+
+                document.getElementById('current-calories').textContent = totals.calories.toFixed(0);
+                document.getElementById('goal-calories').textContent = goals.calories;
+                document.getElementById('current-protein').textContent = totals.protein.toFixed(1);
+                document.getElementById('goal-protein').textContent = goals.protein;
+                document.getElementById('current-carbs').textContent = totals.carbs.toFixed(1);
+                document.getElementById('goal-carbs').textContent = goals.carbs;
+                document.getElementById('current-fat').textContent = totals.fat.toFixed(1);
+                document.getElementById('goal-fat').textContent = goals.fat;
+                document.getElementById('current-sugar').textContent = totals.sugar.toFixed(1);
+                document.getElementById('goal-sugar').textContent = goals.sugar;
+                document.getElementById('current-sodium').textContent = totals.sodium.toFixed(0);
+                document.getElementById('goal-sodium').textContent = goals.sodium;
+                document.getElementById('current-potassium').textContent = totals.potassium.toFixed(0);
+                document.getElementById('goal-potassium').textContent = goals.potassium;
+                
+                const macroSum = totals.protein + totals.carbs + totals.fat;
+                macroChart.data.datasets[0].data = macroSum > 0 ? [totals.protein, totals.carbs, totals.fat] : [1, 1, 1];
+                macroChart.update();
+            }
+
+            function renderDailyLog() {
+                if (dailyLog.length === 0) {
+                    ui.dailyLogDiv.innerHTML = '<p class="text-gray-500">No food logged yet.</p>';
+                    return;
+                }
+                const isFavorite = (itemName) => favoriteFoods.some(fav => fav.name.toLowerCase() === itemName.toLowerCase());
+
+                ui.dailyLogDiv.innerHTML = dailyLog.map((item, index) => `
+                    <div class="flex justify-between items-center bg-black/30 p-3 rounded-lg">
+                        <div>
+                            <p class="font-medium">${item.name} ${item.grams > 0 ? `(${Math.round(item.grams)}g)` : ''}</p>
+                            <p class="text-sm text-gray-400">
+                                ${Math.round(item.calories || 0)}kcal | 
+                                ${item.protein?.toFixed(1) || 0}p | 
+                                ${item.carbs?.toFixed(1) || 0}c | 
+                                ${item.fat?.toFixed(1) || 0}f | 
+                                ${item.sugar?.toFixed(1) || 0}s | 
+                                ${item.sodium?.toFixed(0) || 0}na | 
+                                ${item.potassium?.toFixed(0) || 0}k
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                             <button class="favorite-food-btn p-1 rounded-md transition-colors ${isFavorite(item.name) ? 'text-yellow-400 hover:text-yellow-500' : 'text-gray-500 hover:text-yellow-400'}" data-index="${index}" title="Favorite">
+                                <i data-lucide="star" class="w-5 h-5 pointer-events-none ${isFavorite(item.name) ? 'fill-current' : ''}"></i>
+                            </button>
+                            <button class="edit-food-btn p-1 text-gray-500 hover:text-white rounded-md transition-colors" data-index="${index}" title="Edit"><i data-lucide="pencil" class="w-5 h-5 pointer-events-none"></i></button>
+                            <button class="remove-item-btn p-1 text-gray-500 hover:text-white rounded-md transition-colors" data-index="${index}" title="Delete"><i data-lucide="x" class="w-5 h-5 pointer-events-none"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+            
+             function renderFavoritesList() {
+                if (favoriteFoods.length === 0) {
+                    ui.favoriteFoodsListDiv.innerHTML = '<p class="text-gray-500 text-center">No favorite foods yet.</p>';
+                    return;
+                }
+                ui.favoriteFoodsListDiv.innerHTML = favoriteFoods.map(food => `
+                    <div class="flex justify-between items-center bg-black/30 p-3 rounded-lg">
+                        <p class="font-medium">${food.name}</p>
+                        <div class="flex items-center gap-2">
+                             <button class="log-favorite-btn p-1 text-gray-500 hover:text-white rounded-md transition-colors" data-name="${food.name}" title="Log Favorite">
+                                <i data-lucide="plus-circle" class="w-5 h-5 pointer-events-none"></i>
+                            </button>
+                            <button class="delete-favorite-btn p-1 text-gray-500 hover:text-white rounded-md transition-colors" data-name="${food.name}" title="Delete Favorite">
+                               <i data-lucide="trash-2" class="w-5 h-5 pointer-events-none"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+
+            function renderSavedRecipesList() {
+                if(savedRecipes.length === 0) {
+                    ui.savedRecipesListDiv.innerHTML = '<p class="text-gray-500 text-center">No recipes saved yet.</p>';
+                    return;
+                }
+                ui.savedRecipesListDiv.innerHTML = savedRecipes.map((recipe, index) => `
+                    <div class="bg-black/30 rounded-lg">
+                        <div class="flex justify-between items-center p-3">
+                            <span class="font-medium">${recipe.name}</span>
+                            <div class="flex items-center gap-2">
+                                <button class="log-recipe-btn p-1 text-gray-500 hover:text-white rounded-md transition-colors" data-index="${index}" title="Log Recipe">
+                                   <i data-lucide="plus-circle" class="w-5 h-5 pointer-events-none"></i>
+                                </button>
+                                <button class="delete-recipe-btn p-1 text-gray-500 hover:text-white rounded-md transition-colors" data-index="${index}" title="Delete Recipe">
+                                   <i data-lucide="trash-2" class="w-5 h-5 pointer-events-none"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                 lucide.createIcons();
+            }
+
+            function fullRender() {
+                updateSummary();
+                renderDailyLog();
+                renderFavoritesList(); 
+                renderSavedRecipesList();
+                lucide.createIcons();
+            }
+            
+            async function getMacrosFromAI(foodName, brand, grams = 0) {
+                let prompt = `Calculate the nutritional information for "${foodName}"`;
+                if(brand) prompt += ` from the brand "${brand}"`;
+                if (grams > 0) {
+                    prompt += `. Calculate for ${grams}g.`;
+                } else {
+                    prompt += `. Estimate for a typical single serving and include the estimated grams.`
+                }
+                prompt += ` Include grams, calories, protein, carbs, fat, sugar, sodium, and potassium. Respond with only a valid JSON object.`;
+                
+                const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                grams: { type: "NUMBER"},
+                                calories: { type: "NUMBER" }, protein: { type: "NUMBER" },
+                                carbs: { type: "NUMBER" }, fat: { type: "NUMBER" },
+                                sugar: { type: "NUMBER" }, sodium: { type: "NUMBER" },
+                                potassium: { type: "NUMBER" }
+                            }
+                        }
+                    }
+                };
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                const result = await response.json();
+                if (!result.candidates) throw new Error("Invalid API response.");
+                return JSON.parse(result.candidates[0].content.parts[0].text);
+            }
+            
+            function toggleFavorite(logIndex) {
+                const loggedItem = dailyLog[logIndex];
+                if (!loggedItem) return;
+
+                if (savedRecipes.some(r => r.name.toLowerCase() === loggedItem.name.toLowerCase())) {
+                    showCustomAlert("Action Not Allowed", "Recipes are automatically saved. You can't favorite them separately.");
+                    return;
+                }
+
+                const favIndex = favoriteFoods.findIndex(fav => fav.name.toLowerCase() === loggedItem.name.toLowerCase());
+
+                if (favIndex > -1) {
+                    favoriteFoods.splice(favIndex, 1);
+                } else {
+                    const servings = loggedItem.servings || 1;
+                    const baseGrams = loggedItem.grams / servings;
+                    
+                    if (!baseGrams || baseGrams <= 0) {
+                         showCustomAlert("Cannot Favorite", "Cannot favorite an item with 0 grams to calculate base macros.");
+                         return;
+                    }
+
+                    favoriteFoods.push({
+                        name: loggedItem.name,
+                        grams: baseGrams,
+                        calories: (loggedItem.calories / servings),
+                        protein: (loggedItem.protein / servings),
+                        carbs: (loggedItem.carbs / servings),
+                        fat: (loggedItem.fat / servings),
+                        sugar: (loggedItem.sugar / servings),
+                        sodium: (loggedItem.sodium / servings),
+                        potassium: (loggedItem.potassium / servings),
+                    });
+                }
+                saveData();
+                fullRender();
+            }
+
+
+            // --- EVENT LISTENERS ---
+            ui.addFoodBtn.addEventListener('click', async () => {
+                ui.addFoodError.textContent = '';
+                const foodName = ui.foodNameInput.value.trim();
+                const servings = parseFloat(ui.foodServingsInput.value) || 1;
+                
+                if (!foodName) {
+                    ui.addFoodError.textContent = "Please enter a food name.";
+                    return;
+                }
+
+                const foodItem = {
+                    name: foodName,
+                    servings: servings,
+                    grams: (parseFloat(ui.foodGramsInput.value) || 0) * servings,
+                    calories: (parseFloat(document.getElementById('food-calories-input').value) || 0) * servings,
+                    protein: (parseFloat(document.getElementById('food-protein-input').value) || 0) * servings,
+                    carbs: (parseFloat(document.getElementById('food-carbs-input').value) || 0) * servings,
+                    fat: (parseFloat(document.getElementById('food-fat-input').value) || 0) * servings,
+                    sugar: (parseFloat(document.getElementById('food-sugar-input').value) || 0) * servings,
+                    sodium: (parseFloat(document.getElementById('food-sodium-input').value) || 0) * servings,
+                    potassium: (parseFloat(document.getElementById('food-potassium-input').value) || 0) * servings,
+                };
+                
+                if (foodItem.calories === 0 && editingFoodLogIndex === null) {
+                    ui.addFoodError.textContent = 'Please enter macros or use "Get Macros with AI".';
+                    return;
+                }
+                
+                if (editingFoodLogIndex !== null) {
+                    dailyLog[editingFoodLogIndex] = foodItem;
+                    editingFoodLogIndex = null;
+                    ui.addFoodBtn.querySelector('.btn-text').textContent = 'Add Food';
+                } else {
+                    dailyLog.push(foodItem);
+                }
+
+                ui.logMealForm.reset();
+                ui.foodServingsInput.value = 1;
+                updateTotalMacrosDisplay();
+                saveData();
+                fullRender();
+            });
+            
+            ui.dailyLogDiv.addEventListener('click', (e) => {
+                const removeBtn = e.target.closest('.remove-item-btn');
+                const editBtn = e.target.closest('.edit-food-btn');
+                const favoriteBtn = e.target.closest('.favorite-food-btn');
+
+                if (removeBtn) {
+                    const index = parseInt(removeBtn.dataset.index, 10);
+                    showConfirmModal('Delete Log Entry?', 'Are you sure?', () => {
+                        dailyLog.splice(index, 1);
+                        saveData();
+                        fullRender();
+                    });
+                }
+                if(editBtn) {
+                    const index = parseInt(editBtn.dataset.index);
+                    const item = dailyLog[index];
+                    const servings = item.servings || 1;
+                    editingFoodLogIndex = index;
+
+                    ui.foodNameInput.value = item.name;
+                    ui.foodServingsInput.value = servings; 
+                    ui.foodGramsInput.value = item.grams / servings;
+                    
+                    document.getElementById('food-calories-input').value = item.calories / servings;
+                    document.getElementById('food-protein-input').value = item.protein / servings;
+                    document.getElementById('food-carbs-input').value = item.carbs / servings;
+                    document.getElementById('food-fat-input').value = item.fat / servings;
+                    document.getElementById('food-sugar-input').value = (item.sugar || 0) / servings;
+                    document.getElementById('food-sodium-input').value = (item.sodium || 0) / servings;
+                    document.getElementById('food-potassium-input').value = (item.potassium || 0) / servings;
+                    
+                    ui.addFoodBtn.querySelector('.btn-text').textContent = 'Update Food';
+                    updateTotalMacrosDisplay();
+                    ui.logMealForm.scrollIntoView({ behavior: 'smooth' });
+                }
+                if(favoriteBtn) {
+                    const index = parseInt(favoriteBtn.dataset.index, 10);
+                    toggleFavorite(index);
+                }
+            });
+
+            ui.aiGetMacrosBtn.addEventListener('click', async () => {
+                const foodName = ui.foodNameInput.value.trim();
+                const brand = ui.foodBrandInput.value.trim();
+                 if (!foodName) {
+                    ui.addFoodError.textContent = "Please enter a food name first.";
+                    return;
+                }
+                ui.addFoodError.textContent = "";
+
+                const btn = ui.aiGetMacrosBtn;
+                const btnText = btn.querySelector('.btn-text');
+                const loader = btn.querySelector('.loader');
+
+                btn.disabled = true;
+                btnText.style.display = 'none';
+                loader.classList.remove('hidden');
+
+                try {
+                    const data = await getMacrosFromAI(foodName, brand); // Grams are optional
+                    ui.foodGramsInput.value = data.grams?.toFixed(0) || '';
+                    document.getElementById('food-calories-input').value = data.calories?.toFixed(1) || 0;
+                    document.getElementById('food-protein-input').value = data.protein?.toFixed(1) || 0;
+                    document.getElementById('food-carbs-input').value = data.carbs?.toFixed(1) || 0;
+                    document.getElementById('food-fat-input').value = data.fat?.toFixed(1) || 0;
+                    document.getElementById('food-sugar-input').value = data.sugar?.toFixed(1) || 0;
+                    document.getElementById('food-sodium-input').value = data.sodium?.toFixed(1) || 0;
+                    document.getElementById('food-potassium-input').value = data.potassium?.toFixed(1) || 0;
+                    updateTotalMacrosDisplay();
+                } catch (error) {
+                    console.error("AI Get Macros Error:", error);
+                    ui.addFoodError.textContent = "Could not fetch nutrition data.";
+                } finally {
+                    btn.disabled = false;
+                    btnText.style.display = 'inline';
+                    loader.classList.add('hidden');
+                }
+            });
+
+            ui.aiSuggestionBtn.addEventListener('click', async () => {
+                const btn = ui.aiSuggestionBtn;
+                const btnText = btn.querySelector('.btn-text');
+                const loader = btn.querySelector('.loader');
+                const ingredients = document.getElementById('ai-ingredients').value.trim();
+
+                if (!ingredients) {
+                    ui.aiSuggestionsOutput.innerHTML = `<p class="text-yellow-400">Please enter some ingredients.</p>`;
+                    return;
+                }
+                
+                btn.disabled = true;
+                btnText.style.display = 'none';
+                loader.classList.remove('hidden');
+                ui.aiSuggestionsOutput.innerHTML = '';
+
+                const remainingCalories = Math.max(0, goals.calories - dailyLog.reduce((sum, item) => sum + item.calories, 0));
+
+                const prompt = `I have: ${ingredients}. I have about ${remainingCalories} calories left. My goal is ${userProfile.goal}. Suggest one simple, healthy meal. Provide the name, prep/cook time, and simple step-by-step instructions. Format with Markdown.`;
+                const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
+                
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    });
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                    const result = await response.json();
+                    let text = result.candidates[0].content.parts[0].text;
+                    text = text.replace(/\*\*(.*?)\*\*/g, '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>').replace(/\*/g, '').replace(/(\d+\.)/g, '<br>$1');
+                    ui.aiSuggestionsOutput.innerHTML = `<div class="bg-black/30 p-4 rounded-lg text-sm">${text}</div>`;
+                } catch (error) {
+                    console.error("AI Suggestion Error:", error);
+                    ui.aiSuggestionsOutput.innerHTML = `<p class="text-red-400">Could not get a suggestion.</p>`;
+                } finally {
+                    btn.disabled = false;
+                    btnText.style.display = 'inline';
+                    loader.classList.add('hidden');
+                }
+            });
+
+            function handleImageSelection(file) {
+                if (file) {
+                    scannedImageData = file;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        ui.imagePreview.src = e.target.result;
+                        ui.imagePreview.classList.remove('hidden');
+                        ui.imagePlaceholder.classList.add('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+             function fileToGenerativePart(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const base64Data = reader.result.split(',')[1];
+                        resolve({
+                            inlineData: {
+                                mimeType: file.type,
+                                data: base64Data
+                            }
+                        });
+                    };
+                    reader.onerror = (err) => reject(err);
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            ui.scanFoodBtn.addEventListener('click', () => showModal(ui.foodScannerModal));
+            ui.closeFoodScannerModalBtn.addEventListener('click', () => hideModal(ui.foodScannerModal));
+            ui.uploadPhotoInput.addEventListener('change', (e) => handleImageSelection(e.target.files[0]));
+            ui.takePictureInput.addEventListener('change', (e) => handleImageSelection(e.target.files[0]));
+            
+             ui.aiGetMacrosFromImageBtn.addEventListener('click', async () => {
+                const foodName = document.getElementById('scanner-food-name').value.trim();
+                const foodGrams = document.getElementById('scanner-food-grams').value.trim();
+                const brand = document.getElementById('scanner-brand-input').value.trim();
+                const manualCalories = document.getElementById('scanner-calories').value;
+
+                if (!scannedImageData && !manualCalories) {
+                    ui.foodScannerStatus.textContent = 'Please provide an image or manual macros.';
+                    return;
+                }
+                 if (scannedImageData && !foodName) {
+                    ui.foodScannerStatus.textContent = 'Please provide a food name for the image.';
+                    return;
+                }
+                const btn = ui.aiGetMacrosFromImageBtn;
+                btn.disabled = true;
+                btn.querySelector('.loader').classList.remove('hidden');
+                btn.querySelector('.btn-text').style.display = 'none';
+                ui.foodScannerStatus.textContent = 'Processing...';
+                
+                try {
+                    let data = {};
+                    if(manualCalories) {
+                        data.calories = parseFloat(manualCalories);
+                        data.protein = parseFloat(document.getElementById('scanner-protein').value) || 0;
+                        data.carbs = parseFloat(document.getElementById('scanner-carbs').value) || 0;
+                        data.fat = parseFloat(document.getElementById('scanner-fat').value) || 0;
+                        data.sugar = parseFloat(document.getElementById('scanner-sugar').value) || 0;
+                        data.sodium = parseFloat(document.getElementById('scanner-sodium').value) || 0;
+                        data.potassium = parseFloat(document.getElementById('scanner-potassium').value) || 0;
+                        data.grams = parseFloat(document.getElementById('scanner-food-grams').value) || 0;
+                    } else {
+                        const imagePart = await fileToGenerativePart(scannedImageData);
+                        let prompt = `Analyze the food in the image, identified as "${foodName}". `;
+                        if(brand) prompt += ` from the brand "${brand}"`;
+                        if (foodGrams) prompt += `The portion is ${foodGrams}g. `;
+                        else prompt += `Estimate the grams. `;
+                        prompt += `Respond ONLY with a JSON object with: grams, calories, protein, carbs, fat, sugar, sodium, potassium.`;
+
+                        const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
+                        const payload = {
+                            contents: [{ parts: [{ text: prompt }, imagePart] }],
+                            generationConfig: { responseMimeType: "application/json" }
+                        };
+
+                        const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                        if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                        const result = await response.json();
+                        if (!result.candidates?.[0].content.parts[0].text) throw new Error("Invalid API response.");
+                        data = JSON.parse(result.candidates[0].content.parts[0].text);
+                    }
+                    
+                    ui.foodNameInput.value = foodName;
+                    ui.foodGramsInput.value = data.grams?.toFixed(0) || '';
+                    ui.foodServingsInput.value = 1;
+                    document.getElementById('food-calories-input').value = data.calories?.toFixed(1) || 0;
+                    document.getElementById('food-protein-input').value = data.protein?.toFixed(1) || 0;
+                    document.getElementById('food-carbs-input').value = data.carbs?.toFixed(1) || 0;
+                    document.getElementById('food-fat-input').value = data.fat?.toFixed(1) || 0;
+                    document.getElementById('food-sugar-input').value = data.sugar?.toFixed(1) || 0;
+                    document.getElementById('food-sodium-input').value = data.sodium?.toFixed(1) || 0;
+                    document.getElementById('food-potassium-input').value = data.potassium?.toFixed(1) || 0;
+                    
+                    updateTotalMacrosDisplay();
+                    hideModal(ui.foodScannerModal);
+                    showCustomAlert('Success', 'Macros populated from image!');
+
+                } catch (error) {
+                    console.error("AI Image Scan Error:", error);
+                    ui.foodScannerStatus.textContent = 'Error analyzing image.';
+                } finally {
+                    btn.disabled = false;
+                    btn.querySelector('.loader').classList.add('hidden');
+                    btn.querySelector('.btn-text').style.display = 'inline';
+                }
+            });
+            
+            ui.createRecipeBtn.addEventListener('click', () => {
+                editingRecipeIndex = null;
+                ui.compoundFoodModal.querySelector('h2').textContent = "Create a Recipe";
+                ui.saveRecipeBtn.textContent = "Save & Log Recipe";
+                ui.compoundFoodForm.reset();
+                ui.ingredientListContainer.innerHTML = '';
+                addIngredientRow(); 
+                addIngredientRow();
+                updateRecipeTotals();
+                showModal(ui.compoundFoodModal);
+            });
+            
+            ui.addIngredientBtn.addEventListener('click', () => addIngredientRow());
+            
+            function addIngredientRow(ingredient = null) {
+                const div = document.createElement('div');
+                div.className = 'ingredient-row space-y-2 border-t border-gray-700 pt-3 mt-3';
+                div.innerHTML = `
+                    <div class="grid grid-cols-12 gap-2 items-center">
+                        <input type="text" list="favorite-foods-datalist" placeholder="Ingredient Name" class="form-input col-span-12 sm:col-span-6 ingredient-name" value="${ingredient ? ingredient.name : ''}">
+                        <input type="number" placeholder="grams" class="form-input col-span-6 sm:col-span-3 ingredient-grams" value="${ingredient ? ingredient.grams : ''}">
+                        <div class="col-span-6 sm:col-span-3 flex justify-end gap-2">
+                            <button type="button" class="recipe-ai-btn btn btn-secondary !p-2" title="Get Macros with AI"><i data-lucide="sparkles" class="w-4 h-4 pointer-events-none"></i></button>
+                            <button type="button" class="remove-ingredient-btn btn btn-secondary !p-2" title="Remove Ingredient"><i data-lucide="x" class="w-4 h-4 pointer-events-none"></i></button>
+                        </div>
+                    </div>
+                     <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <input type="number" step="0.1" placeholder="kcal" class="form-input ingredient-calories" value="${ingredient ? ingredient.calories : ''}">
+                        <input type="number" step="0.1" placeholder="protein" class="form-input ingredient-protein" value="${ingredient ? ingredient.protein : ''}">
+                        <input type="number" step="0.1" placeholder="carbs" class="form-input ingredient-carbs" value="${ingredient ? ingredient.carbs : ''}">
+                        <input type="number" step="0.1" placeholder="fat" class="form-input ingredient-fat" value="${ingredient ? ingredient.fat : ''}">
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                         <input type="number" step="0.1" placeholder="sugar" class="form-input ingredient-sugar" value="${ingredient ? ingredient.sugar : ''}">
+                         <input type="number" step="0.1" placeholder="sodium" class="form-input ingredient-sodium" value="${ingredient ? ingredient.sodium : ''}">
+                         <input type="number" step="0.1" placeholder="potassium" class="form-input ingredient-potassium" value="${ingredient ? ingredient.potassium : ''}">
+                    </div>
+                `;
+                ui.ingredientListContainer.appendChild(div);
+                lucide.createIcons();
+            }
+
+            function updateRecipeTotals() {
+                let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0, totalGrams = 0;
+                document.querySelectorAll('.ingredient-row').forEach(row => {
+                    const grams = parseFloat(row.querySelector('.ingredient-grams').value) || 0;
+                    if (grams > 0) {
+                        totalGrams += grams;
+                        totalCalories += parseFloat(row.querySelector('.ingredient-calories').value) || 0;
+                        totalProtein += parseFloat(row.querySelector('.ingredient-protein').value) || 0;
+                        totalCarbs += parseFloat(row.querySelector('.ingredient-carbs').value) || 0;
+                        totalFat += parseFloat(row.querySelector('.ingredient-fat').value) || 0;
+                    }
+                });
+                document.getElementById('recipe-total-calories').textContent = totalCalories.toFixed(0);
+                document.getElementById('recipe-total-protein').textContent = totalProtein.toFixed(1);
+                document.getElementById('recipe-total-carbs').textContent = totalCarbs.toFixed(1);
+                document.getElementById('recipe-total-fat').textContent = totalFat.toFixed(1);
+                document.getElementById('recipe-total-grams').textContent = totalGrams.toFixed(1);
+            }
+            
+            ui.ingredientListContainer.addEventListener('input', updateRecipeTotals);
+            ui.ingredientListContainer.addEventListener('click', async (e) => {
+                const aiBtn = e.target.closest('.recipe-ai-btn');
+                const removeBtn = e.target.closest('.remove-ingredient-btn');
+
+                if (removeBtn) {
+                    removeBtn.closest('.ingredient-row').remove();
+                    updateRecipeTotals();
+                }
+
+                if (aiBtn) {
+                    const row = aiBtn.closest('.ingredient-row');
+                    const nameInput = row.querySelector('.ingredient-name');
+                    const gramsInput = row.querySelector('.ingredient-grams');
+                    const foodName = nameInput.value.trim();
+                    
+                    if (!foodName) {
+                        showCustomAlert('Missing Info', 'Please enter an ingredient name.');
+                        return;
+                    }
+                    
+                    aiBtn.disabled = true;
+                    aiBtn.innerHTML = '<div class="loader w-4 h-4"></div>';
+
+                    try {
+                        const data = await getMacrosFromAI(foodName); // Grams are optional
+                        gramsInput.value = data.grams?.toFixed(0) || '';
+                        row.querySelector('.ingredient-calories').value = data.calories?.toFixed(1) || '';
+                        row.querySelector('.ingredient-protein').value = data.protein?.toFixed(1) || '';
+                        row.querySelector('.ingredient-carbs').value = data.carbs?.toFixed(1) || '';
+                        row.querySelector('.ingredient-fat').value = data.fat?.toFixed(1) || '';
+                        row.querySelector('.ingredient-sugar').value = data.sugar?.toFixed(1) || '';
+                        row.querySelector('.ingredient-sodium').value = data.sodium?.toFixed(1) || '';
+                        row.querySelector('.ingredient-potassium').value = data.potassium?.toFixed(1) || '';
+                        updateRecipeTotals();
+                    } catch (error) {
+                        showCustomAlert('AI Error', `Could not fetch data for ${foodName}.`);
+                    } finally {
+                        aiBtn.disabled = false;
+                        aiBtn.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4 pointer-events-none"></i>';
+                        lucide.createIcons();
+                    }
+                }
+            });
+            
+            ui.compoundFoodForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = ui.recipeNameInput.value.trim();
+                if(!name) {
+                    showCustomAlert('Missing Name', 'Please give your recipe a name.');
+                    return;
+                }
+                
+                const ingredients = [];
+                 let totalGrams = 0, totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0, totalSugar = 0, totalSodium = 0, totalPotassium = 0;
+                
+                document.querySelectorAll('.ingredient-row').forEach(row => {
+                    const ingName = row.querySelector('.ingredient-name').value.trim();
+                    const ingGrams = parseFloat(row.querySelector('.ingredient-grams').value) || 0;
+                    if(ingName && ingGrams > 0) {
+                        const ing = {
+                            name: ingName,
+                            grams: ingGrams,
+                            calories: parseFloat(row.querySelector('.ingredient-calories').value) || 0,
+                            protein: parseFloat(row.querySelector('.ingredient-protein').value) || 0,
+                            carbs: parseFloat(row.querySelector('.ingredient-carbs').value) || 0,
+                            fat: parseFloat(row.querySelector('.ingredient-fat').value) || 0,
+                            sugar: parseFloat(row.querySelector('.ingredient-sugar').value) || 0,
+                            sodium: parseFloat(row.querySelector('.ingredient-sodium').value) || 0,
+                            potassium: parseFloat(row.querySelector('.ingredient-potassium').value) || 0,
+                        };
+                        ingredients.push(ing);
+                        totalGrams += ing.grams;
+                        totalCalories += ing.calories;
+                        totalProtein += ing.protein;
+                        totalCarbs += ing.carbs;
+                        totalFat += ing.fat;
+                        totalSugar += ing.sugar;
+                        totalSodium += ing.sodium;
+                        totalPotassium += ing.potassium;
+                    }
+                });
+                
+                if(ingredients.length === 0) {
+                    showCustomAlert('No Ingredients', 'Add at least one ingredient to the recipe.');
+                    return;
+                }
+                
+                const newRecipe = {
+                    name, ingredients, totalGrams,
+                    calories: totalCalories, protein: totalProtein, carbs: totalCarbs, fat: totalFat,
+                    sugar: totalSugar, sodium: totalSodium, potassium: totalPotassium
+                };
+
+                savedRecipes.push(newRecipe);
+
+                const logEntry = { ...newRecipe, servings: 1, grams: totalGrams };
+                dailyLog.push(logEntry);
+
+                saveData();
+                fullRender();
+                hideModal(ui.compoundFoodModal);
+                showCustomAlert('Success', `Recipe "${name}" has been saved and logged.`);
+            });
+
+
+            function updateTotalMacrosDisplay() {
+                const servings = parseFloat(ui.foodServingsInput.value) || 1;
+                const calories = (parseFloat(document.getElementById('food-calories-input').value) || 0) * servings;
+                const protein = (parseFloat(document.getElementById('food-protein-input').value) || 0) * servings;
+                const carbs = (parseFloat(document.getElementById('food-carbs-input').value) || 0) * servings;
+                const fat = (parseFloat(document.getElementById('food-fat-input').value) || 0) * servings;
+                const sugar = (parseFloat(document.getElementById('food-sugar-input').value) || 0) * servings;
+                const sodium = (parseFloat(document.getElementById('food-sodium-input').value) || 0) * servings;
+                const potassium = (parseFloat(document.getElementById('food-potassium-input').value) || 0) * servings;
+
+                
+                ui.totalServingsDisplay.textContent = servings;
+                ui.totalMacrosDisplay.textContent = `${calories.toFixed(0)}kcal | ${protein.toFixed(1)}p | ${carbs.toFixed(1)}c | ${fat.toFixed(1)}f | ${sugar.toFixed(1)}s | ${sodium.toFixed(0)}na | ${potassium.toFixed(0)}k`;
+            }
+
+            ui.foodServingsInput.addEventListener('input', updateTotalMacrosDisplay);
+            ui.macroInputs.forEach(input => input.addEventListener('input', updateTotalMacrosDisplay));
+
+
+            // OTHER MODAL LISTENERS
+            ui.closeCompoundFoodModalBtn.addEventListener('click', () => hideModal(ui.compoundFoodModal));
+            ui.alertModalOkBtn.addEventListener('click', () => hideModal(ui.alertModal));
+            ui.confirmModalCancelBtn.addEventListener('click', () => hideModal(ui.confirmModal));
+            ui.confirmModalConfirmBtn.addEventListener('click', () => {
+                if (confirmCallback) confirmCallback();
+                hideModal(ui.confirmModal);
+            });
+             ui.promptModalCancelBtn.addEventListener('click', () => hideModal(ui.promptModal));
+            ui.promptModalOkBtn.addEventListener('click', () => {
+                if(promptCallback) promptCallback(ui.promptModalInput.value);
+                hideModal(ui.promptModal);
+            });
+
+
+            // --- INITIALIZATION ---
+            loadData();
+            fullRender();
+            updateTotalMacrosDisplay();
+        });
+    </script>
+</body>
+</html>

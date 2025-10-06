@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack AI | Workouts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --background: #000000;
+            --primary-text: #eaeaea;
+            --secondary-text: #888888;
+            --card-bg: #111111;
+            --input-bg: #191919;
+            --border-color: #222222;
+            --accent: #FFFFFF;
+            --accent-hover: #DDDDDD;
+            --danger: #E53E3E;
+            --success: #22c55e;
+            --warning: #f59e0b;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--primary-text);
+            font-family: 'Manrope', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+            border-bottom: 2px solid transparent;
+            color: var(--secondary-text);
+            padding-bottom: 4px;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-text);
+        }
+
+        .nav-link.active {
+            color: var(--primary-text);
+            border-bottom-color: var(--primary-text);
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+        }
+
+        .form-input {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--primary-text);
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+
+        .form-label {
+            color: var(--secondary-text);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .btn {
+            border-radius: 0.5rem;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transform: translateY(0);
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: var(--background);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--primary-text);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: var(--border-color);
+            border-color: var(--accent);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--primary-text);
+        }
+        
+        .btn-danger:hover:not(:disabled) {
+             background-color: #C53030;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-content {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .loader {
+            border: 2px solid #333;
+            border-top: 2px solid var(--accent);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: var(--input-bg); border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #666; }
+        
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+
+        .workout-status-select {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            font-size: 0.8rem;
+        }
+
+        .status-completed { border-left: 4px solid var(--success); }
+        .status-partial { border-left: 4px solid var(--warning); }
+        .status-missed { border-left: 4px solid var(--danger); }
+
+        .chart-container {
+            transition: all 0.5s ease-in-out;
+            overflow: hidden;
+        }
+        .chart-container.collapsed {
+            max-height: 200px;
+        }
+        .chart-container.expanded {
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto max-w-7xl px-4 py-8">
+
+        <!-- Header -->
+        <header class="flex flex-col sm:flex-row items-center justify-between mb-16 pb-4 border-b border-gray-900">
+            <a href="index.html" class="flex items-center gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
+                <h1 class="text-2xl font-bold">FitTrack AI</h1>
+            </a>
+            <nav class="mt-4 sm:mt-0">
+                <ul class="flex items-center space-x-4 sm:space-x-6 text-base font-medium">
+                    <li><a href="index.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="nutrition.html" class="nav-link">Nutrition</a></li>
+                    <li><a href="workouts.html" class="nav-link active">Workouts</a></li>
+                    <li><a href="goals.html" class="nav-link">Goals</a></li>
+                    <li><a href="sleep.html" class="nav-link">Sleep</a></li>
+                    <li><a href="settings.html" class="nav-link">Settings</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="space-y-12">
+            <div class="text-left max-w-2xl">
+                <h2 class="text-4xl md:text-5xl font-bold mb-3">Workout Hub</h2>
+                <p class="text-lg text-gray-400">Manage your weekly schedule, track your progress, and get insights from the AI Coach.</p>
+            </div>
+            
+            <div class="content-card">
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                    <h3 class="text-2xl font-bold text-center sm:text-left">This Week's Schedule</h3>
+                    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                         <button id="manage-warmups-btn" class="btn btn-secondary justify-center w-full">
+                           <i data-lucide="flame" class="w-4 h-4"></i>
+                           Manage Warm-ups
+                        </button>
+                        <button id="add-exercise-btn" class="btn btn-secondary justify-center w-full">
+                           <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                           Add Exercise
+                        </button>
+                    </div>
+                </div>
+                 <div class="relative">
+                    <div id="carousel-viewport" class="overflow-hidden rounded-lg">
+                        <div id="workout-planner" class="flex transition-transform duration-300 ease-in-out">
+                            <!-- Planner will be injected here by JS -->
+                        </div>
+                    </div>
+                    <button id="carousel-prev-btn" class="absolute top-1/2 left-2 -translate-y-1/2 bg-black/50 hover:bg-black/80 p-2 rounded-full z-10">
+                        <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                    </button>
+                    <button id="carousel-next-btn" class="absolute top-1/2 right-2 -translate-y-1/2 bg-black/50 hover:bg-black/80 p-2 rounded-full z-10">
+                        <i data-lucide="chevron-right" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3 class="text-2xl font-bold mb-6 text-center">AI Coach & History</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="content-card bg-black/20">
+                        <div class="flex justify-between items-center mb-6">
+                           <h3 class="text-2xl font-bold">Workout History</h3>
+                           <button id="clear-history-btn" class="btn btn-danger !py-1 !px-3 text-sm">Clear History</button>
+                        </div>
+                        <div id="workout-history" class="space-y-4 max-h-[22.5rem] overflow-y-auto custom-scrollbar pr-2"></div>
+                    </div>
+                    <div class="content-card bg-black/20">
+                         <h4 class="font-bold text-lg mb-4">Progression Advice</h4>
+                         <p class="text-gray-400 text-sm mb-3">Select an exercise to get science-based advice on when to add weight or reps.</p>
+                         <div class="flex gap-2">
+                            <select id="ai-advice-exercise-select" class="form-input w-full">
+                                <option value="">Select an exercise...</option>
+                            </select>
+                            <button id="get-ai-advice-btn" class="btn btn-primary">
+                                <span class="btn-text">Get Advice</span>
+                                 <div class="loader hidden"></div>
+                            </button>
+                         </div>
+                         <div id="ai-advice-output" class="mt-4 p-3 bg-black/30 rounded-md text-sm"></div>
+                    </div>
+                </div>
+                <div id="chart-container" class="mt-8 pt-8 border-t border-gray-800 chart-container collapsed">
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold mb-4 sm:mb-0">Progression Chart</h3>
+                        <div class="flex items-center gap-4 w-full sm:w-auto">
+                            <select id="progress-exercise-select" class="form-input w-full">
+                                <option value="">Select an exercise</option>
+                            </select>
+                            <button id="expand-chart-btn" class="btn btn-secondary !p-2" title="Toggle Chart Size">
+                                <i data-lucide="maximize" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="w-full h-full flex items-center justify-center">
+                        <canvas id="progress-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="workout-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="modal-title" class="text-2xl font-bold">Log Exercise</h2><button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="workout-log-form"><div class="space-y-4"><div id="sets-container"></div><button type="button" id="add-set-btn" class="btn btn-secondary w-full">Add Set</button><button type="submit" id="save-workout-btn" class="btn btn-primary w-full mt-2">Save Workout</button></div></form></div></div>
+    <div id="exercise-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="exercise-modal-title" class="text-2xl font-bold">Add Exercise</h2><button id="close-exercise-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="exercise-form" class="space-y-4"><div><label for="exercise-name" class="form-label">Exercise Name</label><input type="text" id="exercise-name" class="form-input mt-1" required></div><div><label for="exercise-group" class="form-label">Muscle Group</label><select id="exercise-group" class="form-input mt-1"></select></div><div><label for="exercise-type" class="form-label">Equipment Type</label><select id="exercise-type" class="form-input mt-1"><option>Barbell</option><option>Dumbbell</option><option>Machine</option><option>Bodyweight</option><option>Other</option></select></div><button type="submit" id="save-exercise-btn" class="btn btn-primary w-full">Save Exercise</button></form></div></div>
+    <div id="confirm-modal" class="modal-backdrop"><div class="modal-content"><h2 id="confirm-modal-title" class="text-xl font-bold mb-4">Are you sure?</h2><p id="confirm-modal-text" class="text-gray-300 mb-6">This action cannot be undone.</p><div class="flex justify-end gap-4"><button id="confirm-modal-cancel-btn" class="btn btn-secondary">Cancel</button><button id="confirm-modal-confirm-btn" class="btn btn-danger">Confirm</button></div></div></div>
+    <div id="alert-modal" class="modal-backdrop"><div class="modal-content"><h2 id="alert-modal-title" class="text-xl font-bold mb-4">Alert</h2><p id="alert-modal-text" class="text-gray-300 mb-6"></p><div class="flex justify-end"><button id="alert-modal-ok-btn" class="btn btn-primary">OK</button></div></div></div>
+    <div id="exercise-detail-modal" class="modal-backdrop"><div class="modal-content !max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 id="exercise-detail-title" class="text-2xl font-bold">Exercise Details</h2><button id="close-exercise-detail-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><img id="exercise-detail-video" src="" alt="Video placeholder" class="w-full rounded-lg mb-4 bg-gray-700 aspect-video object-cover"><div><h3 class="font-bold text-lg mb-2">Instructions</h3><ul id="exercise-detail-instructions" class="list-disc list-inside space-y-1 text-gray-300"></ul></div><div><h3 class="font-bold text-lg mb-2">Rep Range</h3><p id="exercise-detail-rep-range" class="text-gray-300"></p></div><div><h3 class="font-bold text-lg mb-2">Personal Notes & Advice</h3><textarea id="exercise-detail-notes" rows="4" class="form-input mt-1" placeholder="Add your personal cues, weight progression goals, etc."></textarea><button id="save-exercise-notes-btn" class="mt-2 btn btn-secondary w-full">Save Notes</button></div><button id="log-from-detail-btn" class="btn btn-primary w-full mt-4">Log This Exercise</button></div></div></div>
+    <div id="warmup-manage-modal" class="modal-backdrop"><div class="modal-content !max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Manage Warm-ups</h2><button id="close-warmup-manage-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div><label for="warmup-day-select" class="form-label">Workout Day</label><select id="warmup-day-select" class="form-input mt-1"><option value="Push">Push</option><option value="Pull">Pull</option><option value="Legs">Legs</option></select></div><div id="warmup-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div><hr class="border-gray-800"><form id="warmup-form" class="space-y-3"><h3 id="warmup-form-title" class="font-bold text-lg">Add New Warm-up</h3><div><label for="warmup-name" class="form-label">Name</label><input type="text" id="warmup-name" class="form-input mt-1" required></div><div><label for="warmup-instructions" class="form-label">Instructions (one per line)</label><textarea id="warmup-instructions" rows="4" class="form-input mt-1"></textarea></div><button type="submit" id="save-warmup-btn" class="btn btn-primary w-full">Add Warm-up</button></form></div></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+             // --- STATE MANAGEMENT ---
+            let workoutHistory = [];
+            let exerciseDB = [];
+            let warmups = {};
+            let currentlyLoggingExercise = null;
+            let editingWorkoutLogIndex = null;
+            let editingExerciseName = null;
+            let editingWarmupIndex = null;
+            let confirmCallback = null;
+            let workoutStatuses = {}; // { '2024-10-06': 'completed' }
+            let exerciseCompletion = {}; // { '2024-10-06': { 'Squats': true } }
+            
+            // --- DATABASES ---
+             const defaultWarmups = {
+                "Push": [
+                    { name: "Arm Circles", instructions: ["Stand with feet shoulder-width apart.", "Extend your arms to the sides.", "Make small circles, gradually increasing to large circles.", "Perform for 30 seconds forward, then 30 seconds backward."], repRange: "1 minute total", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Warm-up" },
+                    { name: "Torso Twists", instructions: ["Stand with feet slightly wider than shoulder-width, knees slightly bent.", "Hold your arms out or cross them over your chest.", "Gently twist your torso from side to side.", "Perform for 30-60 seconds."], repRange: "1 minute total", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Warm-up" },
+                    { name: "Dynamic Chest Stretches", instructions: ["Stand tall.", "Swing both arms outwards and backwards, feeling a stretch in your chest.", "Return arms to the front, crossing them over each other.", "Repeat for 10-15 repetitions."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Warm-up" }
+                ],
+                "Pull": [
+                    { name: "Cat-Cow", instructions: ["Start on your hands and knees.", "Inhale as you drop your belly towards the mat (Cow).", "Exhale as you round your spine upwards (Cat).", "Repeat for 10-15 repetitions."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Warm-up" },
+                    { name: "Scapular Pull-ups", instructions: ["Hang from a pull-up bar with an overhand grip.", "Without bending your arms, pull your shoulder blades down and together.", "Hold for a second, then relax.", "Repeat for 8-12 repetitions."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Warm-up" },
+                    { name: "Band Pull-Aparts", instructions: ["Hold a light resistance band with both hands, shoulder-width apart.", "Keeping your arms straight, pull the band apart by squeezing your shoulder blades.", "Return to the start with control.", "Repeat for 15-20 repetitions."], repRange: "15-20 reps", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Warm-up" }
+                ],
+                "Legs": [
+                    { name: "Front-to-back Leg Swings", instructions: ["Hold onto a stable surface for balance.", "Swing one leg forward and backward in a controlled motion.", "Keep your core engaged and torso upright.", "Perform 10-15 swings per leg."], repRange: "10-15 reps per leg", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Warm-up" },
+                    { name: "Side-to-side Leg Swings", instructions: ["Face a stable surface and hold on for balance.", "Swing one leg out to the side, then across the front of your body.", "Keep the movement controlled.", "Perform 10-15 swings per leg."], repRange: "10-15 reps per leg", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Warm-up" },
+                    { name: "Side Lying Twists", instructions: ["Lie on your side with your knees bent at 90 degrees.", "Extend your top arm and rotate your torso, trying to touch your top shoulder blade to the floor.", "Follow your hand with your eyes.", "Perform 8-10 twists per side."], repRange: "8-10 reps per side", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Warm-up" },
+                    { name: "Step Throughs", instructions: ["Start in a push-up position.", "Bring your right foot forward and place it outside your right hand, sinking your hips.", "Hold for a moment, then step back to the start.", "Repeat with the left leg.", "Alternate for 5-8 repetitions per side."], repRange: "5-8 reps per side", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Warm-up" }
+                ]
+            };
+            
+            let defaultExerciseDB = [
+                // Leg Day
+                { name: "Seated leg curl", group: "Hamstrings", type: "Machine", instructions: ["Sit in the machine with your back against the pad and the ankle pad just above your heels.", "Adjust the lap pad to fit snugly on your thighs.", "Curl your legs down as far as possible, squeezing your hamstrings.", "Slowly return to the starting position."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration", notes: "" },
+                { name: "Straight Calf extension", group: "Calves", type: "Machine", instructions: ["Use a standing or seated calf raise machine.", "Place the balls of your feet on the platform, with your heels hanging off.", "Press through the balls of your feet to raise your heels as high as possible.", "Hold the peak contraction, then slowly lower your heels below the platform level."], repRange: "10-20 reps", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration", notes: "" },
+                { name: "Barbell Squats", group: "Abductors", type: "Barbell", instructions: ["Set a barbell in a squat rack at shoulder height.", "Step under the bar and rest it across your upper back.", "Lift the bar off the rack, take a step back, and stand with feet shoulder-width apart.", "Keeping your chest up and back straight, lower your hips as if sitting in a chair.", "Go as deep as you comfortably can, ideally until your thighs are parallel to the floor.", "Push through your heels to return to the starting position."], repRange: "6-12 reps", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration", notes: "" },
+                { name: "Smith Machine squats", group: "Abductors", type: "Machine", instructions: ["Set the bar on the Smith machine to shoulder height.", "Position yourself under the bar with feet shoulder-width apart.", "Un-rack the bar and lower down by bending your knees and hips.", "Keep your back straight and chest up.", "Push through your heels to return to the start."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration", notes: "" },
+                { name: "Romanian Deadlift", group: "Glutes", type: "Barbell", instructions: ["Hold a barbell with an overhand grip, hands just outside your thighs.", "Stand tall with a slight bend in your knees.", "Hinge at your hips, pushing your butt back while keeping your back straight.", "Lower the bar down your shins until you feel a deep stretch in your hamstrings.", "Squeeze your glutes to return to the starting position."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration", notes: "" },
+                { name: "Hip thrusts", group: "Glutes", type: "Barbell", instructions: ["Sit on the floor with your upper back against a bench.", "Roll a barbell over your legs and position it in the crease of your hips.", "Place your feet flat on the floor, shoulder-width apart.", "Drive through your heels to lift your hips until your body forms a straight line from shoulders to knees.", "Squeeze your glutes at the top, then lower your hips back down."], repRange: "8-15 reps", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration", notes: "" },
+                { name: "Leg Extension", group: "Quads", type: "Machine", instructions: ["Sit in the leg extension machine with your legs under the pad.", "Align your knees with the machine's pivot point.", "Extend your legs to lift the weight until they are straight.", "Squeeze your quads at the top.", "Slowly lower the weight back to the starting position."], repRange: "12-20 reps", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration", notes: "" },
+                { name: "Cable Crunch", group: "Abs", type: "Machine", instructions: ["Kneel below a high pulley with a rope attachment.", "Grab the rope and pull it down until your hands are placed on either side of your head.", "Flex your hips slightly and allow the weight to hyperextend your lower back.", "Keeping your hips stationary, flex your waist as you contract your abs so that your elbows travel towards the middle of your thighs.", "Hold the contraction for a second and then slowly return to the starting position."], repRange: "10-20 reps", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration", notes: "" },
+                { name: "Bent Knee Raises", group: "Abs", type: "Bodyweight", instructions: ["Lie flat on your back on a mat with your legs straight.", "Place your hands under your lower back for support.", "Bend your knees and pull your upper thighs into your midsection.", "Hold the contraction for a second and then slowly lower your legs back to the starting position."], repRange: "15-25 reps", videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration", notes: "" },
+
+                // Push Day
+                { 
+                    name: "High-to-low crossover", group: "Chest", type: "Machine", 
+                    instructions: [
+                        "Set pulleys to the highest position.",
+                        "Grab handles with palms facing down, step forward to create tension.",
+                        "With a slight bend in your elbows, pull handles down and across your body until they meet in front of your lower chest.",
+                        "Squeeze your chest muscles at the peak contraction.",
+                        "Slowly return to the starting position."
+                    ],
+                    repRange: "10-15 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                },
+                { 
+                    name: "Dumbbell Press", group: "Chest", type: "Dumbbell",
+                    instructions: [
+                        "Lie on a flat bench with a dumbbell in each hand, resting on your thighs.",
+                        "Use your thighs to help push the dumbbells up one at a time so you can hold them at shoulder-width.",
+                        "Rotate your wrists so your palms are facing away from you.",
+                        "Press the dumbbells up until your arms are fully extended, but not locked at the elbow.",
+                        "Slowly lower the dumbbells back to the starting position."
+                    ],
+                    repRange: "6-12 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                },
+                { 
+                    name: "Machine Chest Press", group: "Chest", type: "Machine",
+                    instructions: [
+                        "Sit on the machine with your back flat against the pad.",
+                        "Adjust the seat height so the handles are level with your mid-chest.",
+                        "Grab the handles with a full grip, keeping your wrists straight.",
+                        "Press the handles forward until your arms are fully extended, but not locked at the elbow.",
+                        "Slowly return to the starting position, feeling a stretch in your chest."
+                    ],
+                    repRange: "8-12 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                },
+                 { 
+                    name: "Cable overhead extension", group: "Triceps", type: "Machine",
+                    instructions: [
+                        "Attach a rope handle to a low pulley.",
+                        "Face away from the machine, grab the rope, and extend your arms fully overhead.",
+                        "Keeping your upper arms stationary, lower the rope behind your head by bending your elbows.",
+                        "Extend your arms to lift the rope back to the starting position, flexing your triceps."
+                    ],
+                    repRange: "10-15 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                },
+                { 
+                    name: "Cable kickback", group: "Triceps", type: "Machine",
+                    instructions: [
+                        "Set a pulley to a low position. Hinge at your hips so your torso is nearly parallel to the floor.",
+                        "Grab the handle and pull your elbow up so your upper arm is parallel to the floor.",
+                        "Keeping your upper arm still, extend your forearm back until your arm is straight.",
+                        "Squeeze your tricep at the top, then slowly return to the start."
+                    ],
+                    repRange: "10-15 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                },
+                { 
+                    name: "Cable lateral raises/ lateral crossover", group: "Shoulders", type: "Machine",
+                    instructions: [
+                        "Set pulleys on both sides to the lowest position.",
+                        "Stand in the middle and grab the left handle with your right hand, and the right handle with your left hand.",
+                        "With a slight bend in your elbows, raise your arms out to your sides until they are parallel to the floor.",
+                        "Control the weight as you slowly lower your arms back down."
+                    ],
+                    repRange: "12-20 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                },
+                { 
+                    name: "Reverse Pec deck", group: "Shoulders", type: "Machine",
+                    instructions: [
+                        "Sit facing the machine, with your chest against the pad.",
+                        "Set the handles to the rearmost position.",
+                        "Grab the handles with a neutral or overhand grip.",
+                        "Keeping your arms slightly bent, squeeze your shoulder blades together to pull the handles back.",
+                        "Slowly return to the starting position."
+                    ],
+                    repRange: "12-20 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                },
+
+                // Pull Day
+                { 
+                    name: "Close Grip Lat Pulldown", group: "Back", type: "Machine",
+                    instructions: [
+                        "Sit at a lat pulldown machine and grab the bar with a close, underhand grip (palms facing you).",
+                        "Keep your chest up and your back straight.",
+                        "Pull the bar down to your upper chest, squeezing your back muscles.",
+                        "Hold the contraction for a moment before slowly returning the bar to the starting position."
+                    ],
+                    repRange: "8-12 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                },
+                { 
+                    name: "Chest Supported Rows", group: "Back", type: "Machine",
+                    instructions: [
+                        "Set up on a chest-supported row machine, with your chest firmly against the pad.",
+                        "Grab the handles with a neutral or overhand grip.",
+                        "Pull the handles towards your torso, squeezing your shoulder blades together.",
+                        "Focus on using your back muscles, not your biceps.",
+                        "Slowly extend your arms back to the starting position."
+                    ],
+                    repRange: "8-12 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                },
+                { 
+                    name: "Seated Cable Rows", group: "Back", type: "Machine",
+                    instructions: [
+                        "Sit at a cable row machine with your feet on the platform and knees slightly bent.",
+                        "Grab the handle with a neutral grip.",
+                        "Keeping your back straight, pull the handle towards your lower abdomen.",
+                        "Squeeze your back muscles at the peak of the movement.",
+                        "Slowly return to the starting position."
+                    ],
+                    repRange: "8-12 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                },
+                { 
+                    name: "Wide Grip Cable Rows", group: "Back", type: "Machine",
+                    instructions: [
+                        "Attach a long bar to the seated row machine.",
+                        "Grab the bar with a wide, overhand grip.",
+                        "Pull the bar towards your upper abdomen/lower chest, keeping your elbows flared out.",
+                        "Focus on squeezing your upper back and rear delts.",
+                        "Slowly return to the starting position."
+                    ],
+                    repRange: "10-15 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                },
+                { 
+                    name: "Bayesian Cable Curls", group: "Biceps", type: "Machine",
+                    instructions: [
+                        "Stand facing a cable machine with the pulley set to the lowest position.",
+                        "Hold a straight bar attachment with an underhand grip, hands shoulder-width apart.",
+                        "Step back to create tension. Keep your elbows pinned to your sides.",
+                        "Curl the bar up towards your chest, squeezing your biceps.",
+                        "Slowly lower the bar back down."
+                    ],
+                    repRange: "10-15 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                },
+                { 
+                    name: "Cable Hammer Curls", group: "Biceps", type: "Machine",
+                    instructions: [
+                        "Attach a rope handle to a low pulley on a cable machine.",
+                        "Grab the rope with a neutral (hammer) grip, palms facing each other.",
+                        "Keep your elbows close to your body and curl the rope up.",
+                        "Squeeze your biceps and forearms at the top.",
+                        "Slowly lower the rope back to the starting position."
+                    ],
+                    repRange: "10-15 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                },
+                { 
+                    name: "Straight Bar Curl", group: "Forearms", type: "Barbell",
+                    instructions: [
+                        "Stand holding a barbell with an underhand grip, hands shoulder-width apart.",
+                        "Keep your elbows close to your torso.",
+                        "Curl the weight forward while contracting your biceps. Only your forearms should move.",
+                        "Continue until your biceps are fully contracted and the bar is at shoulder level.",
+                        "Slowly bring the barbell back to starting position."
+                    ],
+                    repRange: "10-15 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                },
+                { 
+                    name: "Reverse Arm Curl", group: "Forearms", type: "Dumbbell",
+                    instructions: [
+                        "Stand holding a dumbbell in each hand with an overhand grip (palms facing down).",
+                        "Keep your elbows close to your torso.",
+                        "Curl the weight up, keeping your palms facing down. Focus on using your forearm muscles.",
+                        "Slowly lower the dumbbells back to the starting position."
+                    ],
+                    repRange: "12-20 reps",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Video+Demonstration",
+                    notes: ""
+                }
+            ];
+
+            // --- UI ELEMENTS ---
+            const workoutHistoryDiv = document.getElementById('workout-history'), 
+                  workoutModal = document.getElementById('workout-modal'),
+                  modalTitle = document.getElementById('modal-title'), closeModalBtn = document.getElementById('close-modal-btn'), workoutLogForm = document.getElementById('workout-log-form'),
+                  setsContainer = document.getElementById('sets-container'), addSetBtn = document.getElementById('add-set-btn'), saveWorkoutBtn = document.getElementById('save-workout-btn'),
+                  confirmModal = document.getElementById('confirm-modal'), confirmModalTitle = document.getElementById('confirm-modal-title'), confirmModalText = document.getElementById('confirm-modal-text'),
+                  confirmModalCancelBtn = document.getElementById('confirm-modal-cancel-btn'), confirmModalConfirmBtn = document.getElementById('confirm-modal-confirm-btn'),
+                  alertModal = document.getElementById('alert-modal'), alertModalTitle = document.getElementById('alert-modal-title'), alertModalText = document.getElementById('alert-modal-text'), alertModalOkBtn = document.getElementById('alert-modal-ok-btn'),
+                  exerciseModal = document.getElementById('exercise-modal'), closeExerciseModalBtn = document.getElementById('close-exercise-modal-btn'), exerciseForm = document.getElementById('exercise-form'), exerciseModalTitle = document.getElementById('exercise-modal-title'),
+                  progressExerciseSelect = document.getElementById('progress-exercise-select'),
+                  workoutPlannerDiv = document.getElementById('workout-planner'), clearHistoryBtn = document.getElementById('clear-history-btn'),
+                  addExerciseBtn = document.getElementById('add-exercise-btn'),
+                  aiAdviceExerciseSelect = document.getElementById('ai-advice-exercise-select'),
+                  getAIAdviceBtn = document.getElementById('get-ai-advice-btn'),
+                  aiAdviceOutput = document.getElementById('ai-advice-output'),
+                  exerciseDetailModal = document.getElementById('exercise-detail-modal'),
+                  closeExerciseDetailModalBtn = document.getElementById('close-exercise-detail-modal-btn'),
+                  exerciseDetailTitle = document.getElementById('exercise-detail-title'),
+                  exerciseDetailVideo = document.getElementById('exercise-detail-video'),
+                  exerciseDetailInstructions = document.getElementById('exercise-detail-instructions'),
+                  exerciseDetailRepRange = document.getElementById('exercise-detail-rep-range'),
+                  exerciseDetailNotes = document.getElementById('exercise-detail-notes'),
+                  saveExerciseNotesBtn = document.getElementById('save-exercise-notes-btn'),
+                  logFromDetailBtn = document.getElementById('log-from-detail-btn'),
+                  manageWarmupsBtn = document.getElementById('manage-warmups-btn'),
+                  warmupManageModal = document.getElementById('warmup-manage-modal'),
+                  closeWarmupManageModalBtn = document.getElementById('close-warmup-manage-modal-btn'),
+                  warmupDaySelect = document.getElementById('warmup-day-select'),
+                  warmupListDiv = document.getElementById('warmup-list'),
+                  warmupForm = document.getElementById('warmup-form'),
+                  warmupFormTitle = document.getElementById('warmup-form-title'),
+                  warmupNameInput = document.getElementById('warmup-name'),
+                  warmupInstructionsInput = document.getElementById('warmup-instructions'),
+                  saveWarmupBtn = document.getElementById('save-warmup-btn');
+                  
+
+            // --- CHART.JS SETUP ---
+            const progressCtx = document.getElementById('progress-chart').getContext('2d');
+            let progressChart = new Chart(progressCtx, {
+                type: 'line',
+                data: { labels: [], datasets: [] },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: 'var(--primary-text)' }, grid: { color: 'var(--border-color)' } },
+                        x: { ticks: { color: 'var(--primary-text)' }, grid: { color: 'var(--border-color)' } }
+                    },
+                    plugins: { legend: { labels: { color: 'var(--primary-text)' } } }
+                }
+            });
+            
+            // --- ALL FUNCTIONS ---
+
+            function getApiUrl(model, action = 'generateContent') {
+                const apiKey = ""; 
+                return `https://generativelanguage.googleapis.com/v1beta/models/${model}:${action}?key=${apiKey}`;
+            };
+
+            function showModal(modalElement) { modalElement.style.display = 'flex'; }
+            function hideModal(modalElement) { modalElement.style.display = 'none'; }
+            
+            function showCustomAlert(title, text) {
+                alertModalTitle.textContent = title;
+                alertModalText.textContent = text;
+                showModal(alertModal);
+            }
+
+            function showConfirmModal(title, text, onConfirm) {
+                confirmModalTitle.textContent = title;
+                confirmModalText.textContent = text;
+                confirmCallback = onConfirm;
+                showModal(confirmModal);
+            }
+            
+            function saveData() {
+                localStorage.setItem('fitTrackAI_workoutHistory', JSON.stringify(workoutHistory));
+                localStorage.setItem('fitTrackAI_exerciseDB', JSON.stringify(exerciseDB));
+                localStorage.setItem('fitTrackAI_warmups', JSON.stringify(warmups));
+            };
+            
+            function loadData() {
+                workoutHistory = JSON.parse(localStorage.getItem('fitTrackAI_workoutHistory')) || [];
+                exerciseDB = JSON.parse(localStorage.getItem('fitTrackAI_exerciseDB')) || JSON.parse(JSON.stringify(defaultExerciseDB));
+                warmups = JSON.parse(localStorage.getItem('fitTrackAI_warmups')) || JSON.parse(JSON.stringify(defaultWarmups));
+            }
+
+             async function getAIWorkoutAdvice() {
+                const exerciseName = aiAdviceExerciseSelect.value;
+                if (!exerciseName) {
+                    aiAdviceOutput.innerHTML = `<p class="text-yellow-400">Please select an exercise first.</p>`;
+                    return;
+                }
+
+                const btn = getAIAdviceBtn;
+                btn.disabled = true;
+                btn.querySelector('.btn-text').style.display = 'none';
+                btn.querySelector('.loader').classList.remove('hidden');
+                aiAdviceOutput.innerHTML = '';
+
+                const exerciseLogs = workoutHistory.filter(log => log.name === exerciseName).slice(-3); // Get last 3 sessions
+
+                const prompt = `Act as an expert fitness coach grounded in science (citing sources like Jeff Nippard, Dr. Mike Israetel, Jeremy Ethier). A user has performed the following recent sessions for ${exerciseName}:
+                ${exerciseLogs.map((log, i) => `Session ${i+1} (${new Date(log.date).toLocaleDateString()}): ${log.sets.map(set => set.map(part => `${part.weight}kg x ${part.reps} reps`).join(' + ')).join(', ')}`).join('\n')}
+
+                Based on the principles of progressive overload, analyze this data. Provide a clear, actionable recommendation for the user's *next* session. Should they increase weight, reps, or sets? Be specific (e.g., "Aim for 6-8 reps with 52.5kg"). Give a concise rationale based on performance trends. Keep the entire response under 75 words.`;
+
+                const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    });
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                    const result = await response.json();
+                    let text = result.candidates[0].content.parts[0].text;
+                    aiAdviceOutput.innerHTML = `<p>${text}</p>`;
+
+                } catch (error) {
+                    console.error("AI Workout Advice Error:", error);
+                    aiAdviceOutput.innerHTML = `<p class="text-red-400">Could not get AI advice at this time.</p>`;
+                } finally {
+                    btn.disabled = false;
+                    btn.querySelector('.btn-text').style.display = 'inline';
+                    btn.querySelector('.loader').classList.add('hidden');
+                }
+            }
+            
+            function renderWorkoutPlanner() {
+                const schedule = [
+                    { day: "Monday", type: "Pull" },
+                    { day: "Tuesday", type: "Legs" },
+                    { day: "Wednesday", type: "Rest" },
+                    { day: "Thursday", type: "Push" },
+                    { day: "Friday", type: "Pull" },
+                    { day: "Saturday", type: "Legs" },
+                    { day: "Sunday", type: "Push" },
+                ];
+                
+                const exerciseGroups = {
+                    "Push": ['Chest', 'Shoulders', 'Triceps'],
+                    "Pull": ['Back', 'Biceps', 'Forearms'],
+                    "Legs": ['Quads', 'Abductors', 'Glutes', 'Hamstrings',  'Calves', 'Abs'] 
+                };
+
+                const todayIndex = (new Date().getDay() + 6) % 7; // Monday is 0, Sunday is 6
+
+                workoutPlannerDiv.innerHTML = schedule.map((item, index) => {
+                    const isToday = index === todayIndex;
+                    const isFuture = index > todayIndex;
+                    let exercisesHtml = '';
+                    if (item.type === 'Rest') {
+                        exercisesHtml = `<div class="flex flex-col items-center justify-center h-full text-center">
+                            <i data-lucide="bed-double" class="w-10 h-10 text-gray-400 mb-2"></i>
+                            <p class="text-gray-400 italic mt-2">Rest Day</p>
+                        </div>`;
+                    } else {
+                        const groupsForDay = exerciseGroups[item.type];
+                        const warmupExercises = warmups[item.type] || [];
+                        
+                        exercisesHtml = '<div class="planner-exercises space-y-4 pr-2 overflow-y-auto max-h-64 custom-scrollbar">';
+                        
+                        if (warmupExercises.length > 0) {
+                            exercisesHtml += `<div>
+                                <h5 class="font-semibold text-green-400 text-sm mb-1">Warm-up</h5>
+                                <ul class="space-y-1">
+                                    ${warmupExercises.map(w => `
+                                        <li class="text-sm text-gray-300 exercise-item flex justify-between items-center group">
+                                            <button class="flex-grow text-left p-1 rounded hover:bg-gray-600 warmup-detail-btn" data-name="${w.name}" data-day-type="${item.type}">${w.name}</button>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>`;
+                        }
+                        
+                        for(const group of groupsForDay) {
+                            const exercisesForGroup = exerciseDB.filter(ex => ex.group === group);
+                            if(exercisesForGroup.length > 0) {
+                                exercisesHtml += `<div>
+                                    <h5 class="font-semibold text-blue-400 text-sm mb-1">${group}</h5>
+                                    <ul class="space-y-1">
+                                        ${exercisesForGroup.map(ex => `
+                                            <li class="text-sm text-gray-300 exercise-item flex justify-between items-center group">
+                                                <button class="flex-grow text-left p-1 rounded hover:bg-gray-600 log-workout-btn" data-name="${ex.name}">${ex.name}</button>
+                                            </li>`).join('')}
+                                    </ul>
+                                </div>`;
+                            }
+                        }
+
+                        exercisesHtml += '</div>';
+                    }
+                    
+                    return `
+                        <div class="workout-day-card w-full flex-shrink-0 flex flex-col ${isToday ? 'border-2 border-white' : 'border-2 border-transparent'} bg-black/30 p-3 rounded-lg h-full" data-day-index="${index}" ${isFuture ? 'data-future="true"' : ''}>
+                            <h4 class="font-bold text-lg text-center ${isToday ? 'text-white' : 'text-gray-300'}">${item.day}</h4>
+                            <p class="text-center font-semibold text-gray-400 mb-3">${item.type}</p>
+                            <div class="flex-grow min-h-0">${exercisesHtml}</div>
+                        </div>
+                    `;
+                }).join('');
+                lucide.createIcons();
+            };
+
+            function populateProgressSelect() {
+                const exercisedNames = [...new Set(workoutHistory.map(log => log.name))].sort();
+                const options = '<option value="">Select an exercise...</option>' + exercisedNames.map(name => `<option value="${name}">${name}</option>`).join('');
+                progressExerciseSelect.innerHTML = options;
+                aiAdviceExerciseSelect.innerHTML = options;
+            };
+
+            function renderProgressionChart(exerciseName) {
+                if (!exerciseName) {
+                    progressChart.data.labels = [];
+                    progressChart.data.datasets = [];
+                    progressChart.update();
+                    return;
+                }
+                const exerciseLogs = workoutHistory.filter(log => log.name === exerciseName)
+                                                 .sort((a,b) => new Date(a.date) - new Date(b.date));
+                
+                const labels = exerciseLogs.map(log => new Date(log.date).toLocaleDateString());
+                const maxWeightData = exerciseLogs.map(log => Math.max(...log.sets.flatMap(set => set.map(s => s.weight || 0))));
+                const volumeData = exerciseLogs.map(log => log.sets.flat().reduce((total, s) => total + (s.weight * s.reps), 0));
+
+                progressChart.data.labels = labels;
+                progressChart.data.datasets = [
+                    {
+                        label: 'Max Weight (kg)',
+                        data: maxWeightData,
+                        borderColor: '#60a5fa',
+                        backgroundColor: '#60a5fa',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Total Volume (kg)',
+                        data: volumeData,
+                        borderColor: '#4ade80',
+                        backgroundColor: '#4ade80',
+                        tension: 0.1
+                    }
+                ];
+                progressChart.update();
+            };
+            
+            function openExerciseDetailModal(itemName, itemType, dayType = null) {
+                let item;
+                if (itemType === 'warmup') {
+                    if (!dayType || !warmups[dayType]) return;
+                    item = warmups[dayType].find(w => w.name === itemName);
+                } else {
+                    item = exerciseDB.find(ex => ex.name === itemName);
+                }
+
+                if (!item) return;
+
+                currentlyLoggingExercise = item.name;
+
+                exerciseDetailTitle.textContent = item.name;
+                exerciseDetailVideo.src = item.videoPlaceholder || "https://placehold.co/400x225/374151/FFFFFF?text=No+Video";
+                
+                const instructions = Array.isArray(item.instructions) ? item.instructions : (item.instructions || "").split('\n');
+                exerciseDetailInstructions.innerHTML = instructions.map(step => `<li>${step}</li>`).join('');
+
+                exerciseDetailRepRange.textContent = item.repRange ? `Aim for ${item.repRange}.` : 'No specific rep range.';
+                exerciseDetailNotes.value = item.notes || '';
+                
+                logFromDetailBtn.style.display = itemType === 'warmup' ? 'none' : 'block';
+                
+                showModal(exerciseDetailModal);
+            }
+            
+            function openWorkoutModal(exerciseName) {
+                editingWorkoutLogIndex = null;
+                currentlyLoggingExercise = exerciseName;
+                modalTitle.textContent = `Log: ${exerciseName}`;
+                saveWorkoutBtn.textContent = 'Save Workout';
+                setsContainer.innerHTML = '';
+                addSetRow();
+                addSetRow();
+                addSetRow();
+                showModal(workoutModal);
+            };
+
+            function openEditWorkoutModal(index) {
+                editingWorkoutLogIndex = index;
+                const logEntry = workoutHistory[index];
+                currentlyLoggingExercise = logEntry.name;
+                modalTitle.textContent = `Edit: ${logEntry.name}`;
+                saveWorkoutBtn.textContent = 'Update Workout';
+                setsContainer.innerHTML = '';
+                logEntry.sets.forEach(set => addSetRow(set));
+                showModal(workoutModal);
+            };
+
+            function closeWorkoutModal() {
+                hideModal(workoutModal);
+                editingWorkoutLogIndex = null;
+            };
+            
+            function addSetRow(setParts = [{weight: '', reps: '', partial: false}]) {
+                const setNumber = setsContainer.children.length + 1;
+                const row = document.createElement('div');
+                row.className = 'set-row border border-gray-800 p-3 rounded-lg space-y-2';
+                
+                let content = `<div class="flex justify-between items-center">
+                    <label class="font-bold text-lg">Set ${setNumber}</label>
+                    <div>
+                        <button type="button" class="add-part-btn text-white hover:text-gray-300 p-1" title="Add drop set / pyramid">
+                            <i data-lucide="plus-circle"></i>
+                        </button>
+                        <button type="button" class="remove-set-btn text-red-500 hover:text-red-400 p-1" title="Delete set">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="parts-container space-y-2"></div>`;
+
+                row.innerHTML = content;
+                setsContainer.appendChild(row);
+                
+                const partsContainer = row.querySelector('.parts-container');
+                setParts.forEach(part => addWeightRepPart(partsContainer, part.weight, part.reps, part.partial));
+
+                lucide.createIcons();
+            };
+
+            function addWeightRepPart(container, weight='', reps='', isPartial=false) {
+                const partHtml = `
+                    <div class="set-part-row grid grid-cols-12 gap-2 items-center">
+                        <input type="number" step="0.25" placeholder="Weight (kg)" value="${weight}" class="form-input col-span-5 set-weight">
+                        <span class="text-center col-span-1">x</span>
+                        <input type="number" placeholder="Reps" value="${reps}" class="form-input col-span-2 set-reps">
+                        <div class="col-span-3 flex items-center justify-center">
+                            <input type="checkbox" ${isPartial ? 'checked' : ''} class="form-checkbox h-5 w-5 bg-gray-600 border-gray-500 rounded text-white focus:ring-white set-partial">
+                            <label class="ml-2 text-sm">Partial</label>
+                        </div>
+                        <button type="button" class="remove-part-btn text-gray-500 hover:text-red-400 p-1 col-span-1">
+                            <i data-lucide="x-circle" class="w-4 h-4"></i>
+                        </button>
+                    </div>`;
+                container.insertAdjacentHTML('beforeend', partHtml);
+                lucide.createIcons();
+            };
+
+
+             function renderWorkoutHistory() {
+                if (workoutHistory.length === 0) {
+                    workoutHistoryDiv.innerHTML = '<p class="text-gray-500 text-center">No workouts logged yet.</p>';
+                    return;
+                }
+                workoutHistoryDiv.innerHTML = workoutHistory.map((log, index) => ({...log, originalIndex: index}))
+                .reverse()
+                .map(log => {
+                    const setsHtml = log.sets.map((setParts, i) => {
+                        const partsHtml = setParts.map(part => `${part.weight} kg x ${part.reps} reps ${part.partial ? '<span class="text-yellow-400">(P)</span>' : ''}`).join(', ');
+                        return `<span><strong>Set ${i+1}:</strong> ${partsHtml}</span>`;
+                    }).join('<br>');
+                    
+                    return `
+                    <div class="bg-black/30 p-4 rounded-lg">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h4 class="font-bold text-lg">${log.name}</h4>
+                                <span class="text-sm text-gray-400">${new Date(log.date).toLocaleDateString()}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="edit-log-btn p-1 text-gray-400 hover:text-white" data-index="${log.originalIndex}">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+                                <button class="delete-log-btn p-1 text-gray-400 hover:text-white" data-index="${log.originalIndex}">
+                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="text-sm space-y-1">
+                           ${setsHtml}
+                        </div>
+                    </div>
+                `}).join('');
+                lucide.createIcons();
+            };
+
+            function showConfirmModal(title, text, onConfirm) {
+                confirmModalTitle.textContent = title;
+                confirmModalText.textContent = text;
+                confirmCallback = onConfirm;
+                showModal(confirmModal);
+            };
+
+            function showCustomAlert(title, text) {
+                alertModalTitle.textContent = title;
+                alertModalText.textContent = text;
+                showModal(alertModal);
+            };
+
+            function populateExerciseModal(exercise = null) {
+                const groupSelect = document.getElementById('exercise-group');
+                const muscleGroups = [...new Set(defaultExerciseDB.map(ex => ex.group))].sort();
+                groupSelect.innerHTML = muscleGroups.map(g => `<option value="${g}">${g}</option>`).join('');
+
+                
+                if (exercise) {
+                    exerciseModalTitle.textContent = "Edit Exercise";
+                    document.getElementById('exercise-name').value = exercise.name;
+                    groupSelect.value = exercise.group;
+                    document.getElementById('exercise-type').value = exercise.type;
+                    editingExerciseName = exercise.name;
+                } else {
+                    exerciseModalTitle.textContent = "Add New Exercise";
+                    exerciseForm.reset();
+                    editingExerciseName = null;
+                }
+                showModal(exerciseModal);
+            };
+            
+            function renderAIWorkoutAnalysis(){
+                
+            }
+            
+            function renderWarmupManagementList() {
+                const dayType = warmupDaySelect.value;
+                const currentWarmups = warmups[dayType] || [];
+                warmupListDiv.innerHTML = currentWarmups.map((warmup, index) => `
+                    <div class="flex justify-between items-center bg-gray-600 p-2 rounded-md">
+                        <span>${warmup.name}</span>
+                        <div class="flex gap-2">
+                             <button class="edit-warmup-btn p-1" data-index="${index}" data-day-type="${dayType}" title="Edit Warmup"><i data-lucide="pencil" class="w-4 h-4 pointer-events-none text-gray-300"></i></button>
+                            <button class="delete-warmup-btn p-1" data-index="${index}" data-day-type="${dayType}" title="Delete Warmup"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none text-gray-300"></i></button>
+                        </div>
+                    </div>
+                `).join('') || '<p class="text-gray-500">No warm-ups for this day.</p>';
+                lucide.createIcons();
+            }
+
+
+            // --- INITIALIZATION ---
+            function fullRender() {
+                renderWorkoutPlanner();
+                renderWorkoutHistory();
+                populateProgressSelect();
+                renderProgressionChart(progressExerciseSelect.value);
+                // renderAIWorkoutAnalysis(); no longer exists
+                lucide.createIcons();
+            }
+            
+            loadData();
+            fullRender();
+
+             // --- ALL EVENT LISTENERS ---
+            closeModalBtn.addEventListener('click', closeWorkoutModal);
+            addSetBtn.addEventListener('click', () => addSetRow());
+            alertModalOkBtn.addEventListener('click', () => { hideModal(alertModal); });
+
+            addExerciseBtn.addEventListener('click', () => populateExerciseModal());
+            closeExerciseModalBtn.addEventListener('click', () => hideModal(exerciseModal));
+            getAIAdviceBtn.addEventListener('click', getAIWorkoutAdvice);
+
+            confirmModalConfirmBtn.addEventListener('click', () => {
+                if(confirmCallback) confirmCallback();
+                hideModal(confirmModal);
+            });
+            confirmModalCancelBtn.addEventListener('click', () => hideModal(confirmModal));
+            
+            workoutLogForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const sets = [];
+                document.querySelectorAll('.set-row').forEach(row => {
+                    const setParts = [];
+                     row.querySelectorAll('.set-part-row').forEach(partRow => {
+                        const weight = parseFloat(partRow.querySelector('.set-weight').value) || 0;
+                        const reps = parseInt(partRow.querySelector('.set-reps').value) || 0;
+                        const partial = partRow.querySelector('.set-partial').checked;
+                        if(reps > 0) {
+                            setParts.push({ weight, reps, partial });
+                        }
+                    });
+                    if (setParts.length > 0) {
+                        sets.push(setParts);
+                    }
+                });
+
+                if(sets.length === 0) {
+                    showCustomAlert('Empty Workout', 'Please log at least one set with reps.');
+                    return;
+                }
+
+                const newLog = {
+                    name: currentlyLoggingExercise,
+                    date: new Date().toISOString(),
+                    sets: sets
+                };
+
+                if(editingWorkoutLogIndex !== null) {
+                    workoutHistory[editingWorkoutLogIndex] = newLog;
+                } else {
+                    workoutHistory.push(newLog);
+                }
+
+                saveData();
+                fullRender();
+                closeWorkoutModal();
+            });
+
+            setsContainer.addEventListener('click', (e) => {
+                const removeSetBtn = e.target.closest('.remove-set-btn');
+                const removePartBtn = e.target.closest('.remove-part-btn');
+
+                if (removeSetBtn) {
+                    removeSetBtn.closest('.set-row').remove();
+                    document.querySelectorAll('.set-row').forEach((row, index) => {
+                        row.querySelector('label').textContent = `Set ${index + 1}`;
+                    });
+                } else if (removePartBtn) {
+                    const partRow = removePartBtn.closest('.set-part-row');
+                    const partsContainer = partRow.parentElement;
+                    if (partsContainer.children.length > 1) {
+                        partRow.remove();
+                    } else {
+                        showCustomAlert("Action blocked", "A set must have at least one part. Delete the whole set instead.");
+                    }
+                }
+            });
+
+            workoutPlannerDiv.addEventListener('click', (e) => {
+                const logBtn = e.target.closest('.log-workout-btn');
+                const warmupBtn = e.target.closest('.warmup-detail-btn');
+                
+                if (logBtn) {
+                    openExerciseDetailModal(logBtn.dataset.name, 'exercise');
+                } else if (warmupBtn) {
+                    openExerciseDetailModal(warmupBtn.dataset.name, 'warmup', warmupBtn.dataset.dayType);
+                } 
+            });
+
+             workoutHistoryDiv.addEventListener('click', (e) => {
+                const editBtn = e.target.closest('.edit-log-btn');
+                const deleteBtn = e.target.closest('.delete-log-btn');
+
+                if(editBtn) {
+                    openEditWorkoutModal(parseInt(editBtn.dataset.index));
+                }
+                if(deleteBtn) {
+                    const indexToDelete = parseInt(deleteBtn.dataset.index);
+                    showConfirmModal('Delete Log?', 'Are you sure you want to delete this workout log?', () => {
+                        workoutHistory.splice(indexToDelete, 1);
+                        saveData();
+                        fullRender();
+                    });
+                }
+            });
+
+            closeExerciseDetailModalBtn.addEventListener('click', () => {
+                hideModal(exerciseDetailModal);
+            });
+
+            logFromDetailBtn.addEventListener('click', () => {
+                hideModal(exerciseDetailModal);
+                openWorkoutModal(currentlyLoggingExercise);
+            });
+
+            saveExerciseNotesBtn.addEventListener('click', () => {
+                const exercise = exerciseDB.find(ex => ex.name === currentlyLoggingExercise);
+                 if (exercise) {
+                    exercise.notes = exerciseDetailNotes.value;
+                    saveData();
+                    const btn = saveExerciseNotesBtn;
+                    btn.textContent = 'Notes Saved!';
+                    setTimeout(() => {
+                        btn.textContent = 'Save Notes';
+                    }, 2000);
+                }
+            });
+            
+            // --- Warmup Management Listeners ---
+            manageWarmupsBtn.addEventListener('click', () => {
+                editingWarmupIndex = null;
+                warmupForm.reset();
+                warmupFormTitle.textContent = "Add New Warm-up";
+                saveWarmupBtn.textContent = "Add Warm-up";
+                renderWarmupManagementList();
+                showModal(warmupManageModal);
+            });
+
+            closeWarmupManageModalBtn.addEventListener('click', () => {
+                hideModal(warmupManageModal);
+            });
+
+            warmupDaySelect.addEventListener('change', () => {
+                editingWarmupIndex = null;
+                warmupForm.reset();
+                warmupFormTitle.textContent = "Add New Warm-up";
+                saveWarmupBtn.textContent = "Add Warm-up";
+                renderWarmupManagementList();
+            });
+
+            warmupListDiv.addEventListener('click', (e) => {
+                const editBtn = e.target.closest('.edit-warmup-btn');
+                const deleteBtn = e.target.closest('.delete-warmup-btn');
+                
+                if (editBtn) {
+                    const dayType = editBtn.dataset.dayType;
+                    const index = parseInt(editBtn.dataset.index);
+                    const warmup = warmups[dayType]?.[index];
+                    if(!warmup) return;
+
+                    editingWarmupIndex = index;
+                    warmupNameInput.value = warmup.name;
+                    warmupInstructionsInput.value = Array.isArray(warmup.instructions) ? warmup.instructions.join('\n') : '';
+                    warmupFormTitle.textContent = "Edit Warm-up";
+                    saveWarmupBtn.textContent = "Update Warm-up";
+                } else if (deleteBtn) {
+                    const dayType = deleteBtn.dataset.dayType;
+                    const index = parseInt(deleteBtn.dataset.index);
+                    const warmupName = warmups[dayType]?.[index]?.name || 'this item';
+                    showConfirmModal('Delete Warm-up?', `Are you sure you want to delete "${warmupName}"?`, () => {
+                        if (warmups[dayType]) {
+                           warmups[dayType].splice(index, 1);
+                           saveData();
+                           renderWarmupManagementList();
+                           renderWorkoutPlanner(); 
+                        }
+                    });
+                }
+            });
+
+            warmupForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const dayType = warmupDaySelect.value;
+                const name = warmupNameInput.value.trim();
+                const instructions = warmupInstructionsInput.value.split('\n').filter(line => line.trim() !== '');
+
+                if (!name) return;
+
+                const newWarmup = {
+                    name,
+                    instructions,
+                    repRange: "As needed",
+                    videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=Warm-up"
+                };
+
+                if (!warmups[dayType]) warmups[dayType] = [];
+
+                if (editingWarmupIndex !== null) {
+                    warmups[dayType][editingWarmupIndex] = newWarmup;
+                } else {
+                    warmups[dayType].push(newWarmup);
+                }
+                
+                saveData();
+                renderWarmupManagementList();
+                renderWorkoutPlanner();
+                warmupForm.reset();
+                warmupFormTitle.textContent = "Add New Warm-up";
+                saveWarmupBtn.textContent = "Add Warm-up";
+                editingWarmupIndex = null;
+            });
+
+            exerciseForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('exercise-name').value.trim();
+                const group = document.getElementById('exercise-group').value;
+                const type = document.getElementById('exercise-type').value;
+
+                if (!name || !group) {
+                    showCustomAlert('Error', 'Please enter an exercise name and muscle group.');
+                    return;
+                }
+
+                if (editingExerciseName) {
+                    const exerciseIndex = exerciseDB.findIndex(ex => ex.name === editingExerciseName);
+                    if (exerciseIndex > -1) {
+                        if (name.toLowerCase() !== editingExerciseName.toLowerCase() && exerciseDB.some(ex => ex.name.toLowerCase() === name.toLowerCase())) {
+                             showCustomAlert('Error', 'An exercise with this name already exists.');
+                             return;
+                        }
+                        exerciseDB[exerciseIndex] = { ...exerciseDB[exerciseIndex], name, group, type };
+                    }
+                } else {
+                    if (exerciseDB.some(ex => ex.name.toLowerCase() === name.toLowerCase())) {
+                        showCustomAlert('Error', 'An exercise with this name already exists.');
+                        return;
+                    }
+                    exerciseDB.push({
+                        name,
+                        group,
+                        type,
+                        instructions: ["No instructions added yet."],
+                        repRange: "N/A",
+                        videoPlaceholder: "https://placehold.co/400x225/374151/FFFFFF?text=No+Video",
+                        notes: ""
+                    });
+                }
+
+                editingExerciseName = null;
+                hideModal(exerciseModal);
+                saveData();
+                fullRender();
+            });
+        });
+    </script>
+</body>
+</html>

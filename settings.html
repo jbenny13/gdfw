@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack AI | Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --background: #000000;
+            --primary-text: #eaeaea;
+            --secondary-text: #888888;
+            --card-bg: #111111;
+            --input-bg: #191919;
+            --border-color: #222222;
+            --accent: #FFFFFF;
+            --accent-hover: #DDDDDD;
+            --danger: #E53E3E;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--primary-text);
+            font-family: 'Manrope', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+            border-bottom: 2px solid transparent;
+            color: var(--secondary-text);
+            padding-bottom: 4px;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-text);
+        }
+
+        .nav-link.active {
+            color: var(--primary-text);
+            border-bottom-color: var(--primary-text);
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+        }
+
+        .form-input {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--primary-text);
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+
+        .form-label {
+            color: var(--secondary-text);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .btn {
+            border-radius: 0.5rem;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transform: translateY(0);
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: var(--background);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--primary-text);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: var(--border-color);
+            border-color: var(--accent);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--primary-text);
+        }
+        
+        .btn-danger:hover:not(:disabled) {
+             background-color: #C53030;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-content {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .loader {
+            border: 2px solid #333;
+            border-top: 2px solid var(--accent);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto max-w-7xl px-4 py-8">
+
+        <!-- Header -->
+        <header class="flex flex-col sm:flex-row items-center justify-between mb-16 pb-4 border-b border-gray-900">
+            <a href="index.html" class="flex items-center gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
+                <h1 class="text-2xl font-bold">FitTrack AI</h1>
+            </a>
+            <nav class="mt-4 sm:mt-0">
+                <ul class="flex items-center space-x-4 sm:space-x-6 text-base font-medium">
+                    <li><a href="index.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="nutrition.html" class="nav-link">Nutrition</a></li>
+                    <li><a href="workouts.html" class="nav-link">Workouts</a></li>
+                    <li><a href="goals.html" class="nav-link">Goals</a></li>
+                    <li><a href="sleep.html" class="nav-link">Sleep</a></li>
+                    <li><a href="settings.html" class="nav-link active">Settings</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-2xl mx-auto">
+            <div class="content-card">
+                <h2 class="text-2xl font-semibold mb-4">Data Management</h2>
+                <p class="text-sm text-gray-400 mb-6">Save your data to a file or restore from a backup. Deleting is permanent and will affect all sections of the app.</p>
+                <div class="space-y-4">
+                    <button id="backup-data-btn" class="w-full btn btn-secondary"><i data-lucide="download"></i>Backup All Data</button>
+                    <label for="restore-data-input" class="w-full btn btn-secondary cursor-pointer">
+                        <i data-lucide="upload"></i>Restore From Backup
+                    </label>
+                    <input type="file" id="restore-data-input" class="hidden" accept=".json">
+                    <button id="delete-all-data-btn" class="w-full btn btn-danger">Delete All Data</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="confirm-modal" class="modal-backdrop"><div class="modal-content"><h2 id="confirm-modal-title" class="text-xl font-bold mb-4">Are you sure?</h2><p id="confirm-modal-text" class="text-gray-300 mb-6">This action cannot be undone.</p><div class="flex justify-end gap-4"><button id="confirm-modal-cancel-btn" class="btn btn-secondary">Cancel</button><button id="confirm-modal-confirm-btn" class="btn btn-danger">Confirm</button></div></div></div>
+    <div id="alert-modal" class="modal-backdrop"><div class="modal-content"><h2 id="alert-modal-title" class="text-xl font-bold mb-4">Alert</h2><p id="alert-modal-text" class="text-gray-300 mb-6"></p><div class="flex justify-end"><button id="alert-modal-ok-btn" class="btn btn-primary">OK</button></div></div></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let confirmCallback = null;
+
+            const ui = {
+                confirmModal: document.getElementById('confirm-modal'),
+                confirmModalTitle: document.getElementById('confirm-modal-title'),
+                confirmModalText: document.getElementById('confirm-modal-text'),
+                confirmModalCancelBtn: document.getElementById('confirm-modal-cancel-btn'),
+                confirmModalConfirmBtn: document.getElementById('confirm-modal-confirm-btn'),
+                alertModal: document.getElementById('alert-modal'),
+                alertModalTitle: document.getElementById('alert-modal-title'),
+                alertModalText: document.getElementById('alert-modal-text'),
+                alertModalOkBtn: document.getElementById('alert-modal-ok-btn'),
+                backupDataBtn: document.getElementById('backup-data-btn'),
+                restoreDataInput: document.getElementById('restore-data-input'),
+                deleteAllDataBtn: document.getElementById('delete-all-data-btn'),
+            };
+
+            function showModal(modalElement) { modalElement.style.display = 'flex'; }
+            function hideModal(modalElement) { modalElement.style.display = 'none'; }
+            
+            function showCustomAlert(title, text) {
+                ui.alertModalTitle.textContent = title;
+                ui.alertModalText.textContent = text;
+                showModal(ui.alertModal);
+            }
+
+            function showConfirmModal(title, text, onConfirm) {
+                ui.confirmModalTitle.textContent = title;
+                ui.confirmModalText.textContent = text;
+                confirmCallback = onConfirm;
+                showModal(ui.confirmModal);
+            }
+
+            ui.backupDataBtn.addEventListener('click', () => {
+                const allData = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('fitTrackAI_')) {
+                        allData[key.replace('fitTrackAI_', '')] = JSON.parse(localStorage.getItem(key));
+                    }
+                }
+                const dataStr = JSON.stringify(allData, null, 2);
+                const blob = new Blob([dataStr], {type: "application/json"});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `fittrack_backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showCustomAlert('Success', 'Your data has been backed up.');
+            });
+
+            ui.restoreDataInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if(!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const restoredData = JSON.parse(event.target.result);
+                        Object.keys(localStorage)
+                            .filter(key => key.startsWith('fitTrackAI_'))
+                            .forEach(key => localStorage.removeItem(key));
+                        
+                        Object.keys(restoredData).forEach(key => {
+                            localStorage.setItem(`fitTrackAI_${key}`, JSON.stringify(restoredData[key]));
+                        });
+                        showCustomAlert('Success', 'Your data has been restored. The page will now reload.');
+                        setTimeout(() => location.reload(), 2000);
+                    } catch (err) {
+                        showCustomAlert('Error', 'Could not read the backup file. It may be corrupted.');
+                        console.error("Restore error: ", err);
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+            });
+
+            ui.deleteAllDataBtn.addEventListener('click', () => {
+                showConfirmModal('Delete All Data?', 'This will permanently erase all your saved data across the entire application. This action cannot be undone.', () => {
+                    Object.keys(localStorage)
+                        .filter(key => key.startsWith('fitTrackAI_'))
+                        .forEach(key => localStorage.removeItem(key));
+                    showCustomAlert('Data Deleted', 'All application data has been cleared. The page will now reload.');
+                    setTimeout(() => location.reload(), 2000);
+                });
+            });
+
+            ui.alertModalOkBtn.addEventListener('click', () => hideModal(ui.alertModal));
+            ui.confirmModalCancelBtn.addEventListener('click', () => hideModal(ui.confirmModal));
+            ui.confirmModalConfirmBtn.addEventListener('click', () => {
+                if (confirmCallback) confirmCallback();
+                hideModal(ui.confirmModal);
+            });
+
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

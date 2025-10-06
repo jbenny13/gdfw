@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack AI | Sleep</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --background: #000000;
+            --primary-text: #eaeaea;
+            --secondary-text: #888888;
+            --card-bg: #111111;
+            --input-bg: #191919;
+            --border-color: #222222;
+            --accent: #FFFFFF;
+            --accent-hover: #DDDDDD;
+            --danger: #E53E3E;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--primary-text);
+            font-family: 'Manrope', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+            border-bottom: 2px solid transparent;
+            color: var(--secondary-text);
+            padding-bottom: 4px;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-text);
+        }
+
+        .nav-link.active {
+            color: var(--primary-text);
+            border-bottom-color: var(--primary-text);
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+        }
+
+        .form-input {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--primary-text);
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        /* Style for date/time inputs */
+        .form-input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+
+        .form-label {
+            color: var(--secondary-text);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .btn {
+            border-radius: 0.5rem;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transform: translateY(0);
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: var(--background);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--primary-text);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: var(--border-color);
+            border-color: var(--accent);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--primary-text);
+        }
+        
+        .btn-danger:hover:not(:disabled) {
+             background-color: #C53030;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-content {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .star-rating > button {
+            cursor: pointer;
+            font-size: 2rem;
+            color: #4b5563; /* gray-600 */
+            background: none;
+            border: none;
+            padding: 0 0.2rem;
+        }
+        .star-rating > button.selected, .star-rating > button:hover, .star-rating:hover > button:hover ~ button {
+            color: #f59e0b; /* amber-500 */
+        }
+         .star-rating:hover > button {
+            color: #f59e0b;
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto max-w-7xl px-4 py-8">
+
+        <!-- Header -->
+        <header class="flex flex-col sm:flex-row items-center justify-between mb-16 pb-4 border-b border-gray-900">
+            <a href="index.html" class="flex items-center gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
+                <h1 class="text-2xl font-bold">FitTrack AI</h1>
+            </a>
+            <nav class="mt-4 sm:mt-0">
+                <ul class="flex items-center space-x-4 sm:space-x-6 text-base font-medium">
+                    <li><a href="index.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="nutrition.html" class="nav-link">Nutrition</a></li>
+                    <li><a href="workouts.html" class="nav-link">Workouts</a></li>
+                    <li><a href="goals.html" class="nav-link">Goals</a></li>
+                    <li><a href="sleep.html" class="nav-link active">Sleep</a></li>
+                    <li><a href="settings.html" class="nav-link">Settings</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+             <div class="space-y-8">
+                <div class="content-card">
+                    <h2 class="text-2xl font-semibold mb-4">Log Your Sleep</h2>
+                    <form id="sleep-log-form" class="space-y-6">
+                         <div>
+                            <label for="sleep-date" class="form-label">Date of Sleep</label>
+                            <input type="date" id="sleep-date" class="form-input mt-1" required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="sleep-start-time" class="form-label">Went to bed</label>
+                                <input type="time" id="sleep-start-time" class="form-input mt-1" required>
+                            </div>
+                            <div>
+                                <label for="sleep-end-time" class="form-label">Woke up</label>
+                                <input type="time" id="sleep-end-time" class="form-input mt-1" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label mb-2 block">Sleep Quality</label>
+                            <div id="sleep-quality-rating" class="star-rating flex flex-row-reverse justify-end items-center">
+                                <button type="button" data-value="5">&starf;</button>
+                                <button type="button" data-value="4">&starf;</button>
+                                <button type="button" data-value="3">&starf;</button>
+                                <button type="button" data-value="2">&starf;</button>
+                                <button type="button" data-value="1">&starf;</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="sleep-notes" class="form-label">Notes (Optional)</label>
+                            <textarea id="sleep-notes" rows="3" class="form-input mt-1" placeholder="e.g., Woke up during the night, felt well-rested..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full btn btn-primary">Log Sleep</button>
+                    </form>
+                </div>
+                <div class="content-card">
+                    <h2 class="text-2xl font-semibold mb-4">Sleep Cycle Calculator</h2>
+                    <p class="text-gray-400 mb-4 text-sm">To wake up feeling refreshed, you should aim to wake up at the end of a sleep cycle. Here are some suggestions based on the current time.</p>
+                    <div id="sleep-wake-times" class="grid grid-cols-3 gap-3 text-center">
+                        <!-- Wake up times will be dynamically injected here -->
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4">Calculations are based on 90-minute sleep cycles and an average of 15 minutes to fall asleep.</p>
+                </div>
+            </div>
+            <div class="space-y-8">
+                 <div class="content-card">
+                    <h2 class="text-2xl font-semibold mb-4">Sleep Duration</h2>
+                    <div class="w-full h-64">
+                         <canvas id="sleep-chart"></canvas>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <h2 class="text-2xl font-semibold mb-4">Sleep History</h2>
+                    <div id="sleep-history" class="space-y-4 max-h-[30rem] overflow-y-auto pr-2">
+                        <p class="text-gray-500">No sleep logged yet.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="edit-sleep-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Edit Sleep Log</h2>
+                <button id="close-edit-sleep-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+            </div>
+            <form id="edit-sleep-log-form" class="space-y-6">
+                <div>
+                    <label for="edit-sleep-date" class="form-label">Date</label>
+                    <input type="date" id="edit-sleep-date" class="form-input mt-1" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit-sleep-start-time" class="form-label">Went to bed</label>
+                        <input type="time" id="edit-sleep-start-time" class="form-input mt-1" required>
+                    </div>
+                    <div>
+                        <label for="edit-sleep-end-time" class="form-label">Woke up</label>
+                        <input type="time" id="edit-sleep-end-time" class="form-input mt-1" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label mb-2 block">Sleep Quality</label>
+                    <div id="edit-sleep-quality-rating" class="star-rating flex flex-row-reverse justify-end items-center">
+                        <button type="button" data-value="5">&starf;</button>
+                        <button type="button" data-value="4">&starf;</button>
+                        <button type="button" data-value="3">&starf;</button>
+                        <button type="button" data-value="2">&starf;</button>
+                        <button type="button" data-value="1">&starf;</button>
+                    </div>
+                </div>
+                <div>
+                    <label for="edit-sleep-notes" class="form-label">Notes</label>
+                    <textarea id="edit-sleep-notes" rows="3" class="form-input mt-1"></textarea>
+                </div>
+                <button type="submit" class="w-full btn btn-primary">Update Sleep Log</button>
+            </form>
+        </div>
+    </div>
+    <div id="confirm-modal" class="modal-backdrop"><div class="modal-content"><h2 id="confirm-modal-title" class="text-xl font-bold mb-4">Are you sure?</h2><p id="confirm-modal-text" class="text-gray-300 mb-6">This action cannot be undone.</p><div class="flex justify-end gap-4"><button id="confirm-modal-cancel-btn" class="btn btn-secondary">Cancel</button><button id="confirm-modal-confirm-btn" class="btn btn-danger">Confirm</button></div></div></div>
+    <div id="alert-modal" class="modal-backdrop"><div class="modal-content"><h2 id="alert-modal-title" class="text-xl font-bold mb-4">Alert</h2><p id="alert-modal-text" class="text-gray-300 mb-6"></p><div class="flex justify-end"><button id="alert-modal-ok-btn" class="btn btn-primary">OK</button></div></div></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- STATE MANAGEMENT ---
+            let userProfile = { sleepHistory: [] };
+            let currentSleepQuality = 0;
+            let currentEditSleepQuality = 0;
+            let editingSleepLogIndex = null;
+            let confirmCallback = null;
+
+             // --- UI ELEMENTS ---
+            const ui = {
+                sleepLogForm: document.getElementById('sleep-log-form'),
+                sleepDateInput: document.getElementById('sleep-date'),
+                sleepQualityRating: document.getElementById('sleep-quality-rating'),
+                sleepHistoryDiv: document.getElementById('sleep-history'),
+                sleepWakeTimesDiv: document.getElementById('sleep-wake-times'),
+                editSleepModal: document.getElementById('edit-sleep-modal'),
+                closeEditSleepModalBtn: document.getElementById('close-edit-sleep-modal-btn'),
+                editSleepLogForm: document.getElementById('edit-sleep-log-form'),
+                editSleepQualityRating: document.getElementById('edit-sleep-quality-rating'),
+                confirmModal: document.getElementById('confirm-modal'),
+                confirmModalTitle: document.getElementById('confirm-modal-title'),
+                confirmModalText: document.getElementById('confirm-modal-text'),
+                confirmModalCancelBtn: document.getElementById('confirm-modal-cancel-btn'),
+                confirmModalConfirmBtn: document.getElementById('confirm-modal-confirm-btn'),
+                alertModal: document.getElementById('alert-modal'),
+                alertModalTitle: document.getElementById('alert-modal-title'),
+                alertModalText: document.getElementById('alert-modal-text'),
+                alertModalOkBtn: document.getElementById('alert-modal-ok-btn'),
+            };
+
+            // --- CHART.JS SETUP ---
+            Chart.defaults.color = 'var(--primary-text)';
+            const sleepCtx = document.getElementById('sleep-chart').getContext('2d');
+            let sleepChart = new Chart(sleepCtx, {
+                type: 'bar',
+                data: { labels: [], datasets: [] },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { color: 'var(--primary-text)', callback: (value) => value + 'h' }, 
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+                        },
+                        x: { 
+                            ticks: { color: 'var(--primary-text)' }, 
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+                        }
+                    },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `${context.raw.toFixed(2)} hours`
+                            }
+                        }
+                    }
+                }
+            });
+
+            // --- CORE FUNCTIONS ---
+            function showModal(modal) { modal.style.display = 'flex'; }
+            function hideModal(modal) { modal.style.display = 'none'; }
+            function showCustomAlert(title, text) {
+                ui.alertModalTitle.textContent = title; ui.alertModalText.textContent = text; showModal(ui.alertModal);
+            }
+            function showConfirmModal(title, text, onConfirm) {
+                ui.confirmModalTitle.textContent = title; ui.confirmModalText.textContent = text; confirmCallback = onConfirm; showModal(ui.confirmModal);
+            }
+
+            function loadData() {
+                userProfile = JSON.parse(localStorage.getItem('fitTrackAI_userProfile')) || { sleepHistory: [] };
+                if (!userProfile.sleepHistory) userProfile.sleepHistory = [];
+            }
+            function saveData() {
+                localStorage.setItem('fitTrackAI_userProfile', JSON.stringify(userProfile));
+            }
+
+            function calculateWakeUpTimes() {
+                const now = new Date();
+                const fallAsleepMinutes = 15;
+                ui.sleepWakeTimesDiv.innerHTML = '';
+
+                for(let i = 4; i <= 6; i++) { // Suggest 4, 5, and 6 cycles
+                    const cycleDurationMs = (90 * i * 60 * 1000) + (fallAsleepMinutes * 60 * 1000);
+                    const wakeUpDate = new Date(now.getTime() + cycleDurationMs);
+                    const timeString = wakeUpDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const timeEl = document.createElement('div');
+                    timeEl.className = 'bg-input-bg border border-border-color p-2 rounded-md text-center';
+                    timeEl.innerHTML = `<span class="font-semibold text-lg">${timeString}</span><span class="text-xs text-gray-400 block">${i} cycles</span>`;
+                    ui.sleepWakeTimesDiv.appendChild(timeEl);
+                }
+            }
+            
+            function renderSleepHistory() {
+                 if (!userProfile.sleepHistory || userProfile.sleepHistory.length === 0) {
+                    ui.sleepHistoryDiv.innerHTML = '<p class="text-gray-500">No sleep logged yet.</p>';
+                    return;
+                }
+
+                // Sort by date descending
+                const sortedHistory = [...userProfile.sleepHistory].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+                ui.sleepHistoryDiv.innerHTML = sortedHistory.map((log, index) => {
+                    // Use original index for editing/deleting
+                    const originalIndex = userProfile.sleepHistory.indexOf(log);
+                    const { durationHours, durationMinutes } = calculateDuration(log.startTime, log.endTime, log.date);
+                    
+                    return `
+                    <div class="bg-black/30 p-4 rounded-lg">
+                        <div class="flex justify-between items-start mb-2">
+                             <div>
+                                <h4 class="font-bold text-lg">${new Date(log.date.replace(/-/g, '/')).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</h4>
+                                <div class="flex items-center gap-1 mt-1 text-amber-400">${'★'.repeat(log.quality)}<span class="text-gray-600">${'★'.repeat(5 - log.quality)}</span></div>
+                            </div>
+                             <div class="flex gap-2">
+                                <button class="edit-sleep-btn p-1 text-gray-500 hover:text-white rounded-md transition-colors" data-index="${originalIndex}" title="Edit"><i data-lucide="pencil" class="w-5 h-5 pointer-events-none"></i></button>
+                                <button class="delete-sleep-btn p-1 text-gray-500 hover:text-white rounded-md transition-colors" data-index="${originalIndex}" title="Delete"><i data-lucide="trash-2" class="w-5 h-5 pointer-events-none"></i></button>
+                            </div>
+                        </div>
+                        <p class="text-sm"><strong>Duration:</strong> ${durationHours}h ${durationMinutes}m</p>
+                        <p class="text-sm"><strong>Time:</strong> ${log.startTime} - ${log.endTime}</p>
+                        ${log.notes ? `<p class="text-sm mt-2 pt-2 border-t border-border-color"><strong>Notes:</strong> ${log.notes}</p>` : ''}
+                    </div>
+                `;
+                }).join('');
+                lucide.createIcons();
+            }
+
+            function renderSleepChart() {
+                if (!userProfile.sleepHistory || userProfile.sleepHistory.length === 0) {
+                    sleepChart.data = { labels: [], datasets: [] };
+                    sleepChart.update();
+                    return;
+                }
+                const sortedHistory = [...userProfile.sleepHistory].sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-14); // Last 14 entries
+                const labels = sortedHistory.map(log => new Date(log.date.replace(/-/g, '/')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+                const data = sortedHistory.map(log => {
+                    const { durationHours, durationMinutes } = calculateDuration(log.startTime, log.endTime, log.date);
+                    return durationHours + (durationMinutes / 60);
+                });
+                
+                sleepChart.data = {
+                    labels,
+                    datasets: [{
+                        label: 'Sleep Duration (hours)', data, backgroundColor: 'rgba(96, 165, 250, 0.5)', borderColor: '#60a5fa', borderWidth: 2, borderRadius: 4,
+                    }]
+                };
+                sleepChart.update();
+            }
+
+            function calculateDuration(startTime, endTime, dateStr) {
+                const startDate = new Date(`${dateStr}T${startTime}`);
+                const endDate = new Date(`${dateStr}T${endTime}`);
+                if(endDate <= startDate) endDate.setDate(endDate.getDate() + 1);
+                const durationMs = endDate - startDate;
+                const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+                const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+                return { durationHours, durationMinutes };
+            }
+
+            function openEditSleepModal(index) {
+                const log = userProfile.sleepHistory[index];
+                if (!log) return;
+                editingSleepLogIndex = index;
+                document.getElementById('edit-sleep-date').value = log.date;
+                document.getElementById('edit-sleep-start-time').value = log.startTime;
+                document.getElementById('edit-sleep-end-time').value = log.endTime;
+                document.getElementById('edit-sleep-notes').value = log.notes;
+                currentEditSleepQuality = log.quality;
+                updateStarRating(ui.editSleepQualityRating, currentEditSleepQuality);
+                showModal(ui.editSleepModal);
+            }
+
+            function updateStarRating(container, quality) {
+                Array.from(container.children).forEach(button => {
+                    button.classList.toggle('selected', parseInt(button.dataset.value, 10) <= quality);
+                });
+            }
+
+            function handleRating(container, e, isEdit = false) {
+                 const button = e.target.closest('button');
+                 if (button && button.dataset.value) {
+                    const quality = parseInt(button.dataset.value, 10);
+                    if (isEdit) { currentEditSleepQuality = quality; }
+                    else { currentSleepQuality = quality; }
+                    updateStarRating(container, quality);
+                }
+            }
+            
+            function fullRender() {
+                renderSleepHistory();
+                renderSleepChart();
+                calculateWakeUpTimes();
+            }
+
+            // --- EVENT LISTENERS ---
+            ui.sleepLogForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const date = ui.sleepDateInput.value;
+                const startTime = document.getElementById('sleep-start-time').value;
+                const endTime = document.getElementById('sleep-end-time').value;
+                const notes = document.getElementById('sleep-notes').value;
+                if (!date || !startTime || !endTime || currentSleepQuality === 0) {
+                    showCustomAlert('Missing Info', 'Please fill in date, sleep/wake times and select a quality rating.');
+                    return;
+                }
+                const sleepLog = { date, startTime, endTime, quality: currentSleepQuality, notes };
+                userProfile.sleepHistory.push(sleepLog);
+                saveData();
+                fullRender();
+                ui.sleepLogForm.reset();
+                ui.sleepDateInput.value = new Date().toISOString().split('T')[0];
+                currentSleepQuality = 0;
+                updateStarRating(ui.sleepQualityRating, 0);
+            });
+
+            ui.editSleepLogForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (editingSleepLogIndex === null) return;
+
+                const updatedLog = {
+                    date: document.getElementById('edit-sleep-date').value,
+                    startTime: document.getElementById('edit-sleep-start-time').value,
+                    endTime: document.getElementById('edit-sleep-end-time').value,
+                    notes: document.getElementById('edit-sleep-notes').value,
+                    quality: currentEditSleepQuality
+                };
+                userProfile.sleepHistory[editingSleepLogIndex] = updatedLog;
+                saveData();
+                fullRender();
+                hideModal(ui.editSleepModal);
+                editingSleepLogIndex = null;
+            });
+
+            ui.sleepQualityRating.addEventListener('click', (e) => handleRating(ui.sleepQualityRating, e, false));
+            ui.editSleepQualityRating.addEventListener('click', (e) => handleRating(ui.editSleepQualityRating, e, true));
+
+            ui.sleepHistoryDiv.addEventListener('click', (e) => {
+                const editBtn = e.target.closest('.edit-sleep-btn');
+                const deleteBtn = e.target.closest('.delete-sleep-btn');
+                if (editBtn) openEditSleepModal(parseInt(editBtn.dataset.index));
+                if (deleteBtn) {
+                     const indexToDelete = parseInt(deleteBtn.dataset.index);
+                     showConfirmModal('Delete Sleep Log?', 'Are you sure?', () => {
+                        userProfile.sleepHistory.splice(indexToDelete, 1);
+                        saveData();
+                        fullRender();
+                    });
+                }
+            });
+
+            ui.closeEditSleepModalBtn.addEventListener('click', () => hideModal(ui.editSleepModal));
+            ui.alertModalOkBtn.addEventListener('click', () => hideModal(ui.alertModal));
+            ui.confirmModalCancelBtn.addEventListener('click', () => hideModal(ui.confirmModal));
+            ui.confirmModalConfirmBtn.addEventListener('click', () => {
+                if(confirmCallback) confirmCallback(); hideModal(ui.confirmModal);
+            });
+
+            // --- INITIALIZATION ---
+            loadData();
+            fullRender();
+            ui.sleepDateInput.value = new Date().toISOString().split('T')[0];
+            setInterval(calculateWakeUpTimes, 60000); // Update wake up times every minute
+        });
+    </script>
+</body>
+</html>

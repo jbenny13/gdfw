@@ -125,18 +125,22 @@
         }
         
         .btn-danger {
-            background-color: var(--danger);
-            color: var(--primary-text);
+            color: var(--danger);
         }
         
         .btn-danger:hover:not(:disabled) {
-             background-color: #C53030;
+             background-color: rgba(229, 62, 62, 0.1);
+        }
+
+        #workout-actions-dropdown {
+            z-index: 50;
+            background-color: var(--card-bg);
         }
 
         .modal-backdrop {
             display: none;
             position: fixed;
-            z-index: 50;
+            z-index: 100;
             top: 0;
             left: 0;
             width: 100%;
@@ -178,21 +182,54 @@
         
         .exercise-item-controls { display: none; }
         .exercise-item:hover .exercise-item-controls { display: inline-flex; }
-        .workout-day-card.expanded {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 100;
-            background-color: var(--card-bg);
-            padding: 2rem;
-            overflow-y: auto;
-            border-color: transparent !important;
-            cursor: default;
+        
+        .calendar-day {
+            padding: 0.25rem 0;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: 1px solid transparent;
         }
-        .workout-day-card.expanded .planner-exercises {
-            max-height: calc(100vh - 12rem);
+        .calendar-day:hover:not(.is-future) {
+            background-color: var(--input-bg);
+        }
+        .calendar-day.is-today {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .calendar-day.is-selected {
+            background-color: var(--accent);
+            color: var(--background);
+            font-weight: 700;
+        }
+        .calendar-day.has-workout {
+            position: relative;
+        }
+        .calendar-day.has-workout::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: #3b82f6; /* Blue dot */
+        }
+        .calendar-day.is-selected.has-workout::after {
+            background-color: var(--background);
+        }
+        .calendar-day.is-future {
+            color: var(--secondary-text);
+            opacity: 0.5;
+            cursor: default;
+            pointer-events: none;
+        }
+        
+        .log-workout-btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            cursor: not-allowed;
         }
 
     </style>
@@ -204,7 +241,7 @@
         <!-- Header -->
         <header class="flex flex-col sm:flex-row items-center justify-between mb-16 pb-4 border-b border-gray-900">
             <a href="index.html" class="flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
                 <h1 class="text-2xl font-bold">FitTrack AI</h1>
             </a>
             <nav class="mt-4 sm:mt-0">
@@ -223,71 +260,92 @@
         <main>
              <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold">Your Workout Plan</h2>
-                <p class="text-gray-400 mt-2">Push, Pull, Legs split. Click a day to expand, then click an exercise for details.</p>
+                <p class="text-gray-400 mt-2">Push, Pull, Legs split.</p>
             </div>
             
-             <div class="content-card mb-8">
-                <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-                    <h3 class="text-2xl font-semibold text-center sm:text-left">This Week's Schedule</h3>
-                    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                         <button id="manage-warmups-btn" class="btn btn-secondary">
-                           <i data-lucide="flame" class="w-4 h-4"></i>
-                           Manage Warm-ups
-                        </button>
-                        <button id="add-exercise-btn" class="btn btn-primary">
-                           <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                           Add Exercise
-                        </button>
-                    </div>
-                </div>
-                <div id="workout-planner" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
-                    <!-- Planner will be injected here by JS -->
-                </div>
-            </div>
-
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="content-card lg:col-span-2">
-                    <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
-                        <h3 class="text-2xl font-semibold mb-4 sm:mb-0">Progression Chart</h3>
-                        <select id="progress-exercise-select" class="w-full sm:w-auto form-input">
-                            <option value="">Select an exercise to see progress</option>
-                        </select>
-                    </div>
-                    <div class="w-full h-80 flex items-center justify-center">
-                        <canvas id="progress-chart"></canvas>
-                    </div>
-                </div>
-                 <div class="content-card">
+                <!-- Left Column: Main Interactive View -->
+                <div class="lg:col-span-2 content-card">
                     <div class="flex justify-between items-center mb-4">
-                       <h3 class="text-2xl font-semibold">Workout History</h3>
-                       <button id="clear-history-btn" class="text-sm btn btn-danger !py-1 !px-3">Clear History</button>
-                    </div>
-                    <div id="workout-history" class="space-y-4 max-h-[22.5rem] overflow-y-auto custom-scrollbar pr-2"></div>
-                </div>
-            </div>
-
-             <div class="content-card mt-8">
-                <h3 class="text-2xl font-semibold mb-4 text-center">AI Coach: Weekly Volume & Progression</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <h4 class="font-bold text-lg text-blue-400 mb-2">Weekly Volume Analysis</h4>
-                        <div id="volume-analysis" class="space-y-2">
-                            <p class="text-gray-400">Log some workouts to see your weekly volume analysis.</p>
+                         <div class="flex-1">
+                             <h4 id="day-view-title" class="text-2xl font-semibold">Select a day</h4>
+                        </div>
+                        <div class="flex items-center gap-2">
+                             <button id="back-to-today-btn" class="btn btn-secondary !p-2" title="Go to Today">
+                                <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                            </button>
+                             <div class="relative">
+                                <button id="workout-actions-btn" class="btn btn-secondary !p-2">
+                                    <i data-lucide="more-horizontal" class="w-5 h-5"></i>
+                                </button>
+                                <div id="workout-actions-dropdown" class="absolute right-0 mt-2 w-48 border border-border-color rounded-md shadow-lg hidden">
+                                    <button id="manage-warmups-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-t-md">
+                                        <i data-lucide="flame" class="w-4 h-4"></i> Manage Warm-ups
+                                    </button>
+                                    <button id="add-exercise-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2">
+                                        <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Exercise
+                                    </button>
+                                    <button id="clear-history-btn" class="w-full text-left px-4 py-2 text-sm btn-danger hover:bg-input-bg flex items-center gap-2 rounded-b-md">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i> Clear All History
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    
+                    <div class="flex items-center justify-center gap-4 mb-6">
+                        <button id="prev-day-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                        <button id="day-view-date-display-btn" class="text-lg font-semibold text-center w-48 hover:bg-input-bg px-4 py-2 rounded-lg transition-colors"></button>
+                        <button id="next-day-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                    </div>
+
                     <div>
-                         <h4 class="font-bold text-lg text-blue-400 mb-2">Progression Advice</h4>
-                         <p class="text-gray-400 text-sm mb-3">Select an exercise to get science-based advice on when to add weight or reps.</p>
-                         <div class="flex gap-2">
-                            <select id="ai-advice-exercise-select" class="w-full form-input">
-                                <option value="">Select an exercise...</option>
+                        <div class="flex justify-end items-baseline mb-2">
+                            <span id="day-view-status" class="text-sm font-bold"></span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mt-4">
+                            <div>
+                                <h5 class="font-semibold text-lg mb-2 border-b border-border-color pb-1">Plan</h5>
+                                <div id="workout-plan-for-day" class="space-y-4 max-h-96 overflow-y-auto custom-scrollbar pr-2"></div>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold text-lg mb-2 border-b border-border-color pb-1">History</h5>
+                                <div id="history-day-content" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar pr-2">
+                                    <p class="text-secondary-text">No workouts logged.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Supporting Info -->
+                <div class="space-y-8">
+                    <div class="content-card">
+                        <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+                            <h3 class="text-2xl font-semibold">Progression</h3>
+                            <select id="progress-exercise-select" class="w-full sm:w-auto form-input">
+                                <option value="">Select an exercise</option>
                             </select>
-                            <button id="get-ai-advice-btn" class="btn btn-secondary">
-                                <span class="btn-text">Get Advice</span>
-                                 <div class="loader hidden ml-2"></div>
-                            </button>
-                         </div>
-                         <div id="ai-advice-output" class="mt-4 p-3 bg-black/30 rounded-md text-sm"></div>
+                        </div>
+                        <div class="w-full h-80 flex items-center justify-center">
+                            <canvas id="progress-chart"></canvas>
+                        </div>
+                    </div>
+                     <div class="content-card">
+                        <h3 class="text-2xl font-semibold mb-4 text-center">AI Coach: Progression Advice</h3>
+                        <div class="max-w-md mx-auto">
+                             <p class="text-gray-400 text-sm mb-3 text-center">Select an exercise to get science-based advice on when to add weight or reps.</p>
+                             <div class="flex gap-2">
+                                <select id="ai-advice-exercise-select" class="w-full form-input">
+                                    <option value="">Select an exercise...</option>
+                                </select>
+                                <button id="get-ai-advice-btn" class="btn btn-secondary">
+                                    <span class="btn-text">Get Advice</span>
+                                     <div class="loader hidden ml-2"></div>
+                                </button>
+                             </div>
+                             <div id="ai-advice-output" class="mt-4 p-3 bg-black/30 rounded-md text-sm min-h-[50px]"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -295,6 +353,16 @@
     </div>
 
     <!-- Modals -->
+    <div id="date-picker-modal" class="modal-backdrop">
+        <div class="modal-content !max-w-sm">
+             <div class="flex justify-between items-center mb-4">
+                <button id="modal-prev-month-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                <h4 id="modal-month-year-display" class="text-lg font-semibold"></h4>
+                <button id="modal-next-month-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+            </div>
+            <div id="modal-calendar-grid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+        </div>
+    </div>
     <div id="exercise-detail-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 id="exercise-detail-title" class="text-2xl font-bold">Exercise Details</h2><button id="close-exercise-detail-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-gray-800"><img id="exercise-detail-video" src="" alt="Video placeholder" class="w-full h-full object-contain"></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Instructions</h3><ul id="exercise-detail-instructions" class="list-disc list-inside space-y-1 text-gray-300"></ul></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Rep Range</h3><p id="exercise-detail-rep-range" class="text-gray-300"></p></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Personal Notes & Advice</h3><textarea id="exercise-detail-notes" rows="4" class="form-input mt-1" placeholder="Add your personal cues, weight progression goals, etc."></textarea><button id="save-exercise-notes-btn" class="mt-2 w-full btn btn-secondary">Save Notes</button></div><button id="log-from-detail-btn" class="w-full btn btn-primary mt-4">Log This Exercise</button></div></div></div>
     <div id="warmup-manage-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Manage Warm-ups</h2><button id="close-warmup-manage-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div><label for="warmup-day-select" class="form-label">Workout Day</label><select id="warmup-day-select" class="form-input mt-1"><option value="Push">Push</option><option value="Pull">Pull</option><option value="Legs">Legs</option></select></div><div id="warmup-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div><hr class="border-gray-800"><form id="warmup-form" class="space-y-3"><h3 id="warmup-form-title" class="font-bold text-lg text-blue-400">Add New Warm-up</h3><div><label for="warmup-name" class="form-label">Name</label><input type="text" id="warmup-name" class="form-input mt-1" required></div><div><label for="warmup-instructions" class="form-label">Instructions (one per line)</label><textarea id="warmup-instructions" rows="4" class="form-input mt-1"></textarea></div><button type="submit" id="save-warmup-btn" class="w-full btn btn-primary">Add Warm-up</button></form></div></div></div>
     <div id="workout-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="modal-title" class="text-2xl font-bold">Log Exercise</h2><button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="workout-log-form"><div class="space-y-4"><div id="sets-container"></div><button type="button" id="add-set-btn" class="w-full btn btn-secondary">Add Set</button><button type="submit" id="save-workout-btn" class="w-full btn btn-primary mt-2">Save Workout</button></div></form></div></div>
@@ -313,6 +381,13 @@
             let editingExerciseName = null;
             let editingWarmupIndex = null;
             let confirmCallback = null;
+            let viewDate = new Date(); // Central state for the currently viewed date
+            let modalCalendarDate = new Date();
+            
+            // --- Set viewDate to today, ignoring time
+            viewDate.setHours(0,0,0,0);
+            modalCalendarDate.setHours(0,0,0,0);
+
 
             // --- DATABASES ---
              const defaultWarmups = {
@@ -363,7 +438,6 @@
 
             // --- UI ELEMENTS ---
             const ui = {
-                workoutHistoryDiv: document.getElementById('workout-history'),
                 workoutModal: document.getElementById('workout-modal'),
                 modalTitle: document.getElementById('modal-title'),
                 closeModalBtn: document.getElementById('close-modal-btn'),
@@ -385,10 +459,8 @@
                 exerciseForm: document.getElementById('exercise-form'),
                 exerciseModalTitle: document.getElementById('exercise-modal-title'),
                 progressExerciseSelect: document.getElementById('progress-exercise-select'),
-                workoutPlannerDiv: document.getElementById('workout-planner'),
                 clearHistoryBtn: document.getElementById('clear-history-btn'),
                 addExerciseBtn: document.getElementById('add-exercise-btn'),
-                volumeAnalysisDiv: document.getElementById('volume-analysis'),
                 aiAdviceExerciseSelect: document.getElementById('ai-advice-exercise-select'),
                 getAIAdviceBtn: document.getElementById('get-ai-advice-btn'),
                 aiAdviceOutput: document.getElementById('ai-advice-output'),
@@ -410,10 +482,27 @@
                 warmupFormTitle: document.getElementById('warmup-form-title'),
                 warmupNameInput: document.getElementById('warmup-name'),
                 warmupInstructionsInput: document.getElementById('warmup-instructions'),
-                saveWarmupBtn: document.getElementById('save-warmup-btn')
+                saveWarmupBtn: document.getElementById('save-warmup-btn'),
+                backToTodayBtn: document.getElementById('back-to-today-btn'),
+                dayViewTitleBtn: document.getElementById('day-view-date-display-btn'),
+                dayViewTitle: document.getElementById('day-view-title'),
+                dayViewStatus: document.getElementById('day-view-status'),
+                dayViewDateDisplay: document.getElementById('day-view-date-display-btn'),
+                workoutPlanForDay: document.getElementById('workout-plan-for-day'),
+                historyDayContent: document.getElementById('history-day-content'),
+                workoutActionsBtn: document.getElementById('workout-actions-btn'),
+                workoutActionsDropdown: document.getElementById('workout-actions-dropdown'),
+                datePickerModal: document.getElementById('date-picker-modal'),
+                modalCalendarGrid: document.getElementById('modal-calendar-grid'),
+                modalMonthYearDisplay: document.getElementById('modal-month-year-display'),
+                modalPrevMonthBtn: document.getElementById('modal-prev-month-btn'),
+                modalNextMonthBtn: document.getElementById('modal-next-month-btn'),
+                prevDayBtn: document.getElementById('prev-day-btn'),
+                nextDayBtn: document.getElementById('next-day-btn'),
             };
 
             // --- CHART.JS SETUP ---
+            Chart.defaults.color = '#FFFFFF';
             const progressCtx = document.getElementById('progress-chart').getContext('2d');
             let progressChart = new Chart(progressCtx, {
                 type: 'line',
@@ -421,10 +510,10 @@
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     scales: {
-                        y: { beginAtZero: true, ticks: { color: 'var(--primary-text)' }, grid: { color: 'var(--border-color)' } },
-                        x: { ticks: { color: 'var(--primary-text)' }, grid: { color: 'var(--border-color)' } }
+                        y: { beginAtZero: true, ticks: { color: '#FFFFFF' }, grid: { color: 'rgba(255, 255, 255, 0.2)' } },
+                        x: { ticks: { color: '#FFFFFF' }, grid: { color: 'rgba(255, 255, 255, 0.2)' } }
                     },
-                    plugins: { legend: { labels: { color: 'var(--primary-text)' } } }
+                    plugins: { legend: { labels: { color: '#FFFFFF' } } }
                 }
             });
 
@@ -462,74 +551,13 @@
                 showModal(ui.alertModal);
             };
 
-            function fullRender() {
-                renderWorkoutPlanner();
-                renderWorkoutHistory();
+            function updateUI() {
+                updateDayView(viewDate);
                 populateProgressSelect();
                 renderProgressionChart(ui.progressExerciseSelect.value);
-                renderAIWorkoutAnalysis();
-                lucide.createIcons();
             }
 
             // --- WORKOUT SPECIFIC FUNCTIONS ---
-
-            function renderWorkoutPlanner() {
-                const schedule = [
-                    { day: "Monday", type: "Push" }, { day: "Tuesday", type: "Pull" },
-                    { day: "Wednesday", type: "Legs" }, { day: "Thursday", type: "Push" },
-                    { day: "Friday", type: "Pull" }, { day: "Saturday", type: "Legs" },
-                    { day: "Sunday", type: "Rest" },
-                ];
-                
-                const exerciseGroups = { "Push": ['Chest', 'Shoulders', 'Triceps'], "Pull": ['Back', 'Biceps', 'Forearms'], "Legs": ['Quads', 'Abductors', 'Glutes', 'Hamstrings',  'Calves', 'Abs'] };
-                const todayIndex = (new Date().getDay() + 6) % 7;
-
-                ui.workoutPlannerDiv.innerHTML = schedule.map((item, index) => {
-                    const isToday = index === todayIndex;
-                    let exercisesHtml = '';
-                    if (item.type === 'Rest') {
-                        exercisesHtml = `<div class="flex flex-col items-center justify-center h-full text-center p-4"><i data-lucide="bed-double" class="w-12 h-12 text-gray-500 mb-2"></i><p class="text-gray-500 italic mt-2">Rest Day</p></div>`;
-                    } else {
-                        const groupsForDay = exerciseGroups[item.type];
-                        const warmupExercises = warmups[item.type] || [];
-                        
-                        exercisesHtml = '<div class="planner-exercises space-y-4 pr-2 overflow-y-auto max-h-64 custom-scrollbar">';
-                        
-                        if (warmupExercises.length > 0) {
-                            exercisesHtml += `<div><h5 class="font-semibold text-green-400 text-sm mb-1">Warm-up</h5><ul class="space-y-1">${warmupExercises.map(w => `<li class="text-sm text-gray-300 exercise-item flex justify-between items-center group"><button class="flex-grow text-left p-1 rounded hover:bg-black/30 warmup-detail-btn" data-name="${w.name}" data-day-type="${item.type}">${w.name}</button><span class="exercise-item-controls items-center gap-1 pl-1"><button class="edit-warmup-btn p-1" data-name="${w.name}" data-day-type="${item.type}" title="Edit Warmup"><i data-lucide="pencil" class="w-4 h-4 text-gray-500 hover:text-yellow-400 pointer-events-none"></i></button><button class="delete-warmup-btn p-1" data-name="${w.name}" data-day-type="${item.type}" title="Delete Warmup"><i data-lucide="trash-2" class="w-4 h-4 text-gray-500 hover:text-red-500 pointer-events-none"></i></button></span></li>`).join('')}</ul></div>`;
-                        }
-                        
-                        for(const group of groupsForDay) {
-                            const exercisesForGroup = exerciseDB.filter(ex => ex.group === group);
-                            if(exercisesForGroup.length > 0) {
-                                exercisesHtml += `<div><h5 class="font-semibold text-blue-400 text-sm mb-1">${group}</h5><ul class="space-y-1">${exercisesForGroup.map(ex => `<li class="text-sm text-gray-300 exercise-item flex justify-between items-center group"><button class="flex-grow text-left p-1 rounded hover:bg-black/30 log-workout-btn" data-name="${ex.name}">${ex.name}</button><span class="exercise-item-controls items-center gap-1 pl-1"><button class="edit-exercise-btn p-1" data-name="${ex.name}" title="Edit Exercise"><i data-lucide="pencil" class="w-4 h-4 text-gray-500 hover:text-yellow-400 pointer-events-none"></i></button><button class="delete-exercise-btn p-1" data-name="${ex.name}" title="Delete Exercise"><i data-lucide="trash-2" class="w-4 h-4 text-gray-500 hover:text-red-500 pointer-events-none"></i></button></span></li>`).join('')}</ul></div>`;
-                            }
-                        }
-                        exercisesHtml += '</div>';
-                    }
-                    
-                    return `<div class="workout-day-card flex flex-col ${isToday ? 'border-2 border-blue-500' : 'border-2 border-transparent'} bg-black/30 p-3 rounded-lg h-full cursor-pointer" data-day-index="${index}"><h4 class="font-bold text-lg text-center ${isToday ? 'text-blue-400' : 'text-white'}">${item.day}</h4><p class="text-center font-semibold text-gray-400 mb-3">${item.type}</p><div class="flex-grow min-h-0">${exercisesHtml}</div></div>`;
-                }).join('');
-                lucide.createIcons();
-            }
-
-            function renderWorkoutHistory() {
-                if (workoutHistory.length === 0) {
-                    ui.workoutHistoryDiv.innerHTML = '<p class="text-gray-500 text-center">No workouts logged yet.</p>';
-                    return;
-                }
-                ui.workoutHistoryDiv.innerHTML = workoutHistory.map((log, index) => ({...log, originalIndex: index}))
-                .reverse()
-                .map(log => {
-                    const setsHtml = log.sets.map((setParts, i) => {
-                        const partsHtml = setParts.map(part => `${part.weight} kg x ${part.reps} reps ${part.partial ? '<span class="text-yellow-400">(P)</span>' : ''}`).join(', ');
-                        return `<span><strong>Set ${i+1}:</strong> ${partsHtml}</span>`;
-                    }).join('<br>');
-                    
-                    return `<div class="bg-black/30 p-4 rounded-md"><div class="flex justify-between items-start mb-2"><div><h4 class="font-bold text-lg text-blue-400">${log.name}</h4><span class="text-sm text-gray-500">${new Date(log.date).toLocaleDateString()}</span></div><div class="flex gap-2"><button class="edit-log-btn p-1 hover:bg-gray-900 rounded" data-index="${log.originalIndex}"><i data-lucide="pencil" class="w-4 h-4"></i></button><button class="delete-log-btn p-1 hover:bg-gray-900 rounded" data-index="${log.originalIndex}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div><div class="text-sm space-y-1">${setsHtml}</div></div>`;
-                }).join('');
-                lucide.createIcons();
-            };
             
             function openWorkoutModal(exerciseName) {
                 editingWorkoutLogIndex = null;
@@ -560,10 +588,164 @@
             };
 
             function addWeightRepPart(container, weight='', reps='', isPartial=false) {
-                const partHtml = `<div class="set-part-row grid grid-cols-12 gap-2 items-center"><input type="number" step="0.25" placeholder="Weight (kg)" value="${weight}" class="form-input !py-2 col-span-5 set-weight"><span class="text-center col-span-1">x</span><input type="number" placeholder="Reps" value="${reps}" class="form-input !py-2 col-span-2 set-reps"><div class="col-span-3 flex items-center justify-center"><input type="checkbox" ${isPartial ? 'checked' : ''} class="form-checkbox h-5 w-5 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500 set-partial"><label class="ml-2 text-sm">Partial</label></div><button type="button" class="remove-part-btn text-gray-500 hover:text-red-400 p-1 col-span-1"><i data-lucide="x-circle" class="w-4 h-4"></i></button></div>`;
+                const partHtml = `<div class="set-part-row grid grid-cols-12 gap-2 items-center"><input type="number" step="0.25" min="0" placeholder="Weight (kg)" value="${weight}" class="form-input !py-2 col-span-5 set-weight"><span class="text-center col-span-1">x</span><input type="number" min="1" step="1" placeholder="Reps" value="${reps}" class="form-input !py-2 col-span-2 set-reps"><div class="col-span-3 flex items-center justify-center"><input type="checkbox" ${isPartial ? 'checked' : ''} class="form-checkbox h-5 w-5 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500 set-partial"><label class="ml-2 text-sm">Partial</label></div><button type="button" class="remove-part-btn text-gray-500 hover:text-red-400 p-1 col-span-1"><i data-lucide="x-circle" class="w-4 h-4"></i></button></div>`;
                 container.insertAdjacentHTML('beforeend', partHtml);
                 lucide.createIcons();
             };
+
+            // --- CALENDAR & DAY VIEW FUNCTIONS ---
+            function renderCalendar(container, date, isModal = false) {
+                container.innerHTML = '';
+                const year = date.getFullYear();
+                const month = date.getMonth();
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                
+                if(isModal) {
+                    ui.modalMonthYearDisplay.textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`;
+                }
+
+                const firstDayOfMonth = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                
+                const dayHeaders = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+                dayHeaders.forEach(day => {
+                    const dayEl = document.createElement('div');
+                    dayEl.textContent = day;
+                    dayEl.className = 'font-bold text-secondary-text';
+                    container.appendChild(dayEl);
+                });
+
+                const dayOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1; 
+
+                for (let i = 0; i < dayOffset; i++) {
+                    const emptyCell = document.createElement('div');
+                    container.appendChild(emptyCell);
+                }
+
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const dayEl = document.createElement('div');
+                    const dayDate = new Date(year, month, i);
+                    dayEl.textContent = i;
+                    dayEl.classList.add('calendar-day');
+                    dayEl.dataset.date = dayDate.toISOString().split('T')[0];
+                    
+                    if (dayDate.getTime() === today.getTime()) dayEl.classList.add('is-today');
+                    if (viewDate && dayDate.toDateString() === viewDate.toDateString()) dayEl.classList.add('is-selected');
+                    if (dayDate > today) dayEl.classList.add('is-future');
+                    
+                    const hasWorkout = workoutHistory.some(log => new Date(log.date).toDateString() === dayDate.toDateString());
+                    if (hasWorkout) dayEl.classList.add('has-workout');
+
+                    container.appendChild(dayEl);
+                }
+            }
+
+            function updateDayView(date) {
+                viewDate = date; // Update central state
+                renderWorkoutPlanForDate(date);
+                renderHistoryForDate(date);
+                ui.dayViewTitle.textContent = date.toLocaleDateString(undefined, { weekday: 'long' });
+                ui.dayViewDateDisplay.textContent = date.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
+
+                lucide.createIcons();
+            }
+            
+            function renderWorkoutPlanForDate(date) {
+                const schedule = [ { day: "Monday", type: "Push" }, { day: "Tuesday", type: "Pull" }, { day: "Wednesday", type: "Legs" }, { day: "Thursday", type: "Push" }, { day: "Friday", type: "Pull" }, { day: "Saturday", type: "Legs" }, { day: "Sunday", type: "Rest" }];
+                const exerciseGroups = { "Push": ['Chest', 'Shoulders', 'Triceps'], "Pull": ['Back', 'Biceps', 'Forearms'], "Legs": ['Quads', 'Abductors', 'Glutes', 'Hamstrings',  'Calves', 'Abs'] };
+                
+                const dayIndex = (date.getDay() + 6) % 7;
+                const item = schedule[dayIndex];
+                
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                const isFutureDay = date > today;
+
+                let exercisesHtml = '';
+                if (item.type === 'Rest') {
+                    exercisesHtml = `<div class="flex flex-col items-center justify-center h-full text-center p-4"><i data-lucide="bed-double" class="w-12 h-12 text-gray-500 mb-2"></i><p class="text-gray-500 italic mt-2">Rest Day</p></div>`;
+                } else {
+                    const groupsForDay = exerciseGroups[item.type];
+                    const warmupExercises = warmups[item.type] || [];
+                    
+                    if (warmupExercises.length > 0) {
+                        exercisesHtml += `<div><h5 class="font-semibold text-green-400 text-sm mb-1">Warm-up</h5><ul class="space-y-1">${warmupExercises.map(w => `<li class="text-base text-gray-300 exercise-item flex justify-between items-center group"><button class="flex-grow text-left p-1 rounded hover:bg-black/30 warmup-detail-btn" data-name="${w.name}" data-day-type="${item.type}">${w.name}</button><span class="exercise-item-controls items-center gap-1 pl-1"><button class="edit-warmup-btn p-1" data-name="${w.name}" data-day-type="${item.type}" title="Edit Warmup"><i data-lucide="pencil" class="w-4 h-4 text-gray-500 hover:text-yellow-400 pointer-events-none"></i></button><button class="delete-warmup-btn p-1" data-name="${w.name}" data-day-type="${item.type}" title="Delete Warmup"><i data-lucide="trash-2" class="w-4 h-4 text-gray-500 hover:text-red-500 pointer-events-none"></i></button></span></li>`).join('')}</ul></div>`;
+                    }
+                    
+                    for(const group of groupsForDay) {
+                        const exercisesForGroup = exerciseDB.filter(ex => ex.group === group);
+                        if(exercisesForGroup.length > 0) {
+                            exercisesHtml += `<div><h5 class="font-semibold text-blue-400 text-sm mb-1">${group}</h5><ul class="space-y-1">${exercisesForGroup.map(ex => `<li class="text-base text-gray-300 exercise-item flex justify-between items-center group"><button class="flex-grow text-left p-1 rounded hover:bg-black/30 log-workout-btn" data-name="${ex.name}" ${isFutureDay ? 'disabled' : ''}>${ex.name}</button><span class="exercise-item-controls items-center gap-1 pl-1"><button class="edit-exercise-btn p-1" data-name="${ex.name}" title="Edit Exercise"><i data-lucide="pencil" class="w-4 h-4 text-gray-500 hover:text-yellow-400 pointer-events-none"></i></button><button class="delete-exercise-btn p-1" data-name="${ex.name}" title="Delete Exercise"><i data-lucide="trash-2" class="w-4 h-4 text-gray-500 hover:text-red-500 pointer-events-none"></i></button></span></li>`).join('')}</ul></div>`;
+                        }
+                    }
+                }
+                ui.workoutPlanForDay.innerHTML = exercisesHtml;
+            }
+
+            function renderHistoryForDate(date) {
+                const logsForDay = workoutHistory.filter(log => new Date(log.date.replace(/-/g, '/')).toDateString() === date.toDateString());
+
+                if (logsForDay.length === 0) {
+                    ui.historyDayContent.innerHTML = `<p class="text-secondary-text">No workouts logged.</p>`;
+                    ui.dayViewStatus.textContent = '';
+                    return;
+                }
+
+                ui.historyDayContent.innerHTML = logsForDay.map(log => {
+                     const setsHtml = log.sets.map((setParts, i) => `<span><strong>Set ${i+1}:</strong> ${setParts.map(p => `${p.weight}kg x ${p.reps}r ${p.partial ? '(P)' : ''}`).join(', ')}</span>`).join('<br>');
+                     return `<div class="bg-black/30 p-2 rounded-md"><strong class="text-primary-text">${log.name}</strong><div class="text-sm text-secondary-text mt-1">${setsHtml}</div></div>`;
+                }).join('');
+
+                const schedule = [ { day: "Monday", type: "Push" }, { day: "Tuesday", type: "Pull" }, { day: "Wednesday", type: "Legs" }, { day: "Thursday", type: "Push" }, { day: "Friday", type: "Pull" }, { day: "Saturday", type: "Legs" }, { day: "Sunday", type: "Rest" }];
+                const exerciseGroups = { "Push": ['Chest', 'Shoulders', 'Triceps'], "Pull": ['Back', 'Biceps', 'Forearms'], "Legs": ['Quads', 'Abductors', 'Glutes', 'Hamstrings',  'Calves', 'Abs'] };
+
+                const dayIndex = (date.getDay() + 6) % 7;
+                const workoutType = schedule[dayIndex].type;
+
+                if (workoutType !== 'Rest') {
+                    const requiredGroups = exerciseGroups[workoutType];
+                    
+                    const loggedGroupCounts = {};
+                    logsForDay.forEach(log => {
+                        const exercise = exerciseDB.find(ex => ex.name === log.name);
+                        if (exercise && exercise.group) {
+                            if (!loggedGroupCounts[exercise.group]) {
+                                loggedGroupCounts[exercise.group] = 0;
+                            }
+                            loggedGroupCounts[exercise.group]++;
+                        }
+                    });
+
+                    let allDone = true;
+                    if (requiredGroups.length === 0) {
+                        allDone = false;
+                    } else {
+                        for (const group of requiredGroups) {
+                            const loggedCount = loggedGroupCounts[group] || 0;
+                            const requiredCount = (workoutType === 'Legs') ? 1 : 2;
+                            
+                            const exercisesInPlanForGroup = exerciseDB.filter(ex => ex.group === group).length;
+                            if (exercisesInPlanForGroup > 0 && loggedCount < requiredCount) {
+                                allDone = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (allDone) {
+                        ui.dayViewStatus.textContent = "Complete";
+                        ui.dayViewStatus.className = 'text-sm font-bold text-green-400';
+                    } else {
+                        ui.dayViewStatus.textContent = "Incomplete";
+                        ui.dayViewStatus.className = 'text-sm font-bold text-yellow-400';
+                    }
+                } else {
+                     ui.dayViewStatus.textContent = "Rest Day";
+                     ui.dayViewStatus.className = 'text-sm font-bold text-secondary-text';
+                }
+            }
+
 
             // --- EVENT LISTENERS ---
             ui.addExerciseBtn.addEventListener('click', () => populateExerciseModal());
@@ -576,10 +758,6 @@
             ui.confirmModalConfirmBtn.addEventListener('click', () => { if(confirmCallback) confirmCallback(); hideModal(ui.confirmModal); });
             ui.progressExerciseSelect.addEventListener('change', (e) => renderProgressionChart(e.target.value));
             
-            // ... all other functions and event listeners from the original script related to workouts ...
-            // The following is a condensed version of the remaining functions and listeners
-            // to ensure all functionality is included.
-
             function populateProgressSelect() {
                 const exercisedNames = [...new Set(workoutHistory.map(log => log.name))].sort();
                 const options = '<option value="">Select an exercise...</option>' + exercisedNames.map(name => `<option value="${name}">${name}</option>`).join('');
@@ -595,7 +773,7 @@
                 }
                 const exerciseLogs = workoutHistory.filter(log => log.name === exerciseName).sort((a,b) => new Date(a.date) - new Date(b.date));
                 
-                const labels = exerciseLogs.map(log => new Date(log.date).toLocaleDateString());
+                const labels = exerciseLogs.map(log => new Date(log.date.replace(/-/g, '/')).toLocaleDateString());
                 const maxWeightData = exerciseLogs.map(log => Math.max(...log.sets.flatMap(set => set.map(s => s.weight || 0))));
                 const volumeData = exerciseLogs.map(log => log.sets.flat().reduce((total, s) => total + (s.weight * s.reps), 0));
 
@@ -631,29 +809,23 @@
                 btn.querySelector('.loader').classList.remove('hidden');
                 ui.aiAdviceOutput.innerHTML = '';
 
-                const exerciseLogs = workoutHistory.filter(log => log.name === exerciseName).slice(-3); // Get last 3 sessions
+                const exerciseLogs = workoutHistory.filter(log => log.name === exerciseName).slice(-3);
 
-                const prompt = `Act as an expert fitness coach grounded in science (citing sources like Jeff Nippard, Dr. Mike Israetel, Jeremy Ethier). A user has performed the following recent sessions for ${exerciseName}:
-                ${exerciseLogs.map((log, i) => `Session ${i+1} (${new Date(log.date).toLocaleDateString()}): ${log.sets.map(set => set.map(part => `${part.weight}kg x ${part.reps} reps`).join(' + ')).join(', ')}`).join('\n')}
-
-                Based on the principles of progressive overload, analyze this data. Provide a clear, actionable recommendation for the user's *next* session. Should they increase weight, reps, or sets? Be specific (e.g., "Aim for 6-8 reps with 52.5kg"). Give a concise rationale based on performance trends. Keep the entire response under 75 words.`;
+                const prompt = `Act as an expert fitness coach grounded in science. A user has performed these recent sessions for ${exerciseName}:
+                ${exerciseLogs.map((log, i) => `Session ${i+1} (${new Date(log.date.replace(/-/g, '/')).toLocaleDateString()}): ${log.sets.map(set => set.map(part => `${part.weight}kg x ${part.reps} reps`).join(' + ')).join(', ')}`).join('\n')}
+                Based on progressive overload, give a clear, actionable recommendation for their *next* session. Be specific (e.g., "Aim for 6-8 reps with 52.5kg"). Keep it under 75 words.`;
 
                 const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
 
                 try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                    });
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
                     if (!response.ok) throw new Error(`API Error: ${response.status}`);
                     const result = await response.json();
                     let text = result.candidates[0].content.parts[0].text;
                     ui.aiAdviceOutput.innerHTML = `<p>${text}</p>`;
-
                 } catch (error) {
                     console.error("AI Workout Advice Error:", error);
-                    ui.aiAdviceOutput.innerHTML = `<p class="text-red-400">Could not get AI advice at this time.</p>`;
+                    ui.aiAdviceOutput.innerHTML = `<p class="text-red-400">Could not get AI advice.</p>`;
                 } finally {
                     btn.disabled = false;
                     btn.querySelector('.btn-text').style.display = 'inline';
@@ -671,20 +843,14 @@
                 }
 
                 if (!item) return;
-
                 currentlyLoggingExercise = item.name;
-
                 ui.exerciseDetailTitle.textContent = item.name;
                 ui.exerciseDetailVideo.src = item.videoPlaceholder || "https://placehold.co/400x225/111111/FFFFFF?text=No+Video";
-                
                 const instructions = Array.isArray(item.instructions) ? item.instructions : (item.instructions || "").split('\n');
                 ui.exerciseDetailInstructions.innerHTML = instructions.map(step => `<li>${step}</li>`).join('');
-
                 ui.exerciseDetailRepRange.textContent = item.repRange ? `Aim for ${item.repRange}.` : 'No specific rep range.';
                 ui.exerciseDetailNotes.value = item.notes || '';
-                
                 ui.logFromDetailBtn.style.display = itemType === 'warmup' ? 'none' : 'block';
-                
                 showModal(ui.exerciseDetailModal);
             }
             
@@ -692,7 +858,6 @@
                 const groupSelect = document.getElementById('exercise-group');
                 const muscleGroups = [...new Set(defaultExerciseDB.map(ex => ex.group))].sort();
                 groupSelect.innerHTML = muscleGroups.map(g => `<option value="${g}">${g}</option>`).join('');
-                
                 if (exercise) {
                     ui.exerciseModalTitle.textContent = "Edit Exercise";
                     document.getElementById('exercise-name').value = exercise.name;
@@ -706,34 +871,6 @@
                 }
                 showModal(ui.exerciseModal);
             };
-            
-            function renderAIWorkoutAnalysis(){
-                const oneWeekAgo = new Date(); oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-                const recentWorkouts = workoutHistory.filter(log => new Date(log.date) >= oneWeekAgo);
-                const volumeByGroup = {};
-                recentWorkouts.forEach(log => {
-                    const exercise = exerciseDB.find(ex => ex.name === log.name);
-                    if(exercise) {
-                        if(!volumeByGroup[exercise.group]) volumeByGroup[exercise.group] = 0;
-                        volumeByGroup[exercise.group] += log.sets.length;
-                    }
-                });
-                const recommendations = { 'Chest': {min: 10, max: 20}, 'Back': {min: 10, max: 20}, 'Quads': {min: 8, max: 20}, 'Hamstrings': {min: 6, max: 16}, 'Shoulders': {min: 8, max: 20}, 'Biceps': {min: 8, max: 20}, 'Triceps': {min: 6, max: 16}, 'Glutes': {min: 4, max: 12}, 'Calves': {min: 8, max: 16}, 'Abs': {min: 8, max: 20}, 'Forearms': {min: 4, max: 12} };
-                let analysisHtml = '';
-                const allGroups = [...new Set(exerciseDB.map(e => e.group))].sort();
-                allGroups.forEach(group => {
-                    const volume = volumeByGroup[group] || 0;
-                    const rec = recommendations[group] || {min: 0, max: 0};
-                    let statusColor = 'text-gray-500', statusText = 'Not trained';
-                    if (volume > 0) {
-                        if (volume < rec.min) { statusColor = 'text-yellow-400'; statusText = 'Low Volume'; } 
-                        else if (volume > rec.max) { statusColor = 'text-red-400'; statusText = 'High Volume'; }
-                        else { statusColor = 'text-green-400'; statusText = 'Good Volume'; }
-                    }
-                    analysisHtml += `<div class="flex justify-between items-center text-sm"><span class="font-bold">${group}</span><div class="flex items-center gap-3"><span>${volume} sets / week</span><span class="${statusColor}">${statusText}</span></div></div>`;
-                });
-                ui.volumeAnalysisDiv.innerHTML = analysisHtml;
-            }
 
             function renderWarmupManagementList() {
                 const dayType = ui.warmupDaySelect.value;
@@ -743,34 +880,26 @@
             }
 
             // Event Listeners
-            ui.workoutPlannerDiv.addEventListener('click', (e) => {
+            ui.workoutPlanForDay.addEventListener('click', (e) => {
                 const logBtn = e.target.closest('.log-workout-btn'), editBtn = e.target.closest('.edit-exercise-btn'),
                       deleteBtn = e.target.closest('.delete-exercise-btn'), warmupBtn = e.target.closest('.warmup-detail-btn'),
-                      closeBtn = e.target.closest('.close-expanded-day-btn'), dayCard = e.target.closest('.workout-day-card'),
                       editWarmupBtn = e.target.closest('.edit-warmup-btn'), deleteWarmupBtn = e.target.closest('.delete-warmup-btn');
 
-                if (logBtn || editBtn || deleteBtn || warmupBtn || closeBtn || editWarmupBtn || deleteWarmupBtn) e.stopPropagation();
-                if (logBtn) openExerciseDetailModal(logBtn.dataset.name, 'exercise');
+                if (logBtn && !logBtn.disabled) openExerciseDetailModal(logBtn.dataset.name, 'exercise');
                 else if (warmupBtn) openExerciseDetailModal(warmupBtn.dataset.name, 'warmup', warmupBtn.dataset.dayType);
                 else if (editBtn) { const ex = exerciseDB.find(e => e.name === editBtn.dataset.name); if(ex) populateExerciseModal(ex); }
-                else if (deleteBtn) { const name = deleteBtn.dataset.name; showConfirmModal('Delete Exercise?', `This will remove "${name}".`, () => { const i = exerciseDB.findIndex(ex => ex.name === name); if (i > -1) { exerciseDB.splice(i, 1); saveData(); fullRender(); } }); }
+                else if (deleteBtn) { const name = deleteBtn.dataset.name; showConfirmModal('Delete Exercise?', `This will remove "${name}".`, () => { const i = exerciseDB.findIndex(ex => ex.name === name); if (i > -1) { exerciseDB.splice(i, 1); saveData(); updateUI(); } }); }
                 else if (editWarmupBtn) { const day = editWarmupBtn.dataset.dayType, name = editWarmupBtn.dataset.name, i = warmups[day]?.findIndex(w => w.name === name); if(i > -1) { showModal(ui.warmupManageModal); ui.warmupDaySelect.value = day; renderWarmupManagementList(); editingWarmupIndex = i; ui.warmupNameInput.value = warmups[day][i].name; ui.warmupInstructionsInput.value = Array.isArray(warmups[day][i].instructions) ? warmups[day][i].instructions.join('\n') : ''; ui.warmupFormTitle.textContent = "Edit Warm-up"; ui.saveWarmupBtn.textContent = "Update"; } }
-                else if (deleteWarmupBtn) { const day = deleteWarmupBtn.dataset.dayType, name = deleteWarmupBtn.dataset.name; showConfirmModal('Delete Warm-up?', `Delete "${name}"?`, () => { if(warmups[day]) { const i = warmups[day].findIndex(w => w.name === name); if (i > -1) { warmups[day].splice(i, 1); saveData(); fullRender(); }} }); }
-                else if (closeBtn) { const card = e.target.closest('.expanded'); if (card) { card.classList.remove('expanded'); card.querySelector('.close-expanded-day-btn')?.remove(); document.querySelectorAll('#workout-planner .workout-day-card').forEach(c => c.classList.remove('hidden')); }}
-                else if (dayCard && !dayCard.classList.contains('expanded')) { document.querySelectorAll('#workout-planner .workout-day-card').forEach(c => c !== dayCard && c.classList.add('hidden')); dayCard.classList.add('expanded'); dayCard.insertAdjacentHTML('afterbegin', `<button class="close-expanded-day-btn text-gray-400 hover:text-white text-5xl absolute top-4 right-6 z-10">&times;</button>`); }
+                else if (deleteWarmupBtn) { const day = deleteWarmupBtn.dataset.dayType, name = deleteWarmupBtn.dataset.name; showConfirmModal('Delete Warm-up?', `Delete "${name}"?`, () => { if(warmups[day]) { const i = warmups[day].findIndex(w => w.name === name); if (i > -1) { warmups[day].splice(i, 1); saveData(); updateUI(); }} }); }
             });
-            ui.workoutHistoryDiv.addEventListener('click', (e) => {
-                const editBtn = e.target.closest('.edit-log-btn'), deleteBtn = e.target.closest('.delete-log-btn');
-                if(editBtn) openEditWorkoutModal(parseInt(editBtn.dataset.index));
-                if(deleteBtn) { const i = parseInt(deleteBtn.dataset.index); showConfirmModal('Delete Log?', 'Are you sure?', () => { workoutHistory.splice(i, 1); saveData(); fullRender(); }); }
-            });
+           
             ui.closeExerciseDetailModalBtn.addEventListener('click', () => hideModal(ui.exerciseDetailModal));
             ui.logFromDetailBtn.addEventListener('click', () => { hideModal(ui.exerciseDetailModal); openWorkoutModal(currentlyLoggingExercise); });
             ui.saveExerciseNotesBtn.addEventListener('click', () => { const ex = exerciseDB.find(e => e.name === currentlyLoggingExercise); if (ex) { ex.notes = ui.exerciseDetailNotes.value; saveData(); const btn = ui.saveExerciseNotesBtn; btn.textContent = 'Saved!'; setTimeout(() => { btn.textContent = 'Save Notes'; }, 2000); }});
             ui.manageWarmupsBtn.addEventListener('click', () => { editingWarmupIndex = null; ui.warmupForm.reset(); ui.warmupFormTitle.textContent = "Add New Warm-up"; ui.saveWarmupBtn.textContent = "Add"; renderWarmupManagementList(); showModal(ui.warmupManageModal); });
             ui.closeWarmupManageModalBtn.addEventListener('click', () => hideModal(ui.warmupManageModal));
             ui.warmupDaySelect.addEventListener('change', () => { editingWarmupIndex = null; ui.warmupForm.reset(); ui.warmupFormTitle.textContent = "Add"; ui.saveWarmupBtn.textContent = "Add"; renderWarmupManagementList(); });
-            ui.warmupListDiv.addEventListener('click', (e) => { /* Logic inside main planner listener now */ });
+            ui.warmupListDiv.addEventListener('click', (e) => { /* Logic handled by workoutPlanForDay listener */ });
             ui.warmupForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const day = ui.warmupDaySelect.value, name = ui.warmupNameInput.value.trim(), instructions = ui.warmupInstructionsInput.value.split('\n').filter(l => l.trim() !== '');
@@ -778,7 +907,7 @@
                 const newWarmup = { name, instructions, repRange: "As needed", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Warm-up" };
                 if (!warmups[day]) warmups[day] = [];
                 if (editingWarmupIndex !== null) { warmups[day][editingWarmupIndex] = newWarmup; } else { warmups[day].push(newWarmup); }
-                saveData(); renderWarmupManagementList(); fullRender(); ui.warmupForm.reset(); editingWarmupIndex = null; ui.warmupFormTitle.textContent = "Add"; ui.saveWarmupBtn.textContent = "Add";
+                saveData(); renderWarmupManagementList(); updateUI(); ui.warmupForm.reset(); editingWarmupIndex = null; ui.warmupFormTitle.textContent = "Add"; ui.saveWarmupBtn.textContent = "Add";
             });
             ui.exerciseForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -794,11 +923,42 @@
                     if (exerciseDB.some(ex => ex.name.toLowerCase() === name.toLowerCase())) return showCustomAlert('Error', 'Name already exists.');
                     exerciseDB.push({ name, group, type, instructions: ["No instructions added."], repRange: "N/A", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=No+Video", notes: "" });
                 }
-                editingExerciseName = null; hideModal(ui.exerciseModal); saveData(); fullRender();
+                editingExerciseName = null; hideModal(ui.exerciseModal); saveData(); updateUI();
             });
              ui.workoutLogForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const sets = [];
+                let formIsValid = true;
+
+                document.querySelectorAll('.set-row').forEach(row => {
+                    row.querySelectorAll('.set-part-row').forEach(partRow => {
+                        partRow.querySelectorAll('input').forEach(input => input.classList.remove('!border-red-500'));
+                        const weightInput = partRow.querySelector('.set-weight');
+                        const repsInput = partRow.querySelector('.set-reps');
+                        const weight = parseFloat(weightInput.value);
+                        const reps = parseFloat(repsInput.value);
+
+                        let setPartIsValid = true;
+                        if ( (isNaN(weight) || weight < 0) && (isNaN(reps) || reps < 1) ) return;
+                        if (isNaN(weight) || weight < 0) {
+                            weightInput.classList.add('!border-red-500');
+                            setPartIsValid = false;
+                        }
+                        if (isNaN(reps) || reps < 1 || !Number.isInteger(reps) ) {
+                             repsInput.classList.add('!border-red-500');
+                             setPartIsValid = false;
+                        }
+                        if(!setPartIsValid) {
+                            formIsValid = false;
+                        }
+                    });
+                });
+
+                if(!formIsValid){
+                     showCustomAlert("Invalid Input", "Weight must be a positive number and reps must be a positive whole number.");
+                     return;
+                }
+                
                 document.querySelectorAll('.set-row').forEach(row => {
                     const setParts = [];
                      row.querySelectorAll('.set-part-row').forEach(partRow => {
@@ -809,22 +969,82 @@
                     });
                     if (setParts.length > 0) sets.push(setParts);
                 });
-                if(sets.length === 0) return showCustomAlert('Empty Workout', 'Please log at least one set.');
-                const newLog = { name: currentlyLoggingExercise, date: new Date().toISOString(), sets: sets };
-                if(editingWorkoutLogIndex !== null) { workoutHistory[editingWorkoutLogIndex] = newLog; } else { workoutHistory.push(newLog); }
-                saveData(); fullRender(); hideModal(ui.workoutModal);
+
+                if(sets.length === 0) return showCustomAlert('Empty Workout', 'Please log at least one valid set.');
+                
+                const year = viewDate.getFullYear();
+                const month = String(viewDate.getMonth() + 1).padStart(2, '0');
+                const day = String(viewDate.getDate()).padStart(2, '0');
+                const dateString = `${year}-${month}-${day}`;
+
+                const newLog = { name: currentlyLoggingExercise, date: dateString, sets: sets };
+                workoutHistory.push(newLog);
+                saveData(); updateUI(); hideModal(ui.workoutModal);
             });
             ui.setsContainer.addEventListener('click', (e) => {
                 const removeSetBtn = e.target.closest('.remove-set-btn'), removePartBtn = e.target.closest('.remove-part-btn');
                 if (removeSetBtn) { removeSetBtn.closest('.set-row').remove(); document.querySelectorAll('.set-row').forEach((row, index) => { row.querySelector('label').textContent = `Set ${index + 1}`; }); }
                 else if (removePartBtn) { const partRow = removePartBtn.closest('.set-part-row'), partsContainer = partRow.parentElement; if (partsContainer.children.length > 1) { partRow.remove(); } else { showCustomAlert("Action blocked", "A set must have at least one part."); } }
             });
-            ui.clearHistoryBtn.addEventListener('click', () => { showConfirmModal('Clear History?', 'This will delete all workout logs.', () => { workoutHistory = []; saveData(); fullRender(); }) });
+            ui.clearHistoryBtn.addEventListener('click', () => { showConfirmModal('Clear History?', 'This will delete all workout logs.', () => { workoutHistory = []; saveData(); updateUI(); }) });
+
+            ui.backToTodayBtn.addEventListener('click', () => {
+                viewDate = new Date();
+                viewDate.setHours(0,0,0,0);
+                updateUI();
+                ui.workoutActionsDropdown.classList.add('hidden');
+            });
+
+            ui.prevDayBtn.addEventListener('click', () => {
+                viewDate.setDate(viewDate.getDate() - 1);
+                updateUI();
+            });
+
+            ui.nextDayBtn.addEventListener('click', () => {
+                viewDate.setDate(viewDate.getDate() + 1);
+                updateUI();
+            });
+
+            ui.workoutActionsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                ui.workoutActionsDropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!ui.workoutActionsBtn.contains(e.target) && !ui.workoutActionsDropdown.contains(e.target)) {
+                    ui.workoutActionsDropdown.classList.add('hidden');
+                }
+            });
+
+            ui.dayViewDateDisplay.addEventListener('click', () => {
+                modalCalendarDate = new Date(viewDate);
+                renderCalendar(ui.modalCalendarGrid, modalCalendarDate, true);
+                showModal(ui.datePickerModal);
+            });
+            ui.modalPrevMonthBtn.addEventListener('click', () => {
+                modalCalendarDate.setMonth(modalCalendarDate.getMonth() - 1);
+                renderCalendar(ui.modalCalendarGrid, modalCalendarDate, true);
+            });
+
+            ui.modalNextMonthBtn.addEventListener('click', () => {
+                modalCalendarDate.setMonth(modalCalendarDate.getMonth() + 1);
+                renderCalendar(ui.modalCalendarGrid, modalCalendarDate, true);
+            });
+            
+            ui.modalCalendarGrid.addEventListener('click', (e) => {
+                const dayEl = e.target.closest('.calendar-day');
+                if (dayEl && dayEl.dataset.date) {
+                    const newDate = new Date(dayEl.dataset.date.replace(/-/g, '/'));
+                    viewDate = newDate;
+                    updateUI();
+                    hideModal(ui.datePickerModal);
+                }
+            });
 
 
             // --- INITIALIZATION ---
             loadData();
-            fullRender();
+            updateUI();
         });
     </script>
 </body>

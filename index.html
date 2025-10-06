@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack AI | Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --background: #000000;
+            --primary-text: #eaeaea;
+            --secondary-text: #888888;
+            --card-bg: #111111;
+            --input-bg: #191919;
+            --border-color: #222222;
+            --accent: #FFFFFF;
+            --accent-hover: #DDDDDD;
+            --danger: #E53E3E;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--primary-text);
+            font-family: 'Manrope', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+            border-bottom: 2px solid transparent;
+            color: var(--secondary-text);
+            padding-bottom: 4px;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-text);
+        }
+
+        .nav-link.active {
+            color: var(--primary-text);
+            border-bottom-color: var(--primary-text);
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto max-w-7xl px-4 py-8">
+
+        <!-- Header -->
+        <header class="flex flex-col sm:flex-row items-center justify-between mb-16 pb-4 border-b border-gray-900">
+            <a href="index.html" class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
+                <h1 class="text-2xl font-bold">FitTrack AI</h1>
+            </a>
+            <nav class="mt-4 sm:mt-0">
+                <ul class="flex items-center space-x-4 sm:space-x-6 text-base font-medium">
+                    <li><a href="index.html" class="nav-link active">Dashboard</a></li>
+                    <li><a href="nutrition.html" class="nav-link">Nutrition</a></li>
+                    <li><a href="workouts.html" class="nav-link">Workouts</a></li>
+                    <li><a href="goals.html" class="nav-link">Goals</a></li>
+                    <li><a href="sleep.html" class="nav-link">Sleep</a></li>
+                    <li><a href="settings.html" class="nav-link">Settings</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="space-y-8">
+            <div class="text-center">
+                <h2 class="text-4xl font-bold">Welcome Back!</h2>
+                <p class="text-lg text-secondary-text mt-2">Here's a quick summary of your progress.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Nutrition Summary -->
+                <div class="content-card">
+                    <h3 class="text-2xl font-bold mb-4">Nutrition at a Glance</h3>
+                    <div class="flex items-center gap-6">
+                        <div class="w-24 h-24 flex-shrink-0">
+                            <canvas id="macro-chart-summary"></canvas>
+                        </div>
+                        <div class="w-full grid grid-cols-1 gap-y-2 text-sm">
+                            <div class="flex justify-between items-baseline"><span class="text-gray-400">Calories:</span> <span class="font-semibold"><span id="summary-current-calories">0</span> / <span id="summary-goal-calories">2000</span></span></div>
+                            <div class="flex justify-between items-baseline"><span class="text-gray-400">Protein:</span> <span class="font-semibold"><span id="summary-current-protein">0</span> / <span id="summary-goal-protein">150</span> g</span></div>
+                            <div class="flex justify-between items-baseline"><span class="text-gray-400">Carbs:</span> <span class="font-semibold"><span id="summary-current-carbs">0</span> / <span id="summary-goal-carbs">225</span> g</span></div>
+                            <div class="flex justify-between items-baseline"><span class="text-gray-400">Fat:</span> <span class="font-semibold"><span id="summary-current-fat">0</span> / <span id="summary-goal-fat">60</span> g</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Workout Summary -->
+                <div class="content-card">
+                    <h3 class="text-2xl font-bold mb-4">Today's Workout</h3>
+                    <div id="workout-summary" class="text-center text-secondary-text">
+                        <p>No workout logged for today yet.</p>
+                        <a href="workouts.html" class="text-accent hover:text-accent-hover mt-4 inline-block">Log a workout</a>
+                    </div>
+                </div>
+
+                <!-- Sleep Summary -->
+                <div class="content-card">
+                    <h3 class="text-2xl font-bold mb-4">Last Night's Sleep</h3>
+                    <div id="sleep-summary" class="text-center text-secondary-text">
+                        <p>No sleep data available.</p>
+                         <a href="sleep.html" class="text-accent hover:text-accent-hover mt-4 inline-block">Log your sleep</a>
+                    </div>
+                </div>
+            </div>
+
+             <div class="content-card">
+                <h3 class="text-2xl font-bold mb-4">Weekly Progress</h3>
+                 <div class="h-64">
+                    <canvas id="weekly-progress-chart"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+
+            // Mock data for demonstration
+            const summaryData = {
+                nutrition: {
+                    current: { calories: 1250, protein: 90, carbs: 150, fat: 30 },
+                    goal: { calories: 2200, protein: 160, carbs: 250, fat: 65 }
+                },
+                workout: "Push Day - Chest & Triceps",
+                sleep: "7h 30m",
+                weeklyProgress: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    calories: [2100, 2250, 2000, 2300, 2150, 2400, 2200],
+                    weight: [75.5, 75.3, 75.4, 75.1, 75.2, 75.0, 74.9]
+                }
+            };
+
+            // Update Nutrition Summary
+            document.getElementById('summary-current-calories').textContent = summaryData.nutrition.current.calories;
+            document.getElementById('summary-goal-calories').textContent = summaryData.nutrition.goal.calories;
+            document.getElementById('summary-current-protein').textContent = summaryData.nutrition.current.protein;
+            document.getElementById('summary-goal-protein').textContent = summaryData.nutrition.goal.protein;
+            document.getElementById('summary-current-carbs').textContent = summaryData.nutrition.current.carbs;
+            document.getElementById('summary-goal-carbs').textContent = summaryData.nutrition.goal.carbs;
+            document.getElementById('summary-current-fat').textContent = summaryData.nutrition.current.fat;
+            document.getElementById('summary-goal-fat').textContent = summaryData.nutrition.goal.fat;
+
+            // Update Workout Summary
+            document.getElementById('workout-summary').innerHTML = `<p class="text-lg font-semibold text-primary-text">${summaryData.workout}</p><a href="workouts.html" class="text-accent hover:text-accent-hover mt-2 inline-block">View details</a>`;
+
+            // Update Sleep Summary
+            document.getElementById('sleep-summary').innerHTML = `<p class="text-3xl font-bold text-primary-text">${summaryData.sleep}</p>`;
+
+            // Macro Chart
+            const macroCtx = document.getElementById('macro-chart-summary').getContext('2d');
+            new Chart(macroCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Protein', 'Carbs', 'Fat'],
+                    datasets: [{
+                        data: [summaryData.nutrition.current.protein, summaryData.nutrition.current.carbs, summaryData.nutrition.current.fat],
+                        backgroundColor: ['#3b82f6', '#10b981', '#ef4444'],
+                        borderColor: 'var(--card-bg)',
+                        borderWidth: 5,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Weekly Progress Chart
+            const weeklyCtx = document.getElementById('weekly-progress-chart').getContext('2d');
+            new Chart(weeklyCtx, {
+                type: 'line',
+                data: {
+                    labels: summaryData.weeklyProgress.labels,
+                    datasets: [
+                        {
+                            label: 'Calories',
+                            data: summaryData.weeklyProgress.calories,
+                            borderColor: '#3b82f6',
+                            backgroundColor: '#3b82f620',
+                            yAxisID: 'y',
+                            tension: 0.3,
+                            fill: true,
+                        },
+                        {
+                            label: 'Weight (kg)',
+                            data: summaryData.weeklyProgress.weight,
+                            borderColor: '#10b981',
+                            backgroundColor: '#10b98120',
+                            yAxisID: 'y1',
+                             tension: 0.3,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                             ticks: { color: 'var(--secondary-text)' },
+                             grid: { color: 'var(--border-color)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                             ticks: { color: 'var(--secondary-text)' },
+                            grid: {
+                                drawOnChartArea: false, 
+                            },
+                        },
+                         x: {
+                             ticks: { color: 'var(--secondary-text)' },
+                             grid: { color: 'var(--border-color)' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'var(--primary-text)'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

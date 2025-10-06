@@ -301,22 +301,9 @@
                 </div>
 
                 <div class="content-card">
-                    <h2 class="text-2xl font-semibold mb-4">Weight Progression</h2>
-                    <div class="w-full h-64 flex items-center justify-center">
-                        <canvas id="weight-chart"></canvas>
-                    </div>
-                </div>
-
-                <div class="content-card">
-                    <h2 class="text-2xl font-semibold mb-4">Skeletal Muscle Mass</h2>
-                    <div class="w-full h-64 flex items-center justify-center">
-                        <canvas id="smm-chart"></canvas>
-                    </div>
-                </div>
-                <div class="content-card">
-                    <h2 class="text-2xl font-semibold mb-4">Body Fat Mass</h2>
-                    <div class="w-full h-64 flex items-center justify-center">
-                        <canvas id="bfm-chart"></canvas>
+                    <h2 class="text-2xl font-semibold mb-4">Body Composition Progress</h2>
+                    <div class="w-full h-96 flex items-center justify-center">
+                        <canvas id="progress-chart"></canvas>
                     </div>
                 </div>
             </div>
@@ -359,22 +346,28 @@
             
             // --- CHART.JS SETUP ---
             Chart.defaults.color = 'var(--primary-text)';
-            const weightCtx = document.getElementById('weight-chart').getContext('2d');
-            let weightChart = new Chart(weightCtx, {
+            const progressCtx = document.getElementById('progress-chart').getContext('2d');
+            let progressChart = new Chart(progressCtx, {
                 type: 'line', data: { labels: [], datasets: [] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: 'var(--secondary-text)' }, grid: { color: 'var(--border-color)' } }, x: { ticks: { color: 'var(--secondary-text)' }, grid: { color: 'var(--border-color)' } } }, plugins: { legend: { display: false } } }
-            });
-
-            const smmCtx = document.getElementById('smm-chart').getContext('2d');
-            let smmChart = new Chart(smmCtx, {
-                type: 'line', data: { labels: [], datasets: [] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: 'var(--secondary-text)' }, grid: { color: 'var(--border-color)' } }, x: { ticks: { color: 'var(--secondary-text)' }, grid: { color: 'var(--border-color)' } } }, plugins: { legend: { display: false } } }
-            });
-            
-            const bfmCtx = document.getElementById('bfm-chart').getContext('2d');
-            let bfmChart = new Chart(bfmCtx, {
-                type: 'line', data: { labels: [], datasets: [] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: 'var(--secondary-text)' }, grid: { color: 'var(--border-color)' } }, x: { ticks: { color: 'var(--secondary-text)' }, grid: { color: 'var(--border-color)' } } }, plugins: { legend: { display: false } } }
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            ticks: { color: 'var(--primary-text)' }, 
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+                        },
+                        x: { 
+                            ticks: { color: 'var(--primary-text)' }, 
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+                        }
+                    },
+                    plugins: { 
+                        legend: { 
+                            display: true,
+                            labels: { color: 'var(--primary-text)' }
+                        } 
+                    }
+                }
             });
 
             // --- CORE & HELPER FUNCTIONS ---
@@ -406,44 +399,56 @@
                 if (!userProfile.inbodyHistory) userProfile.inbodyHistory = [];
             }
             
-            function renderWeightChart() {
-                if (!userProfile.weightHistory || userProfile.weightHistory.length === 0) {
-                    weightChart.data = { labels: [], datasets: [] };
-                    weightChart.update();
+            function renderProgressChart() {
+                const weightData = userProfile.weightHistory || [];
+                const inbodyData = userProfile.inbodyHistory || [];
+
+                if (weightData.length === 0 && inbodyData.length === 0) {
+                    progressChart.data = { labels: [], datasets: [] };
+                    progressChart.update();
                     return;
                 }
-                const sortedHistory = [...userProfile.weightHistory].sort((a,b) => new Date(a.date) - new Date(b.date));
-                const labels = sortedHistory.map(entry => new Date(entry.date.replace(/-/g, '/')).toLocaleDateString());
-                const data = sortedHistory.map(entry => entry.weight);
-                
-                weightChart.data = {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Weight (kg)', data: data, borderColor: '#60a5fa', backgroundColor: 'rgba(96, 165, 250, 0.2)', tension: 0.2, fill: true
-                    }]
-                };
-                weightChart.update();
+
+                const allDates = new Set([...weightData.map(d => d.date), ...inbodyData.map(d => d.date)]);
+                const sortedLabels = Array.from(allDates).sort((a, b) => new Date(a) - new Date(b));
+
+                const weightMap = new Map(weightData.map(d => [d.date, d.weight]));
+                const smmMap = new Map(inbodyData.map(d => [d.date, d.smm]));
+                const bfmMap = new Map(inbodyData.map(d => [d.date, d.bfm]));
+
+                progressChart.data.labels = sortedLabels.map(date => new Date(date.replace(/-/g, '/')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+                progressChart.data.datasets = [
+                    {
+                        label: 'Weight (kg)',
+                        data: sortedLabels.map(date => weightMap.get(date) || null),
+                        borderColor: '#60a5fa',
+                        backgroundColor: 'rgba(96, 165, 250, 0.2)',
+                        tension: 0.2,
+                        fill: true,
+                        spanGaps: true,
+                    },
+                    {
+                        label: 'SMM (kg)',
+                        data: sortedLabels.map(date => smmMap.get(date) || null),
+                        borderColor: '#34d399',
+                        backgroundColor: 'rgba(52, 211, 153, 0.2)',
+                        tension: 0.2,
+                        fill: true,
+                        spanGaps: true,
+                    },
+                    {
+                        label: 'BFM (kg)',
+                        data: sortedLabels.map(date => bfmMap.get(date) || null),
+                        borderColor: '#fbbf24',
+                        backgroundColor: 'rgba(251, 191, 36, 0.2)',
+                        tension: 0.2,
+                        fill: true,
+                        spanGaps: true,
+                    }
+                ];
+                progressChart.update();
             }
 
-            function renderSmmBfmCharts() {
-                if (!userProfile.inbodyHistory || userProfile.inbodyHistory.length === 0) {
-                    smmChart.data = { labels: [], datasets: [] };
-                    bfmChart.data = { labels: [], datasets: [] };
-                } else {
-                    const sortedHistory = [...userProfile.inbodyHistory].sort((a, b) => new Date(a.date) - new Date(b.date));
-                    const labels = sortedHistory.map(entry => new Date(entry.date.replace(/-/g, '/')).toLocaleDateString());
-                    smmChart.data = {
-                        labels,
-                        datasets: [{ label: 'SMM (kg)', data: sortedHistory.map(e => e.smm), borderColor: '#34d399', backgroundColor: 'rgba(52, 211, 153, 0.2)', tension: 0.2, fill: true }]
-                    };
-                     bfmChart.data = {
-                        labels,
-                        datasets: [{ label: 'BFM (kg)', data: sortedHistory.map(e => e.bfm), borderColor: '#fbbf24', backgroundColor: 'rgba(251, 191, 36, 0.2)', tension: 0.2, fill: true }]
-                    };
-                }
-                smmChart.update();
-                bfmChart.update();
-            }
 
             function populateProfileForm() {
                 if (userProfile.age) {
@@ -530,8 +535,7 @@
 
                 generateCaloriePlan();
                 saveData();
-                renderWeightChart();
-                renderSmmBfmCharts();
+                renderProgressChart();
 
                 if (showFeedback) {
                     btn.querySelector('.btn-text').textContent = "Saved!";
@@ -551,8 +555,7 @@
             function fullRender() {
                 populateProfileForm();
                 if(userProfile.age) generateCaloriePlan();
-                renderWeightChart();
-                renderSmmBfmCharts();
+                renderProgressChart();
                 lucide.createIcons();
             }
 

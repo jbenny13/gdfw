@@ -57,6 +57,12 @@
             border: 1px solid var(--border-color);
             border-radius: 0.75rem;
             padding: 2rem;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .clickable-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(255, 255, 255, 0.05), 0 4px 6px -2px rgba(255, 255, 255, 0.05);
         }
     </style>
 </head>
@@ -88,7 +94,7 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="content-card">
+                <a href="nutrition.html" class="content-card clickable-card">
                     <h3 class="text-2xl font-bold mb-4">Nutrition at a Glance</h3>
                     <div class="flex items-center gap-6">
                         <div class="w-24 h-24 flex-shrink-0">
@@ -101,23 +107,23 @@
                             <div class="flex justify-between items-baseline"><span class="text-gray-400">Fat:</span> <span class="font-semibold"><span id="summary-current-fat">0</span> / <span id="summary-goal-fat">60</span> g</span></div>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="content-card">
+                <a href="workouts.html" class="content-card clickable-card">
                     <h3 class="text-2xl font-bold mb-4">Today's Workout</h3>
                     <div id="workout-summary" class="text-center text-secondary-text">
                         <p>No workout data available.</p>
-                        <a href="workouts.html" class="text-accent hover:text-accent-hover mt-4 inline-block">Log a workout</a>
+                        <span class="text-accent hover:text-accent-hover mt-4 inline-block">Log a workout</span>
                     </div>
-                </div>
+                </a>
 
-                <div class="content-card">
+                <a href="sleep.html" class="content-card clickable-card">
                     <h3 class="text-2xl font-bold mb-4">Last Night's Sleep</h3>
                     <div id="sleep-summary" class="text-center text-secondary-text">
                         <p>No sleep data available.</p>
-                         <a href="sleep.html" class="text-accent hover:text-accent-hover mt-4 inline-block">Log your sleep</a>
+                         <span class="text-accent hover:text-accent-hover mt-4 inline-block">Log your sleep</span>
                     </div>
-                </div>
+                </a>
             </div>
 
              <div class="content-card">
@@ -177,23 +183,23 @@
                             type: 'linear',
                             display: true,
                             position: 'left',
-                            ticks: { color: 'var(--secondary-text)' },
-                            grid: { color: 'var(--border-color)' }
+                            ticks: { color: '#FFFFFF' }, 
+                            grid: { color: 'rgba(255, 255, 255, 0.2)' }
                         },
                         y1: {
                             type: 'linear',
                             display: true,
                             position: 'right',
-                            ticks: { color: 'var(--secondary-text)' },
+                            ticks: { color: '#FFFFFF' },
                             grid: { drawOnChartArea: false },
                         },
                         x: {
-                            ticks: { color: 'var(--secondary-text)' },
-                            grid: { color: 'var(--border-color)' }
+                            ticks: { color: '#FFFFFF' },
+                            grid: { color: 'rgba(255, 255, 255, 0.2)' }
                         }
                     },
                     plugins: {
-                        legend: { labels: { color: 'var(--primary-text)' } }
+                        legend: { labels: { color: '#FFFFFF' } }
                     }
                 }
             });
@@ -285,21 +291,21 @@
                 let summaryHtml = '';
                 
                 if (dayInfo.type === 'Rest') {
-                    summaryHtml = `<p class="text-3xl font-bold text-green-400 mb-2">Rest Day</p><p class="text-lg font-semibold text-primary-text">Recovery is key!</p><a href="workouts.html" class="text-accent hover:text-accent-hover mt-4 inline-block">View full plan</a>`;
+                    summaryHtml = `<p class="text-3xl font-bold text-green-400 mb-2">Rest Day</p><p class="text-lg font-semibold text-primary-text">Recovery is key!</p><span class="text-accent hover:text-accent-hover mt-4 inline-block">View full plan</span>`;
                 } else if (loggedExercises.length > 0) {
                      const firstExercise = loggedExercises[0].name;
                      const exerciseCount = loggedExercises.length;
                      const statusText = status === 'full' ? 'Complete' : (status === 'partial' ? 'Partial' : 'Logged');
-                     summaryHtml = `<p class="text-3xl font-bold text-blue-400 mb-2">${dayInfo.type} (${statusText})</p><p class="text-lg font-semibold text-primary-text">Logged ${exerciseCount} exercises. Started with ${firstExercise}.</p><a href="workouts.html" class="text-accent hover:text-accent-hover mt-4 inline-block">View full log</a>`;
+                     summaryHtml = `<p class="text-3xl font-bold text-blue-400 mb-2">${dayInfo.type} (${statusText})</p><p class="text-lg font-semibold text-primary-text">Logged ${exerciseCount} exercises. Started with ${firstExercise}.</p><span class="text-accent hover:text-accent-hover mt-4 inline-block">View full log</span>`;
                 } else {
-                    summaryHtml = `<p class="text-lg font-semibold text-primary-text">${dayInfo.type} Scheduled</p><p>Time to hit the gym!</p><a href="workouts.html" class="text-accent hover:text-accent-hover mt-4 inline-block">Start your workout</a>`;
+                    summaryHtml = `<p class="text-lg font-semibold text-primary-text">${dayInfo.type} Scheduled</p><p>Time to hit the gym!</p><span class="text-accent hover:text-accent-hover mt-4 inline-block">Start your workout</span>`;
                 }
                 
                 document.getElementById('workout-summary').innerHTML = summaryHtml;
             }
 
             function renderSleepSummary() {
-                const sleepHistory = appData.userProfile.sleepHistory.sort((a,b) => new Date(b.date) - new Date(a.date));
+                const sleepHistory = (appData.userProfile.sleepHistory || []).sort((a,b) => new Date(b.date) - new Date(a.date));
                 const lastLog = sleepHistory[0];
                 
                 let summaryHtml = '';
@@ -308,9 +314,9 @@
                     const { durationHours, durationMinutes } = calculateDuration(lastLog.startTime, lastLog.endTime, lastLog.date);
                     const qualityText = '★'.repeat(lastLog.quality) + '☆'.repeat(5 - lastLog.quality);
                     
-                    summaryHtml = `<p class="text-3xl font-bold text-primary-text">${durationHours}h ${durationMinutes}m</p><p class="text-lg text-yellow-400 font-semibold mb-2">${qualityText}</p><a href="sleep.html" class="text-accent hover:text-accent-hover mt-4 inline-block">View details</a>`;
+                    summaryHtml = `<p class="text-3xl font-bold text-primary-text">${durationHours}h ${durationMinutes}m</p><p class="text-lg text-yellow-400 font-semibold mb-2">${qualityText}</p><span class="text-accent hover:text-accent-hover mt-4 inline-block">View details</span>`;
                 } else {
-                    summaryHtml = `<p>No sleep data available.</p><a href="sleep.html" class="text-accent hover:text-accent-hover mt-4 inline-block">Log your sleep</a>`;
+                    summaryHtml = `<p>No sleep data available.</p><span class="text-accent hover:text-accent-hover mt-4 inline-block">Log your sleep</span>`;
                 }
 
                 document.getElementById('sleep-summary').innerHTML = summaryHtml;
@@ -335,7 +341,7 @@
                     calorieData.push(totalCalories || null); 
 
                     // 2. Weight Data
-                    const weightEntry = appData.userProfile.weightHistory.find(entry => entry.date === dateKey);
+                    const weightEntry = (appData.userProfile.weightHistory || []).find(entry => entry.date === dateKey);
                     weightData.push(weightEntry ? weightEntry.weight : null);
                 }
 
@@ -344,9 +350,12 @@
                 weeklyProgressChart.data.datasets[0].data = calorieData;
                 weeklyProgressChart.data.datasets[1].data = weightData;
                 
+                const validCalories = calorieData.filter(d => d !== null);
+                const validWeights = weightData.filter(d => d !== null);
+
                 // Ensure the Y-axes scale correctly if there is data
-                weeklyProgressChart.options.scales.y.min = Math.min(...calorieData.filter(d => d !== null)) * 0.9 || 0;
-                weeklyProgressChart.options.scales.y1.min = Math.min(...weightData.filter(d => d !== null)) * 0.95 || 60; // Start slightly below lowest weight
+                weeklyProgressChart.options.scales.y.min = validCalories.length > 0 ? Math.min(...validCalories) * 0.9 : 0;
+                weeklyProgressChart.options.scales.y1.min = validWeights.length > 0 ? Math.min(...validWeights) * 0.95 : 60; // Start slightly below lowest weight
                 
                 weeklyProgressChart.update();
             }

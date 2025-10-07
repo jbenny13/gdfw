@@ -299,10 +299,20 @@
                     </div>
                 </div>
 
-                <!-- Right Column -->
+                <!-- Right Column (Updated with Carousel/Date Navigation) -->
                 <div class="space-y-8">
                     <div class="content-card">
-                         <h3 class="text-2xl font-bold mb-4">Daily Summary</h3>
+                         <!-- Date Navigation -->
+                         <div class="flex justify-between items-center mb-4">
+                            <button id="prev-day-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                            <h3 class="text-xl font-bold text-center">
+                                <span id="day-view-title-span" class="block text-2xl font-semibold">Today</span>
+                                <span id="day-view-date-span" class="text-base text-secondary-text"></span>
+                            </h3>
+                            <button id="next-day-btn" class="btn btn-secondary !p-2" disabled><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                        </div>
+                        
+                        <h3 class="text-2xl font-bold mb-4 border-t border-border-color pt-4">Daily Summary</h3>
                         <div class="flex items-center gap-6">
                             <div class="w-24 h-24 flex-shrink-0">
                                 <canvas id="macro-chart"></canvas>
@@ -317,11 +327,27 @@
                                 <div class="flex justify-between items-baseline"><span class="text-gray-400">Potassium:</span> <span class="font-semibold"><span id="current-potassium">0</span> / <span id="goal-potassium">3500</span> mg</span></div>
                             </div>
                         </div>
+                        
+                        <!-- AI Report Button -->
+                         <button id="ai-daily-report-btn" class="btn btn-primary w-full mt-6">
+                            <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+                            <span class="btn-text">Get Daily Log AI Report</span>
+                            <div class="loader hidden"></div>
+                        </button>
                     </div>
 
+                    <!-- Daily Log Content & AI Report Output -->
                     <div class="content-card">
-                        <h3 class="text-2xl font-bold mb-4">Today's Log</h3>
-                        <div id="daily-log" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"><p class="text-gray-500">No food logged yet.</p></div>
+                        <h3 class="text-2xl font-bold mb-4">Food Log</h3>
+                        <div id="daily-log-content" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"><p class="text-gray-500">No food logged yet.</p></div>
+                        
+                        <div id="ai-report-output" class="mt-4 p-3 bg-black/30 rounded-md text-sm hidden">
+                            <h4 class="font-bold text-lg mb-2 text-yellow-400 flex items-center gap-2">
+                                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                                <span>AI Nutrition Report</span>
+                            </h4>
+                            <p class="text-gray-300" id="ai-report-text">Your personalized report will appear here.</p>
+                        </div>
                     </div>
                     
                     <div class="content-card">
@@ -363,7 +389,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- STATE MANAGEMENT ---
-            let dailyLog = [];
+            let allDailyLogs = {}; // Key: YYYY-MM-DD, Value: Array of food items
             let goals = { calories: 2000, protein: 150, carbs: 225, fat: 60, sugar: 50, sodium: 2300, potassium: 3500 };
             let userProfile = { goal: 'maintain weight' };
             let favoriteFoods = [];
@@ -375,6 +401,70 @@
             let confirmCallback = null;
             let promptCallback = null;
             let scanningIngredientRow = null; // Context for recipe scanner
+            let viewDate = new Date();
+            viewDate.setHours(0, 0, 0, 0); // Initialize viewDate to today, midnight
+
+            // --- CORE & HELPER FUNCTIONS ---
+            function dateToKey(date) {
+                return date.toISOString().split('T')[0];
+            }
+
+            function getCurrentDayLog() {
+                return allDailyLogs[dateToKey(viewDate)] || [];
+            }
+            
+            function getApiUrl(model, action = 'generateContent') {
+                const apiKey = ""; // Leave as-is, will be injected by the environment
+                return `https://generativelanguage.googleapis.com/v1beta/models/${model}:${action}?key=${apiKey}`;
+            };
+            
+            function showModal(modalElement) { modalElement.style.display = 'flex'; }
+            function hideModal(modalElement) { modalElement.style.display = 'none'; }
+            
+            function showCustomAlert(title, text) {
+                ui.alertModalTitle.textContent = title;
+                ui.alertModalText.textContent = text;
+                showModal(ui.alertModal);
+            }
+
+            function showConfirmModal(title, text, onConfirm) {
+                ui.confirmModalTitle.textContent = title;
+                ui.confirmModalText.textContent = text;
+                confirmCallback = onConfirm;
+                showModal(ui.confirmModal);
+            }
+             function showPromptModal(title, text, defaultValue, onConfirm) {
+                ui.promptModalTitle.textContent = title;
+                ui.promptModalText.textContent = text;
+                ui.promptModalInput.value = defaultValue;
+                promptCallback = onConfirm;
+                showModal(ui.promptModal);
+                ui.promptModalInput.focus();
+                ui.promptModalInput.select();
+            }
+
+            function saveData() {
+                localStorage.setItem('fitTrackAI_allDailyLogs', JSON.stringify(allDailyLogs)); // Save all daily logs
+                localStorage.setItem('fitTrackAI_userProfile', JSON.stringify(userProfile));
+                localStorage.setItem('fitTrackAI_favoriteFoods', JSON.stringify(favoriteFoods));
+                localStorage.setItem('fitTrackAI_savedRecipes', JSON.stringify(savedRecipes));
+                localStorage.setItem('fitTrackAI_goals', JSON.stringify(goals));
+            }
+
+            function loadData() {
+                allDailyLogs = JSON.parse(localStorage.getItem('fitTrackAI_allDailyLogs')) || {};
+                // Handle legacy migration: if only old dailyLog exists, move it to the new structure
+                const legacyDailyLog = JSON.parse(localStorage.getItem('fitTrackAI_dailyLog'));
+                if (legacyDailyLog && !Object.keys(allDailyLogs).length) {
+                    allDailyLogs[dateToKey(new Date())] = legacyDailyLog;
+                    localStorage.removeItem('fitTrackAI_dailyLog'); // Clear old key
+                }
+
+                userProfile = JSON.parse(localStorage.getItem('fitTrackAI_userProfile')) || { goal: 'maintain weight' };
+                goals = JSON.parse(localStorage.getItem('fitTrackAI_goals')) || { calories: 2000, protein: 150, carbs: 225, fat: 60, sugar: 50, sodium: 2300, potassium: 3500 };
+                savedRecipes = JSON.parse(localStorage.getItem('fitTrackAI_savedRecipes')) || [];
+                favoriteFoods = JSON.parse(localStorage.getItem('fitTrackAI_favoriteFoods')) || [];
+            }
 
             // --- UI ELEMENT DEFINITIONS ---
             const ui = {
@@ -385,7 +475,7 @@
                 logMealForm: document.getElementById('log-meal-form'),
                 addFoodBtn: document.getElementById('add-food-btn'),
                 addFoodError: document.getElementById('add-food-error'),
-                dailyLogDiv: document.getElementById('daily-log'),
+                dailyLogContentDiv: document.getElementById('daily-log-content'), // Renamed ID in HTML
                 aiSuggestionBtn: document.getElementById('ai-suggestion-btn'),
                 aiSuggestionsOutput: document.getElementById('ai-suggestions-output'),
                 aiGetMacrosBtn: document.getElementById('ai-get-macros-btn'),
@@ -429,7 +519,17 @@
                 totalServingsDisplay: document.getElementById('total-servings-display'),
                 totalMacrosDisplay: document.getElementById('total-macros-display'),
                 macroInputs: document.querySelectorAll('.macro-input'),
+                
+                // New Carousel Elements
+                prevDayBtn: document.getElementById('prev-day-btn'),
+                nextDayBtn: document.getElementById('next-day-btn'),
+                dayViewTitleSpan: document.getElementById('day-view-title-span'),
+                dayViewDateSpan: document.getElementById('day-view-date-span'),
+                aiDailyReportBtn: document.getElementById('ai-daily-report-btn'),
+                aiReportOutputDiv: document.getElementById('ai-report-output'),
+                aiReportText: document.getElementById('ai-report-text'),
             };
+
 
             // --- CHART.JS SETUP ---
             const macroCtx = document.getElementById('macro-chart').getContext('2d');
@@ -453,55 +553,12 @@
                 }
             });
 
-            // --- CORE & HELPER FUNCTIONS ---
-            const getApiUrl = (model, action = 'generateContent') => {
-                const apiKey = "AIzaSyDY48xF1byvU05kS9qKvN8iyrIR3hheP8w"; // Leave as-is, will be injected by the environment
-                return `https://generativelanguage.googleapis.com/v1beta/models/${model}:${action}?key=${apiKey}`;
-            };
-            
-            function showModal(modalElement) { modalElement.style.display = 'flex'; }
-            function hideModal(modalElement) { modalElement.style.display = 'none'; }
-            
-            function showCustomAlert(title, text) {
-                ui.alertModalTitle.textContent = title;
-                ui.alertModalText.textContent = text;
-                showModal(ui.alertModal);
-            }
-
-            function showConfirmModal(title, text, onConfirm) {
-                ui.confirmModalTitle.textContent = title;
-                ui.confirmModalText.textContent = text;
-                confirmCallback = onConfirm;
-                showModal(ui.confirmModal);
-            }
-             function showPromptModal(title, text, defaultValue, onConfirm) {
-                ui.promptModalTitle.textContent = title;
-                ui.promptModalText.textContent = text;
-                ui.promptModalInput.value = defaultValue;
-                promptCallback = onConfirm;
-                showModal(ui.promptModal);
-                ui.promptModalInput.focus();
-                ui.promptModalInput.select();
-            }
-
-            function saveData() {
-                localStorage.setItem('fitTrackAI_dailyLog', JSON.stringify(dailyLog));
-                localStorage.setItem('fitTrackAI_userProfile', JSON.stringify(userProfile));
-                localStorage.setItem('fitTrackAI_favoriteFoods', JSON.stringify(favoriteFoods));
-                localStorage.setItem('fitTrackAI_savedRecipes', JSON.stringify(savedRecipes));
-                localStorage.setItem('fitTrackAI_goals', JSON.stringify(goals));
-            }
-
-            function loadData() {
-                dailyLog = JSON.parse(localStorage.getItem('fitTrackAI_dailyLog')) || [];
-                userProfile = JSON.parse(localStorage.getItem('fitTrackAI_userProfile')) || { goal: 'maintain weight' };
-                goals = JSON.parse(localStorage.getItem('fitTrackAI_goals')) || { calories: 2000, protein: 150, carbs: 225, fat: 60, sugar: 50, sodium: 2300, potassium: 3500 };
-                savedRecipes = JSON.parse(localStorage.getItem('fitTrackAI_savedRecipes')) || [];
-                favoriteFoods = JSON.parse(localStorage.getItem('fitTrackAI_favoriteFoods')) || [];
-            }
+            // --- RENDER & DATA FLOW FUNCTIONS ---
 
             function updateSummary() {
-                const totals = dailyLog.reduce((acc, item) => {
+                const currentDayLog = getCurrentDayLog();
+
+                const totals = currentDayLog.reduce((acc, item) => {
                     acc.calories += item.calories || 0;
                     acc.protein += item.protein || 0;
                     acc.carbs += item.carbs || 0;
@@ -533,13 +590,14 @@
             }
 
             function renderDailyLog() {
-                if (dailyLog.length === 0) {
-                    ui.dailyLogDiv.innerHTML = '<p class="text-gray-500">No food logged yet.</p>';
+                const currentDayLog = getCurrentDayLog();
+                if (currentDayLog.length === 0) {
+                    ui.dailyLogContentDiv.innerHTML = '<p class="text-gray-500">No food logged yet.</p>';
                     return;
                 }
                 const isFavorite = (itemName) => favoriteFoods.some(fav => fav.name.toLowerCase() === itemName.toLowerCase());
 
-                ui.dailyLogDiv.innerHTML = dailyLog.map((item, index) => `
+                ui.dailyLogContentDiv.innerHTML = currentDayLog.map((item, index) => `
                     <div class="flex justify-between items-center bg-black/30 p-3 rounded-lg">
                         <div>
                             <p class="font-medium">${item.name} ${item.grams > 0 ? `(${Math.round(item.grams)}g)` : ''}</p>
@@ -566,6 +624,7 @@
             }
             
              function renderFavoritesList() {
+                // ... existing renderFavoritesList implementation ...
                 if (favoriteFoods.length === 0) {
                     ui.favoriteFoodsListDiv.innerHTML = '<p class="text-gray-500 text-center">No favorite foods yet.</p>';
                     return;
@@ -574,6 +633,9 @@
                     <div class="flex justify-between items-center bg-black/30 p-3 rounded-lg">
                         <p class="font-medium">${food.name}</p>
                         <div class="flex items-center gap-2">
+                             <button class="edit-favorite-btn p-1 text-gray-500 hover:text-white rounded-md transition-colors" data-name="${food.name}" title="Edit Favorite">
+                               <i data-lucide="pencil" class="w-5 h-5 pointer-events-none"></i>
+                            </button>
                              <button class="log-favorite-btn p-1 text-gray-500 hover:text-white rounded-md transition-colors" data-name="${food.name}" title="Log Favorite">
                                 <i data-lucide="plus-circle" class="w-5 h-5 pointer-events-none"></i>
                             </button>
@@ -587,6 +649,7 @@
             }
 
             function renderSavedRecipesList() {
+                // ... existing renderSavedRecipesList implementation ...
                 if(savedRecipes.length === 0) {
                     ui.savedRecipesListDiv.innerHTML = '<p class="text-gray-500 text-center">No recipes saved yet.</p>';
                     return;
@@ -596,6 +659,9 @@
                         <div class="flex justify-between items-center p-3">
                             <span class="font-medium">${recipe.name}</span>
                             <div class="flex items-center gap-2">
+                                <button class="edit-recipe-btn p-1 text-gray-500 hover:text-white rounded-md transition-colors" data-index="${index}" title="Edit Recipe">
+                                   <i data-lucide="pencil" class="w-5 h-5 pointer-events-none"></i>
+                                </button>
                                 <button class="log-recipe-btn p-1 text-gray-500 hover:text-white rounded-md transition-colors" data-index="${index}" title="Log Recipe">
                                    <i data-lucide="plus-circle" class="w-5 h-5 pointer-events-none"></i>
                                 </button>
@@ -617,8 +683,119 @@
                 lucide.createIcons();
             }
             
+            // --- AI REPORT FUNCTION ---
+            async function getDailyLogAIReport() {
+                const btn = ui.aiDailyReportBtn;
+                const btnText = btn.querySelector('.btn-text');
+                const loader = btn.querySelector('.loader');
+                const dateKey = dateToKey(viewDate);
+                const currentLog = getCurrentDayLog();
+
+                ui.aiReportOutputDiv.classList.add('hidden'); // Hide output initially
+
+                if (currentLog.length === 0) {
+                    showCustomAlert('No Data', `There is no food logged for ${dateKey}.`);
+                    return;
+                }
+
+                const totals = currentLog.reduce((acc, item) => {
+                    acc.calories += item.calories || 0; acc.protein += item.protein || 0; acc.carbs += item.carbs || 0; 
+                    acc.fat += item.fat || 0; acc.sugar += item.sugar || 0; acc.sodium += item.sodium || 0; 
+                    acc.potassium += item.potassium || 0; return acc;
+                }, { calories: 0, protein: 0, carbs: 0, fat: 0, sugar: 0, sodium: 0, potassium: 0 });
+
+                const goalData = goals;
+                
+                btn.disabled = true;
+                btnText.style.display = 'none';
+                loader.classList.remove('hidden');
+                ui.aiReportOutputDiv.classList.remove('hidden');
+                ui.aiReportText.textContent = 'Generating personalized report...';
+
+
+                const systemPrompt = `You are a friendly but expert nutrition coach. Your task is to provide a brief, actionable analysis of the user's daily food log.
+                
+                1.  **Analyze** the logged data against the goals.
+                2.  **Evaluate** macro distribution (Protein, Carbs, Fat) and key micronutrients (Sodium/Potassium/Sugar).
+                3.  **Provide a concise summary** (1-2 sentences).
+                4.  **Offer one specific, actionable tip** for improvement/maintenance based on the biggest deviation or goal.
+                
+                Keep the report readable, using markdown bold for key stats, and keep the total response under 100 words.`;
+
+                const userQuery = `Analyze the following log data for ${dateKey}:
+                
+                --- Logged Data ---
+                Total Calories: ${totals.calories.toFixed(0)} kcal
+                Protein: ${totals.protein.toFixed(1)} g
+                Carbs: ${totals.carbs.toFixed(1)} g
+                Fat: ${totals.fat.toFixed(1)} g
+                Sugar: ${totals.sugar.toFixed(1)} g
+                Sodium: ${totals.sodium.toFixed(0)} mg
+                Potassium: ${totals.potassium.toFixed(0)} mg
+                
+                --- Daily Goals ---
+                Calorie Goal: ${goalData.calories} kcal
+                Protein Goal: ${goalData.protein} g
+                Carb Goal: ${goalData.carbs} g
+                Fat Goal: ${goalData.fat} g
+                Sugar Limit: ${goalData.sugar} g
+                Sodium Limit: ${goalData.sodium} mg
+                Potassium Target: ${goalData.potassium} mg`;
+
+                const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
+                
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } })
+                    });
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                    const result = await response.json();
+                    let text = result.candidates[0].content.parts[0].text;
+                    
+                    ui.aiReportText.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+                } catch (error) {
+                    console.error("AI Report Error:", error);
+                    ui.aiReportText.textContent = 'Sorry, the AI coach is unavailable right now.';
+                    ui.aiReportText.classList.add('text-red-400');
+                } finally {
+                    btn.disabled = false;
+                    btnText.style.display = 'inline';
+                    loader.classList.add('hidden');
+                }
+            }
+
+
+            // --- CAROUSEL FUNCTIONS ---
+
+            function updateDayView(date) {
+                viewDate = date; // Update central state
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const dateKey = dateToKey(date);
+                const isToday = dateKey === dateToKey(today);
+
+                ui.dayViewTitleSpan.textContent = isToday ? 'Today' : date.toLocaleDateString(undefined, { weekday: 'long' });
+                ui.dayViewDateSpan.textContent = date.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
+
+                // Disable next day button for future dates
+                const nextDay = new Date(date);
+                nextDay.setDate(nextDay.getDate() + 1);
+                ui.nextDayBtn.disabled = nextDay > today;
+                
+                // Clear the AI report for the new day
+                ui.aiReportOutputDiv.classList.add('hidden');
+                ui.aiReportText.textContent = 'Your personalized report will appear here.';
+
+                fullRender(); // Re-render content based on new viewDate
+            }
+            
+            // --- EXISTING AI/FORM FUNCTIONS MODIFIED FOR NEW DATA MODEL ---
+            
             async function getMacrosFromAI(foodName, brand, grams = 0) {
-                let prompt = `Calculate the nutritional information for "${foodName}"`;
+                 // ... (existing getMacrosFromAI implementation - relies only on parameters) ...
+                 let prompt = `Calculate the nutritional information for "${foodName}"`;
                 if(brand) prompt += ` from the brand "${brand}"`;
                 if (grams > 0) {
                     prompt += `. Calculate for ${grams}g.`;
@@ -644,15 +821,37 @@
                         }
                     }
                 };
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                // Use a retry mechanism (exponential backoff) for API calls
+                let response;
+                for (let i = 0; i < 3; i++) {
+                    try {
+                        response = await fetch(apiUrl, { 
+                            method: 'POST', 
+                            headers: { 'Content-Type': 'application/json' }, 
+                            body: JSON.stringify(payload) 
+                        });
+                        if (response.ok) break;
+                        if (response.status === 429) {
+                            await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
+                        } else {
+                            throw new Error(`API Error: ${response.status}`);
+                        }
+                    } catch (error) {
+                        if (i === 2) throw error;
+                        await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
+                    }
+                }
+                if (!response || !response.ok) throw new Error("API call failed after retries.");
+
                 const result = await response.json();
                 if (!result.candidates) throw new Error("Invalid API response.");
                 return JSON.parse(result.candidates[0].content.parts[0].text);
             }
             
             function toggleFavorite(logIndex) {
-                const loggedItem = dailyLog[logIndex];
+                const currentDayLog = getCurrentDayLog();
+                const loggedItem = currentDayLog[logIndex];
+                
                 if (!loggedItem) return;
 
                 if (savedRecipes.some(r => r.name.toLowerCase() === loggedItem.name.toLowerCase())) {
@@ -690,7 +889,7 @@
             }
 
 
-            // --- EVENT LISTENERS ---
+            // --- EVENT LISTENERS (MODIFIED FOR CAROUSEL) ---
             ui.addFoodBtn.addEventListener('click', async () => {
                 ui.addFoodError.textContent = '';
                 const foodName = ui.foodNameInput.value.trim();
@@ -700,6 +899,12 @@
                     ui.addFoodError.textContent = "Please enter a food name.";
                     return;
                 }
+
+                // Ensure the daily log array exists for the current date
+                const dateKey = dateToKey(viewDate);
+                if (!allDailyLogs[dateKey]) allDailyLogs[dateKey] = [];
+                let currentDayLog = allDailyLogs[dateKey];
+
 
                 const foodItem = {
                     name: foodName,
@@ -720,47 +925,51 @@
                 }
                 
                 if (editingFoodLogIndex !== null) {
-                    dailyLog[editingFoodLogIndex] = foodItem;
+                    currentDayLog[editingFoodLogIndex] = foodItem;
                     editingFoodLogIndex = null;
                     ui.addFoodBtn.querySelector('.btn-text').textContent = 'Add Food';
                 } else {
-                    dailyLog.push(foodItem);
+                    currentDayLog.push(foodItem);
                 }
 
                 ui.logMealForm.reset();
                 ui.foodServingsInput.value = 1;
                 updateTotalMacrosDisplay();
                 saveData();
-                fullRender();
+                updateDayView(viewDate); // Re-render for the current day
             });
             
-            ui.dailyLogDiv.addEventListener('click', (e) => {
+            ui.dailyLogContentDiv.addEventListener('click', (e) => {
                 const removeBtn = e.target.closest('.remove-item-btn');
                 const editBtn = e.target.closest('.edit-food-btn');
                 const favoriteBtn = e.target.closest('.favorite-food-btn');
+                const dateKey = dateToKey(viewDate);
+                let currentDayLog = allDailyLogs[dateKey];
 
                 if (removeBtn) {
                     const index = parseInt(removeBtn.dataset.index, 10);
                     showConfirmModal('Delete Log Entry?', 'Are you sure?', () => {
-                        dailyLog.splice(index, 1);
-                        saveData();
-                        fullRender();
+                        if (currentDayLog) {
+                            currentDayLog.splice(index, 1);
+                            saveData();
+                            updateDayView(viewDate);
+                        }
                     });
                 }
                 if(editBtn) {
                     const index = parseInt(editBtn.dataset.index);
-                    const item = dailyLog[index];
+                    const item = currentDayLog[index];
                     const servings = item.servings || 1;
                     editingFoodLogIndex = index;
 
                     ui.foodNameInput.value = item.name;
                     ui.foodServingsInput.value = servings; 
-                    ui.foodGramsInput.value = item.grams / servings;
+                    ui.foodGramsInput.value = (item.grams / servings)?.toFixed(1) || 0;
                     
-                    document.getElementById('food-calories-input').value = item.calories / servings;
-                    document.getElementById('food-protein-input').value = item.protein / servings;
-                    document.getElementById('food-carbs-input').value = item.carbs / servings;
-                    document.getElementById('food-fat-input').value = item.fat / servings;
+                    document.getElementById('food-calories-input').value = (item.calories / servings)?.toFixed(1) || 0;
+                    document.getElementById('food-protein-input').value = (item.protein / servings)?.toFixed(1) || 0;
+                    document.getElementById('food-carbs-input').value = (item.carbs / servings)?.toFixed(1) || 0;
+                    document.getElementById('food-fat-input').value = (item.fat / servings)?.toFixed(1) || 0;
                     document.getElementById('food-sugar-input').value = (item.sugar || 0) / servings;
                     document.getElementById('food-sodium-input').value = (item.sodium || 0) / servings;
                     document.getElementById('food-potassium-input').value = (item.potassium || 0) / servings;
@@ -775,7 +984,30 @@
                 }
             });
 
+            // --- CAROUSEL BUTTON LISTENERS ---
+            ui.prevDayBtn.addEventListener('click', () => {
+                viewDate.setDate(viewDate.getDate() - 1);
+                updateDayView(viewDate);
+            });
+
+            ui.nextDayBtn.addEventListener('click', () => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const nextDay = new Date(viewDate);
+                nextDay.setDate(nextDay.getDate() + 1);
+
+                if (nextDay.getTime() <= today.getTime()) {
+                    viewDate.setDate(viewDate.getDate() + 1);
+                    updateDayView(viewDate);
+                }
+            });
+            
+            ui.aiDailyReportBtn.addEventListener('click', getDailyLogAIReport);
+
+            // --- EXISTING LISTENERS (PASSTHROUGH) ---
+            
             ui.aiGetMacrosBtn.addEventListener('click', async () => {
+                // ... (existing aiGetMacrosBtn implementation) ...
                 const foodName = ui.foodNameInput.value.trim();
                 const brand = ui.foodBrandInput.value.trim();
                  if (!foodName) {
@@ -814,7 +1046,8 @@
             });
 
             ui.aiSuggestionBtn.addEventListener('click', async () => {
-                const btn = ui.aiSuggestionBtn;
+                // ... (existing aiSuggestionBtn implementation) ...
+                 const btn = ui.aiSuggestionBtn;
                 const btnText = btn.querySelector('.btn-text');
                 const loader = btn.querySelector('.loader');
                 const ingredients = document.getElementById('ai-ingredients').value.trim();
@@ -829,7 +1062,8 @@
                 loader.classList.remove('hidden');
                 ui.aiSuggestionsOutput.innerHTML = '';
 
-                const remainingCalories = Math.max(0, goals.calories - dailyLog.reduce((sum, item) => sum + item.calories, 0));
+                const currentDayLog = getCurrentDayLog();
+                const remainingCalories = Math.max(0, goals.calories - currentDayLog.reduce((sum, item) => sum + item.calories, 0));
 
                 const prompt = `I have: ${ingredients}. I have about ${remainingCalories} calories left. My goal is ${userProfile.goal}. Suggest one simple, healthy meal. Provide the name, prep/cook time, and simple step-by-step instructions. Format with Markdown.`;
                 const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
@@ -856,6 +1090,7 @@
             });
 
             function handleImageSelection(file) {
+                // ... (existing handleImageSelection implementation) ...
                 if (file) {
                     scannedImageData = file;
                     const reader = new FileReader();
@@ -868,6 +1103,7 @@
                 }
             }
              function fileToGenerativePart(file) {
+                // ... (existing fileToGenerativePart implementation) ...
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onloadend = () => {
@@ -890,6 +1126,7 @@
             ui.takePictureInput.addEventListener('change', (e) => handleImageSelection(e.target.files[0]));
             
              ui.aiGetMacrosFromImageBtn.addEventListener('click', async () => {
+                // ... (existing aiGetMacrosFromImageBtn implementation) ...
                 const foodName = document.getElementById('scanner-food-name').value.trim();
                 const foodGrams = document.getElementById('scanner-food-grams').value.trim();
                 const brand = document.getElementById('scanner-brand-input').value.trim();
@@ -967,6 +1204,7 @@
             });
             
             ui.createRecipeBtn.addEventListener('click', () => {
+                // ... (existing createRecipeBtn implementation) ...
                 editingRecipeIndex = null;
                 ui.compoundFoodModal.querySelector('h2').textContent = "Create a Recipe";
                 ui.saveRecipeBtn.textContent = "Save & Log Recipe";
@@ -981,6 +1219,7 @@
             ui.addIngredientBtn.addEventListener('click', () => addIngredientRow());
             
             function addIngredientRow(ingredient = null) {
+                // ... (existing addIngredientRow implementation) ...
                 const div = document.createElement('div');
                 div.className = 'ingredient-row space-y-2 border-t border-gray-700 pt-3 mt-3';
                 div.innerHTML = `
@@ -1009,6 +1248,7 @@
             }
 
             function updateRecipeTotals() {
+                // ... (existing updateRecipeTotals implementation) ...
                 let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0, totalGrams = 0;
                 document.querySelectorAll('.ingredient-row').forEach(row => {
                     const grams = parseFloat(row.querySelector('.ingredient-grams').value) || 0;
@@ -1029,7 +1269,8 @@
             
             ui.ingredientListContainer.addEventListener('input', updateRecipeTotals);
             ui.ingredientListContainer.addEventListener('click', async (e) => {
-                const aiBtn = e.target.closest('.recipe-ai-btn');
+                // ... (existing ingredientListContainer click implementation) ...
+                 const aiBtn = e.target.closest('.recipe-ai-btn');
                 const removeBtn = e.target.closest('.remove-ingredient-btn');
 
                 if (removeBtn) {
@@ -1123,17 +1364,22 @@
 
                 savedRecipes.push(newRecipe);
 
+                // Log the entire recipe as one item for the current day
+                const dateKey = dateToKey(viewDate);
+                if (!allDailyLogs[dateKey]) allDailyLogs[dateKey] = [];
+                
                 const logEntry = { ...newRecipe, servings: 1, grams: totalGrams };
-                dailyLog.push(logEntry);
+                allDailyLogs[dateKey].push(logEntry);
 
                 saveData();
-                fullRender();
+                updateDayView(viewDate);
                 hideModal(ui.compoundFoodModal);
                 showCustomAlert('Success', `Recipe "${name}" has been saved and logged.`);
             });
 
 
             function updateTotalMacrosDisplay() {
+                // ... (existing updateTotalMacrosDisplay implementation) ...
                 const servings = parseFloat(ui.foodServingsInput.value) || 1;
                 const calories = (parseFloat(document.getElementById('food-calories-input').value) || 0) * servings;
                 const protein = (parseFloat(document.getElementById('food-protein-input').value) || 0) * servings;
@@ -1169,7 +1415,7 @@
 
             // --- INITIALIZATION ---
             loadData();
-            fullRender();
+            updateDayView(viewDate); // Use the new function to initialize the UI
             updateTotalMacrosDisplay();
         });
     </script>

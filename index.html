@@ -64,10 +64,9 @@
 
     <div class="container mx-auto max-w-7xl px-4 py-8">
 
-        <!-- Header -->
         <header class="flex flex-col sm:flex-row items-center justify-between mb-16 pb-4 border-b border-gray-900">
             <a href="index.html" class="flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
                 <h1 class="text-2xl font-bold">FitTrack AI</h1>
             </a>
             <nav class="mt-4 sm:mt-0">
@@ -82,7 +81,6 @@
             </nav>
         </header>
 
-        <!-- Main Content -->
         <main class="space-y-8">
             <div class="text-center">
                 <h2 class="text-4xl font-bold">Welcome Back!</h2>
@@ -90,7 +88,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Nutrition Summary -->
                 <div class="content-card">
                     <h3 class="text-2xl font-bold mb-4">Nutrition at a Glance</h3>
                     <div class="flex items-center gap-6">
@@ -106,16 +103,14 @@
                     </div>
                 </div>
 
-                <!-- Workout Summary -->
                 <div class="content-card">
                     <h3 class="text-2xl font-bold mb-4">Today's Workout</h3>
                     <div id="workout-summary" class="text-center text-secondary-text">
-                        <p>No workout logged for today yet.</p>
+                        <p>No workout data available.</p>
                         <a href="workouts.html" class="text-accent hover:text-accent-hover mt-4 inline-block">Log a workout</a>
                     </div>
                 </div>
 
-                <!-- Sleep Summary -->
                 <div class="content-card">
                     <h3 class="text-2xl font-bold mb-4">Last Night's Sleep</h3>
                     <div id="sleep-summary" class="text-center text-secondary-text">
@@ -126,7 +121,7 @@
             </div>
 
              <div class="content-card">
-                <h3 class="text-2xl font-bold mb-4">Weekly Progress</h3>
+                <h3 class="text-2xl font-bold mb-4">Weekly Progress (Weight & Calories)</h3>
                  <div class="h-64">
                     <canvas id="weekly-progress-chart"></canvas>
                 </div>
@@ -138,45 +133,19 @@
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
 
-            // Mock data for demonstration
-            const summaryData = {
-                nutrition: {
-                    current: { calories: 1250, protein: 90, carbs: 150, fat: 30 },
-                    goal: { calories: 2200, protein: 160, carbs: 250, fat: 65 }
-                },
-                workout: "Push Day - Chest & Triceps",
-                sleep: "7h 30m",
-                weeklyProgress: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    calories: [2100, 2250, 2000, 2300, 2150, 2400, 2200],
-                    weight: [75.5, 75.3, 75.4, 75.1, 75.2, 75.0, 74.9]
-                }
-            };
+            // --- STATE MANAGEMENT ---
+            let appData = {};
+            
+            // --- CHART.JS SETUP ---
+            Chart.defaults.color = 'var(--primary-text)';
 
-            // Update Nutrition Summary
-            document.getElementById('summary-current-calories').textContent = summaryData.nutrition.current.calories;
-            document.getElementById('summary-goal-calories').textContent = summaryData.nutrition.goal.calories;
-            document.getElementById('summary-current-protein').textContent = summaryData.nutrition.current.protein;
-            document.getElementById('summary-goal-protein').textContent = summaryData.nutrition.goal.protein;
-            document.getElementById('summary-current-carbs').textContent = summaryData.nutrition.current.carbs;
-            document.getElementById('summary-goal-carbs').textContent = summaryData.nutrition.goal.carbs;
-            document.getElementById('summary-current-fat').textContent = summaryData.nutrition.current.fat;
-            document.getElementById('summary-goal-fat').textContent = summaryData.nutrition.goal.fat;
-
-            // Update Workout Summary
-            document.getElementById('workout-summary').innerHTML = `<p class="text-lg font-semibold text-primary-text">${summaryData.workout}</p><a href="workouts.html" class="text-accent hover:text-accent-hover mt-2 inline-block">View details</a>`;
-
-            // Update Sleep Summary
-            document.getElementById('sleep-summary').innerHTML = `<p class="text-3xl font-bold text-primary-text">${summaryData.sleep}</p>`;
-
-            // Macro Chart
             const macroCtx = document.getElementById('macro-chart-summary').getContext('2d');
-            new Chart(macroCtx, {
+            const macroChart = new Chart(macroCtx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Protein', 'Carbs', 'Fat'],
                     datasets: [{
-                        data: [summaryData.nutrition.current.protein, summaryData.nutrition.current.carbs, summaryData.nutrition.current.fat],
+                        data: [1, 1, 1],
                         backgroundColor: ['#3b82f6', '#10b981', '#ef4444'],
                         borderColor: 'var(--card-bg)',
                         borderWidth: 5,
@@ -190,30 +159,14 @@
                 }
             });
 
-            // Weekly Progress Chart
             const weeklyCtx = document.getElementById('weekly-progress-chart').getContext('2d');
-            new Chart(weeklyCtx, {
+            const weeklyProgressChart = new Chart(weeklyCtx, {
                 type: 'line',
                 data: {
-                    labels: summaryData.weeklyProgress.labels,
+                    labels: [],
                     datasets: [
-                        {
-                            label: 'Calories',
-                            data: summaryData.weeklyProgress.calories,
-                            borderColor: '#3b82f6',
-                            backgroundColor: '#3b82f620',
-                            yAxisID: 'y',
-                            tension: 0.3,
-                            fill: true,
-                        },
-                        {
-                            label: 'Weight (kg)',
-                            data: summaryData.weeklyProgress.weight,
-                            borderColor: '#10b981',
-                            backgroundColor: '#10b98120',
-                            yAxisID: 'y1',
-                             tension: 0.3,
-                        }
+                        { label: 'Calories', data: [], borderColor: '#3b82f6', backgroundColor: '#3b82f620', yAxisID: 'y', tension: 0.3, fill: true, },
+                        { label: 'Weight (kg)', data: [], borderColor: '#10b981', backgroundColor: '#10b98120', yAxisID: 'y1', tension: 0.3, }
                     ]
                 },
                 options: {
@@ -224,32 +177,190 @@
                             type: 'linear',
                             display: true,
                             position: 'left',
-                             ticks: { color: 'var(--secondary-text)' },
-                             grid: { color: 'var(--border-color)' }
+                            ticks: { color: 'var(--secondary-text)' },
+                            grid: { color: 'var(--border-color)' }
                         },
                         y1: {
                             type: 'linear',
                             display: true,
                             position: 'right',
-                             ticks: { color: 'var(--secondary-text)' },
-                            grid: {
-                                drawOnChartArea: false, 
-                            },
+                            ticks: { color: 'var(--secondary-text)' },
+                            grid: { drawOnChartArea: false },
                         },
-                         x: {
-                             ticks: { color: 'var(--secondary-text)' },
-                             grid: { color: 'var(--border-color)' }
+                        x: {
+                            ticks: { color: 'var(--secondary-text)' },
+                            grid: { color: 'var(--border-color)' }
                         }
                     },
                     plugins: {
-                        legend: {
-                            labels: {
-                                color: 'var(--primary-text)'
-                            }
-                        }
+                        legend: { labels: { color: 'var(--primary-text)' } }
                     }
                 }
             });
+
+            // --- HELPER FUNCTIONS ---
+            function dateToKey(date) {
+                return date.toISOString().split('T')[0];
+            }
+
+             function getWorkoutDayType(date) {
+                const schedule = [ 
+                    { day: "Monday", type: "Push" }, 
+                    { day: "Tuesday", type: "Pull" }, 
+                    { day: "Wednesday", type: "Legs" }, 
+                    { day: "Thursday", type: "Push" }, 
+                    { day: "Friday", type: "Pull" }, 
+                    { day: "Saturday", type: "Legs" }, 
+                    { day: "Sunday", type: "Rest" }
+                ];
+                const dayIndex = date.getDay(); 
+                return schedule[(dayIndex + 6) % 7];
+            }
+
+            function calculateDuration(startTime, endTime, dateStr) {
+                // Creates date objects to correctly calculate duration even across midnight
+                const startDate = new Date(`${dateStr}T${startTime}`);
+                const endDate = new Date(`${dateStr}T${endTime}`);
+                if(endDate <= startDate) endDate.setDate(endDate.getDate() + 1);
+                const durationMs = endDate - startDate;
+                const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+                const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+                
+                if (durationMs < 0 || durationHours > 24) return { durationHours: 0, durationMinutes: 0 }; // Handle errors
+                return { durationHours, durationMinutes };
+            }
+
+
+            // --- DATA LOADING ---
+            function loadData() {
+                const todayKey = dateToKey(new Date());
+
+                // Default goals
+                const defaultGoals = { calories: 2000, protein: 150, carbs: 225, fat: 60 };
+                
+                // Load all necessary keys
+                appData.allDailyLogs = JSON.parse(localStorage.getItem('fitTrackAI_allDailyLogs')) || {};
+                appData.userProfile = JSON.parse(localStorage.getItem('fitTrackAI_userProfile')) || { sleepHistory: [], weightHistory: [] };
+                appData.workoutHistory = JSON.parse(localStorage.getItem('fitTrackAI_workoutHistory')) || [];
+                appData.workoutStatusHistory = JSON.parse(localStorage.getItem('fitTrackAI_workoutStatus')) || {};
+                appData.goals = JSON.parse(localStorage.getItem('fitTrackAI_goals')) || defaultGoals;
+                appData.exerciseDB = JSON.parse(localStorage.getItem('fitTrackAI_exerciseDB')) || [];
+
+                // Get today's log and goal
+                appData.todayLog = appData.allDailyLogs[todayKey] || [];
+                appData.goals = { ...defaultGoals, ...appData.goals };
+            }
+
+            // --- RENDERING FUNCTIONS ---
+            
+            function renderNutritionSummary() {
+                const totals = appData.todayLog.reduce((acc, item) => ({
+                    calories: acc.calories + (item.calories || 0), protein: acc.protein + (item.protein || 0),
+                    carbs: acc.carbs + (item.carbs || 0), fat: acc.fat + (item.fat || 0)
+                }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
+
+                document.getElementById('summary-current-calories').textContent = totals.calories.toFixed(0);
+                document.getElementById('summary-goal-calories').textContent = appData.goals.calories.toFixed(0);
+                document.getElementById('summary-current-protein').textContent = totals.protein.toFixed(1);
+                document.getElementById('summary-goal-protein').textContent = appData.goals.protein.toFixed(0);
+                document.getElementById('summary-current-carbs').textContent = totals.carbs.toFixed(1);
+                document.getElementById('summary-goal-carbs').textContent = appData.goals.carbs.toFixed(0);
+                document.getElementById('summary-current-fat').textContent = totals.fat.toFixed(1);
+                document.getElementById('summary-goal-fat').textContent = appData.goals.fat.toFixed(0);
+
+                const macroSum = totals.protein + totals.carbs + totals.fat;
+                macroChart.data.datasets[0].data = macroSum > 0 ? [totals.protein, totals.carbs, totals.fat] : [1, 1, 1];
+                macroChart.update();
+            }
+
+            function renderWorkoutSummary() {
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                const todayKey = dateToKey(today);
+
+                const dayInfo = getWorkoutDayType(today);
+                const loggedExercises = appData.workoutHistory.filter(log => dateToKey(new Date(log.date)) === todayKey);
+                const status = appData.workoutStatusHistory[todayKey];
+                
+                let summaryHtml = '';
+                
+                if (dayInfo.type === 'Rest') {
+                    summaryHtml = `<p class="text-3xl font-bold text-green-400 mb-2">Rest Day</p><p class="text-lg font-semibold text-primary-text">Recovery is key!</p><a href="workouts.html" class="text-accent hover:text-accent-hover mt-4 inline-block">View full plan</a>`;
+                } else if (loggedExercises.length > 0) {
+                     const firstExercise = loggedExercises[0].name;
+                     const exerciseCount = loggedExercises.length;
+                     const statusText = status === 'full' ? 'Complete' : (status === 'partial' ? 'Partial' : 'Logged');
+                     summaryHtml = `<p class="text-3xl font-bold text-blue-400 mb-2">${dayInfo.type} (${statusText})</p><p class="text-lg font-semibold text-primary-text">Logged ${exerciseCount} exercises. Started with ${firstExercise}.</p><a href="workouts.html" class="text-accent hover:text-accent-hover mt-4 inline-block">View full log</a>`;
+                } else {
+                    summaryHtml = `<p class="text-lg font-semibold text-primary-text">${dayInfo.type} Scheduled</p><p>Time to hit the gym!</p><a href="workouts.html" class="text-accent hover:text-accent-hover mt-4 inline-block">Start your workout</a>`;
+                }
+                
+                document.getElementById('workout-summary').innerHTML = summaryHtml;
+            }
+
+            function renderSleepSummary() {
+                const sleepHistory = appData.userProfile.sleepHistory.sort((a,b) => new Date(b.date) - new Date(a.date));
+                const lastLog = sleepHistory[0];
+                
+                let summaryHtml = '';
+
+                if (lastLog) {
+                    const { durationHours, durationMinutes } = calculateDuration(lastLog.startTime, lastLog.endTime, lastLog.date);
+                    const qualityText = '★'.repeat(lastLog.quality) + '☆'.repeat(5 - lastLog.quality);
+                    
+                    summaryHtml = `<p class="text-3xl font-bold text-primary-text">${durationHours}h ${durationMinutes}m</p><p class="text-lg text-yellow-400 font-semibold mb-2">${qualityText}</p><a href="sleep.html" class="text-accent hover:text-accent-hover mt-4 inline-block">View details</a>`;
+                } else {
+                    summaryHtml = `<p>No sleep data available.</p><a href="sleep.html" class="text-accent hover:text-accent-hover mt-4 inline-block">Log your sleep</a>`;
+                }
+
+                document.getElementById('sleep-summary').innerHTML = summaryHtml;
+            }
+
+            function renderWeeklyProgressChart() {
+                const daysToDisplay = 7;
+                const labels = [];
+                const calorieData = [];
+                const weightData = [];
+
+                for (let i = daysToDisplay - 1; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    const dateKey = dateToKey(date);
+                    
+                    labels.push(date.toLocaleDateString(undefined, { weekday: 'short' }));
+
+                    // 1. Calorie Data
+                    const dailyLog = appData.allDailyLogs[dateKey] || [];
+                    const totalCalories = dailyLog.reduce((sum, item) => sum + (item.calories || 0), 0);
+                    calorieData.push(totalCalories || null); 
+
+                    // 2. Weight Data
+                    const weightEntry = appData.userProfile.weightHistory.find(entry => entry.date === dateKey);
+                    weightData.push(weightEntry ? weightEntry.weight : null);
+                }
+
+                // Update Chart
+                weeklyProgressChart.data.labels = labels;
+                weeklyProgressChart.data.datasets[0].data = calorieData;
+                weeklyProgressChart.data.datasets[1].data = weightData;
+                
+                // Ensure the Y-axes scale correctly if there is data
+                weeklyProgressChart.options.scales.y.min = Math.min(...calorieData.filter(d => d !== null)) * 0.9 || 0;
+                weeklyProgressChart.options.scales.y1.min = Math.min(...weightData.filter(d => d !== null)) * 0.95 || 60; // Start slightly below lowest weight
+                
+                weeklyProgressChart.update();
+            }
+
+            function fullRender() {
+                loadData();
+                renderNutritionSummary();
+                renderWorkoutSummary();
+                renderSleepSummary();
+                renderWeeklyProgressChart();
+            }
+
+            // --- INITIALIZATION ---
+            fullRender();
         });
     </script>
 </body>

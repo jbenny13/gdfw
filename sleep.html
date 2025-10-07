@@ -395,7 +395,7 @@
                 const fallAsleepMinutes = 15;
                 ui.sleepWakeTimesDiv.innerHTML = '';
 
-                for(let i = 4; i <= 6; i++) { // Suggest 4, 5, and 6 cycles
+                for(let i = 3; i <= 5; i++) { // Suggest 3, 4, and 5 cycles
                     const cycleDurationMs = (90 * i * 60 * 1000) + (fallAsleepMinutes * 60 * 1000);
                     const wakeUpDate = new Date(now.getTime() + cycleDurationMs);
                     const timeString = wakeUpDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

@@ -327,20 +327,17 @@
                                 <div class="flex justify-between items-baseline"><span class="text-gray-400">Potassium:</span> <span class="font-semibold"><span id="current-potassium">0</span> / <span id="goal-potassium">3500</span> mg</span></div>
                             </div>
                         </div>
-                        
-                        <!-- AI Report Button -->
-                         <button id="ai-daily-report-btn" class="btn btn-primary w-full mt-6">
-                            <i data-lucide="clipboard-list" class="w-4 h-4"></i>
-                            <span class="btn-text">Get Daily Log AI Report</span>
-                            <div class="loader hidden"></div>
-                        </button>
                     </div>
 
                     <!-- Daily Log Content & AI Report Output -->
                     <div class="content-card">
                         <h3 class="text-2xl font-bold mb-4">Food Log</h3>
-                        <div id="daily-log-content" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"><p class="text-gray-500">No food logged yet.</p></div>
-                        
+                        <div id="daily-log-content" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"><p class="text-gray-500">No food logged yet.</p></div>              <!-- AI Report Button -->
+                         <button id="ai-daily-report-btn" class="btn btn-primary w-full mt-6">
+                            <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+                            <span class="btn-text">Get Daily Log AI Report</span>
+                            <div class="loader hidden"></div>
+                        </button>
                         <div id="ai-report-output" class="mt-4 p-3 bg-black/30 rounded-md text-sm hidden">
                             <h4 class="font-bold text-lg mb-2 text-yellow-400 flex items-center gap-2">
                                 <i data-lucide="sparkles" class="w-5 h-5"></i>

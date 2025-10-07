@@ -132,9 +132,11 @@
              background-color: rgba(229, 62, 62, 0.1);
         }
 
+        /* FIX: Ensure dropdown is positioned relative to its container */
         #workout-actions-dropdown {
             z-index: 50;
             background-color: var(--card-bg);
+            position: absolute;
         }
 
         .modal-backdrop {
@@ -254,6 +256,7 @@
                                 <button id="workout-actions-btn" class="btn btn-secondary !p-2">
                                     <i data-lucide="more-horizontal" class="w-5 h-5"></i>
                                 </button>
+                                <!-- FIX: Dropdown is inside its relative container -->
                                 <div id="workout-actions-dropdown" class="absolute right-0 mt-2 w-48 border border-border-color rounded-md shadow-lg hidden">
                                     <button id="manage-warmups-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-t-md">
                                         <i data-lucide="flame" class="w-4 h-4"></i> Manage Warm-ups
@@ -270,7 +273,7 @@
                     </div>
                     <div class="flex items-center justify-center gap-4 mb-6">
                         <button id="prev-day-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-                        <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                             <span id="day-view-status" class="text-sm font-bold text-secondary-text"></span>
                             <div id="workout-status-controls" class="flex gap-2 text-sm">
                                 <button class="status-btn btn !p-2 !py-1" data-status="full">Full</button>
@@ -278,7 +281,6 @@
                                 <button class="status-btn btn !p-2 !py-1" data-status="none">None</button>
                             </div>
                         </div>
-                        <!-- <div class="flex-grow"></div> -->
                         <button id="next-day-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
                     </div>
                     <div>
@@ -297,9 +299,10 @@
                     </div>
                 </div>
 
-                <div class="content-card">
+                <div class="content-card lg:col-span-2">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-                        <h3 class="text-2xl font-semibold">Progression</h3>
+                        <h3 class="text-2xl font-semibold">Progression Chart</h3>
+                        <!-- FIX: Progression dropdown is now inside the card and styled correctly -->
                         <select id="progress-exercise-select" class="w-full sm:w-auto form-input">
                             </select>
                     </div>
@@ -392,8 +395,8 @@
             const defaultExerciseDB = [
                 { name: "Seated leg curl", group: "Hamstrings", type: "Machine", instructions: ["Sit in the machine with your back against the pad and the ankle pad just above your heels.", "Adjust the lap pad to fit snugly on your thighs.", "Curl your legs down as far as possible, squeezing your hamstrings.", "Slowly return to the starting position."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
                 { name: "Straight Calf extension", group: "Calves", type: "Machine", instructions: ["Use a standing or seated calf raise machine.", "Place the balls of your feet on the platform, with your heels hanging off.", "Press through the balls of your feet to raise your heels as high as possible.", "Hold the peak contraction, then slowly lower your heels below the platform level."], repRange: "10-20 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
-                { name: "Barbell Squats", group: "Abductors", type: "Barbell", instructions: ["Set a barbell in a squat rack at shoulder height.", "Step under the bar and rest it across your upper back.", "Lift the bar off the rack, take a step back, and stand with feet shoulder-width apart.", "Keeping your chest up and back straight, lower your hips as if sitting in a chair.", "Go as deep as you comfortably can, ideally until your thighs are parallel to the floor.", "Push through your heels to return to the starting position."], repRange: "6-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
-                { name: "Smith Machine squats", group: "Abductors", type: "Machine", instructions: ["Set the bar on the Smith machine to shoulder height.", "Position yourself under the bar with feet shoulder-width apart.", "Un-rack the bar and lower down by bending your knees and hips.", "Keep your back straight and chest up.", "Push through your heels to return to the start."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
+                { name: "Barbell Squats", group: "Quads", type: "Barbell", instructions: ["Set a barbell in a squat rack at shoulder height.", "Step under the bar and rest it across your upper back.", "Lift the bar off the rack, take a step back, and stand with feet shoulder-width apart.", "Keeping your chest up and back straight, lower your hips as if sitting in a chair.", "Go as deep as you comfortably can, ideally until your thighs are parallel to the floor.", "Push through your heels to return to the starting position."], repRange: "6-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false }, // Group changed from Abductors to Quads
+                { name: "Smith Machine squats", group: "Quads", type: "Machine", instructions: ["Set the bar on the Smith machine to shoulder height.", "Position yourself under the bar with feet shoulder-width apart.", "Un-rack the bar and lower down by bending your knees and hips.", "Keep your back straight and chest up.", "Push through your heels to return to the start."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false }, // Group changed from Abductors to Quads
                 { name: "Romanian Deadlift", group: "Glutes", type: "Barbell", instructions: ["Hold a barbell with an overhand grip, hands just outside your thighs.", "Stand tall with a slight bend in your knees.", "Hinge at your hips, pushing your butt back while keeping your back straight.", "Lower the bar down your shins until you feel a deep stretch in your hamstrings.", "Squeeze your glutes to return to the starting position."], repRange: "8-12 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
                 { name: "Hip thrusts", group: "Glutes", type: "Barbell", instructions: ["Sit on the floor with your upper back against a bench.", "Roll a barbell over your legs and position it in the crease of your hips.", "Place your feet flat on the floor, shoulder-width apart.", "Drive through your heels to lift your hips until your body forms a straight line from shoulders to knees.", "Squeeze your glutes at the top, then lower your hips back down."], repRange: "8-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
                 { name: "Leg Extension", group: "Quads", type: "Machine", instructions: ["Sit in the leg extension machine with your legs under the pad.", "Align your knees with the machine's pivot point.", "Extend your legs to lift the weight until they are straight.", "Squeeze your quads at the top.", "Slowly lower the weight back to the starting position."], repRange: "12-20 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Video+Demonstration", notes: "", favorite: false },
@@ -547,6 +550,7 @@
                 updateDayView(viewDate);
                 populateProgressSelect();
                 renderProgressionChart(ui.progressExerciseSelect.value || 'general');
+                lucide.createIcons();
             }
 
             // --- WORKOUT SPECIFIC FUNCTIONS ---
@@ -612,19 +616,103 @@
                 lucide.createIcons();
             }
 
+            function getWorkoutDayType(date) {
+                const schedule = [ { day: "Monday", type: "Push" }, { day: "Tuesday", type: "Pull" }, { day: "Wednesday", type: "Legs" }, { day: "Thursday", type: "Push" }, { day: "Friday", type: "Pull" }, { day: "Saturday", type: "Legs" }, { day: "Sunday", type: "Rest" }];
+                const dayIndex = date.getDay(); 
+                return schedule[(dayIndex + 6) % 7]; // Convert Sunday (0) to Monday (0) schedule index logic
+            }
+
+            function calculateAutoStatus(date) {
+                const dateKey = dateToKey(date);
+                const dayInfo = getWorkoutDayType(date);
+                
+                if (dayInfo.type === 'Rest') return 'full'; // Always full on rest days
+                
+                const targetGroups = { "Push": ['Chest', 'Shoulders', 'Triceps'], "Pull": ['Back', 'Biceps', 'Forearms'], "Legs": ['Quads', 'Glutes', 'Hamstrings', 'Calves', 'Abs'] };
+                const groupsForDay = targetGroups[dayInfo.type] || [];
+                const loggedExercises = workoutHistory.filter(log => dateToKey(new Date(log.date)) === dateKey);
+                
+                let coveredGroups = {};
+                
+                // Collect all planned exercise names by group for the day
+                const plannedExercises = {};
+                groupsForDay.forEach(group => {
+                    plannedExercises[group] = exerciseDB.filter(ex => ex.group === group).map(ex => ex.name);
+                });
+
+                // Count exercises logged per planned group
+                const loggedExercisesByGroup = {};
+                loggedExercises.forEach(log => {
+                    const exercise = exerciseDB.find(ex => ex.name === log.name);
+                    if (exercise && groupsForDay.includes(exercise.group)) {
+                        if (!loggedExercisesByGroup[exercise.group]) {
+                            loggedExercisesByGroup[exercise.group] = new Set();
+                        }
+                        loggedExercisesByGroup[exercise.group].add(log.name);
+                    }
+                });
+
+                let totalPlannedGroups = 0;
+                let groupsMeetingTarget = 0;
+                let groupsWithSomeActivity = 0;
+
+                groupsForDay.forEach(group => {
+                    const plannedCount = plannedExercises[group].length;
+                    const loggedCount = loggedExercisesByGroup[group]?.size || 0;
+                    
+                    if (plannedCount > 0) {
+                        totalPlannedGroups++;
+
+                        // Define targets based on day type
+                        const requiredExercises = (dayInfo.type === 'Legs' ? 1 : 2);
+                        
+                        if (loggedCount >= requiredExercises) {
+                            groupsMeetingTarget++;
+                        }
+                        if (loggedCount > 0) {
+                            groupsWithSomeActivity++;
+                        }
+                    }
+                });
+
+                if (totalPlannedGroups === 0) return 'none'; // No planned exercises for the day
+
+                if (groupsMeetingTarget === totalPlannedGroups) {
+                    return 'full';
+                } else if (groupsWithSomeActivity > 0) {
+                    return 'partial';
+                } else {
+                    return 'none';
+                }
+            }
+
             function updateWorkoutStatusControls(date) {
                 const dateKey = dateToKey(date);
-                const status = workoutStatusHistory[dateKey] || 'none';
                 const today = new Date();
                 today.setHours(0,0,0,0);
                 const isFutureDay = date > today;
                 
+                // Get the status manually logged, or calculate auto status if not logged
+                let currentStatus = workoutStatusHistory[dateKey];
+                let isManual = true;
+
+                if (currentStatus === undefined || currentStatus === 'auto') {
+                    currentStatus = calculateAutoStatus(date);
+                    isManual = false;
+                }
+                
+                // Store the final calculated status for display purposes (but don't save to history unless explicitly set)
+                // This ensures manual overrides stick, but auto-status is recalculated on load/log/delete.
+                workoutStatusHistory[dateKey] = currentStatus; 
+
                 ui.workoutStatusControls.classList.toggle('hidden', isFutureDay);
                 ui.workoutStatusControls.querySelectorAll('.status-btn').forEach(btn => {
                     btn.classList.remove('selected-full', 'selected-partial', 'selected-none');
-                    if (btn.dataset.status === status) {
-                        btn.classList.add(`selected-${status}`);
+                    if (btn.dataset.status === currentStatus) {
+                        btn.classList.add(`selected-${currentStatus}`);
                     }
+                    // For the UI, show the "auto" status as active if no manual status was set.
+                    // The click handler will set the manual status.
                 });
 
                 let statusText;
@@ -634,7 +722,7 @@
                     statusText = 'Plan for the Future';
                     statusClass = 'text-secondary-text';
                 } else {
-                    switch(status) {
+                    switch(currentStatus) {
                         case 'full':
                             statusText = 'Workout Status: Full';
                             statusClass = 'text-green-400';
@@ -657,11 +745,8 @@
             }
 
             function renderWorkoutPlanForDate(date) {
-                const schedule = [ { day: "Monday", type: "Push" }, { day: "Tuesday", type: "Pull" }, { day: "Wednesday", type: "Legs" }, { day: "Thursday", type: "Push" }, { day: "Friday", type: "Pull" }, { day: "Saturday", type: "Legs" }, { day: "Sunday", type: "Rest" }];
-                const exerciseGroups = { "Push": ['Chest', 'Shoulders', 'Triceps'], "Pull": ['Back', 'Biceps', 'Forearms'], "Legs": ['Quads', 'Abductors', 'Glutes', 'Hamstrings',  'Calves', 'Abs'] };
-                
-                const dayIndex = date.getDay(); 
-                const item = schedule[(dayIndex + 6) % 7]; // Convert Sunday (0) to Monday (0) schedule index logic
+                const dayInfo = getWorkoutDayType(date);
+                const exerciseGroups = { "Push": ['Chest', 'Shoulders', 'Triceps'], "Pull": ['Back', 'Biceps', 'Forearms'], "Legs": ['Quads', 'Glutes', 'Hamstrings', 'Calves', 'Abs'] };
                 
                 const today = new Date();
                 today.setHours(0,0,0,0);
@@ -684,24 +769,26 @@
                     </li>`).join('');
                 };
 
-                if (item.type === 'Rest') {
+                if (dayInfo.type === 'Rest') {
                     exercisesHtml = `<div class="flex flex-col items-center justify-center h-full text-center p-4"><i data-lucide="bed-double" class="w-12 h-12 text-gray-500 mb-2"></i><p class="text-gray-500 italic mt-2">Rest Day</p></div>`;
                 } else {
-                    const groupsForDay = exerciseGroups[item.type];
-                    const warmupExercises = warmups[item.type] || [];
+                    const groupsForDay = exerciseGroups[dayInfo.type];
+                    const warmupExercises = warmups[dayInfo.type] || [];
                     
                     if (warmupExercises.length > 0) {
-                        exercisesHtml += `<div><h5 class="font-semibold text-green-400 text-sm mb-1">Warm-up</h5><ul class="space-y-1">${warmupExercises.map(w => `<li class="text-base text-gray-300 exercise-item flex justify-between items-center group"><button class="flex-grow text-left p-1 rounded hover:bg-black/30 warmup-detail-btn" data-name="${w.name}" data-day-type="${item.type}">${w.name}</button><span class="exercise-item-controls items-center gap-1 pl-1"><button class="edit-warmup-btn p-1" data-name="${w.name}" data-day-type="${item.type}" title="Edit Warmup"><i data-lucide="pencil" class="w-4 h-4 text-gray-500 hover:text-yellow-400 pointer-events-none"></i></button><button class="delete-warmup-btn p-1" data-name="${w.name}" data-day-type="${item.type}" title="Delete Warmup"><i data-lucide="trash-2" class="w-4 h-4 text-gray-500 hover:text-red-500 pointer-events-none"></i></button></span></li>`).join('')}</ul></div>`;
+                        exercisesHtml += `<div><h5 class="font-semibold text-green-400 text-sm mb-1">Warm-up</h5><ul class="space-y-1">${warmupExercises.map(w => `<li class="text-base text-gray-300 exercise-item flex justify-between items-center group"><button class="flex-grow text-left p-1 rounded hover:bg-black/30 warmup-detail-btn" data-name="${w.name}" data-day-type="${dayInfo.type}">${w.name}</button><span class="exercise-item-controls items-center gap-1 pl-1"><button class="edit-warmup-btn p-1" data-name="${w.name}" data-day-type="${dayInfo.type}" title="Edit Warmup"><i data-lucide="pencil" class="w-4 h-4 text-gray-500 hover:text-yellow-400 pointer-events-none"></i></button><button class="delete-warmup-btn p-1" data-name="${w.name}" data-day-type="${dayInfo.type}" title="Delete Warmup"><i data-lucide="trash-2" class="w-4 h-4 text-gray-500 hover:text-red-500 pointer-events-none"></i></button></span></li>`).join('')}</ul></div>`;
                     }
                     
                     for(const group of groupsForDay) {
-                        const exercisesForGroup = exerciseDB.filter(ex => ex.group === group);
+                        // Filter exercises planned for this muscle group, prioritizing favorites
+                        const exercisesForGroup = exerciseDB.filter(ex => ex.group === group).sort((a, b) => (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0));
                         if(exercisesForGroup.length > 0) {
                             exercisesHtml += `<div><h5 class="font-semibold text-blue-400 text-sm mb-1">${group}</h5><ul class="space-y-1">${renderExerciseList(exercisesForGroup)}</ul></div>`;
                         }
                     }
                 }
                 ui.workoutPlanForDay.innerHTML = exercisesHtml;
+                lucide.createIcons();
             }
 
             function renderHistoryForDate(date) {
@@ -728,6 +815,7 @@
                         <div class="text-sm text-secondary-text mt-1">${setsHtml}</div>
                      </div>`;
                 }).join('');
+                lucide.createIcons();
             }
 
 
@@ -774,7 +862,10 @@
                 if (btn) {
                     const status = btn.dataset.status;
                     const dateKey = dateToKey(viewDate);
+                    
+                    // Explicitly set the manual status
                     workoutStatusHistory[dateKey] = status;
+                    
                     saveData();
                     updateWorkoutStatusControls(viewDate);
                 }
@@ -796,6 +887,7 @@
                 ui.aiAdviceExerciseSelect.innerHTML = '<option value="">Select an exercise...</option>' + singleExerciseOptions;
             };
 
+            // FIX: Graph date issue fix by using toLocaleDateString() on date object created from YYYY-MM-DD
             function renderProgressionChart(exerciseName) {
                 if (exerciseName === "general") {
                     renderGeneralProgressionChart();
@@ -810,8 +902,9 @@
                 const exerciseLogs = workoutHistory.filter(log => log.name === exerciseName).sort((a,b) => new Date(a.date) - new Date(b.date));
                 
                 const labels = exerciseLogs.map(log => {
-                    const [y,m,d] = log.date.split('-').map(Number);
-                    return new Date(y, m-1, d).toLocaleDateString();
+                    // Fix: Use Date object created from date string to ensure correct day is displayed
+                    // Replacing hyphens with slashes makes it more robust for date parsing
+                    return new Date(log.date.replace(/-/g, '/')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
                 });
                 const maxWeightData = exerciseLogs.map(log => Math.max(...log.sets.flatMap(set => set.map(s => s.weight || 0))));
                 const volumeData = exerciseLogs.map(log => log.sets.flat().reduce((total, s) => total + (s.weight * s.reps), 0));
@@ -824,6 +917,7 @@
                 progressChart.update();
             };
 
+            // FIX: Graph date issue fix by using toLocaleDateString() on date object created from YYYY-MM-DD
             function renderGeneralProgressionChart() {
                 if (workoutHistory.length === 0) {
                     progressChart.data.labels = [];
@@ -845,8 +939,8 @@
                 const sortedDates = Object.keys(volumeByDay).sort((a, b) => new Date(a) - new Date(b));
                 
                 const labels = sortedDates.map(dateStr => {
-                     const [y,m,d] = dateStr.split('-').map(Number);
-                     return new Date(y, m-1, d).toLocaleDateString();
+                     // Fix: Use Date object created from date string to ensure correct day is displayed
+                     return new Date(dateStr.replace(/-/g, '/')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
                 });
                 const volumeData = sortedDates.map(date => volumeByDay[date]);
 
@@ -892,8 +986,7 @@
 
                 const prompt = `Act as an expert fitness coach grounded in science. A user has performed these recent sessions for ${exerciseName}:
                 ${exerciseLogs.map((log, i) => {
-                    const [y,m,d] = log.date.split('-').map(Number);
-                    const logDate = new Date(y,m-1,d).toLocaleDateString();
+                    const logDate = new Date(log.date.replace(/-/g, '/')).toLocaleDateString();
                     return `Session ${i+1} (${logDate}): ${log.sets.map(set => set.map(part => `${part.weight}kg x ${part.reps} reps`).join(' + ')).join(', ')}`
                 }).join('\n')}
                 Based on progressive overload, give a clear, actionable recommendation for their *next* session. Be specific (e.g., "Aim for 6-8 reps with 52.5kg"). Keep it under 75 words.`;
@@ -934,8 +1027,7 @@
                 const recentHistory = workoutHistory
                     .filter(log => new Date(log.date) >= twoWeeksAgo)
                     .map(log => {
-                        const [y,m,d] = log.date.split('-').map(Number);
-                        const logDate = new Date(y,m-1,d).toLocaleDateString();
+                        const logDate = new Date(log.date.replace(/-/g, '/')).toLocaleDateString();
                         return `On ${logDate}: ${log.name} - ${log.sets.map(s => s.map(p => `${p.weight}kg x ${p.reps}r`).join('/')).join(', ')}`;
                     })
                     .join('; ');
@@ -996,6 +1088,7 @@
             
             function populateExerciseModal(exercise = null) {
                 const groupSelect = document.getElementById('exercise-group');
+                // Use a consistent list of all possible muscle groups from defaults 
                 const muscleGroups = [...new Set(defaultExerciseDB.map(ex => ex.group))].sort();
                 groupSelect.innerHTML = muscleGroups.map(g => `<option value="${g}">${g}</option>`).join('');
                 if (exercise) {
@@ -1152,6 +1245,12 @@
                 }
 
                 editingWorkoutLogIndex = null;
+                // Important: clear any manual status override to let the auto-status calculate 
+                // based on the new/updated log, only if a log was successful.
+                if (workoutStatusHistory[dateString] !== undefined && workoutStatusHistory[dateString] !== 'auto') {
+                    delete workoutStatusHistory[dateString];
+                }
+                
                 saveData(); 
                 updateUI(); 
                 hideModal(ui.workoutModal);

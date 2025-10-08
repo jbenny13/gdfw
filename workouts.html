@@ -379,7 +379,6 @@
         </main>
     </div>
 
-    <!-- Modals -->
     <div id="ai-plan-generator-modal" class="modal-backdrop">
         <div class="modal-content !max-w-3xl">
             <div class="flex justify-between items-center mb-4">
@@ -414,8 +413,7 @@
                         <summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between"><span>Weekly Schedule & Duration</span><i data-lucide="chevron-down" class="w-4 h-4"></i></summary>
                          <div class="pt-4 mt-4 border-t border-gray-800 space-y-4">
                             <div id="ai-plan-schedule-builder">
-                                <!-- Schedule UI will be built here by JS -->
-                            </div>
+                                </div>
                             <div>
                                 <label for="ai-plan-duration" class="form-label">Default Duration (minutes)</label>
                                 <input type="number" id="ai-plan-duration" value="60" class="form-input mt-1">
@@ -451,8 +449,7 @@
                             <i data-lucide="chevron-down" class="w-4 h-4"></i>
                         </summary>
                         <div id="ai-plan-exercise-prefs-container" class="grid grid-cols-2 md:grid-cols-3 gap-2 pt-4 mt-4 border-t border-gray-800">
-                            <!-- Exercise preference buttons will be built here -->
-                        </div>
+                            </div>
                     </details>
 
                     <details class="pt-2">
@@ -629,8 +626,6 @@
 
             // --- CORE & HELPER FUNCTIONS ---
             const getApiUrl = (model, action = 'generateContent') => {
-                // IMPORTANT: To use AI features, add your Google AI API key here.
-                // You can get one for free from Google AI Studio.
                 const apiKey = "AIzaSyDY48xF1byvU05kS9qKvN8iyrIR3hheP8w"; // <--- PASTE YOUR API KEY HERE
                 return `https://generativelanguage.googleapis.com/v1beta/models/${model}:${action}?key=${apiKey}`;
             };
@@ -1306,16 +1301,16 @@
             
              const renderScheduleBuilder = (splitTypes) => {
                 const allTypes = ['Rest', ...splitTypes];
-                
+                const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
                 const dayGrid = document.getElementById('ai-plan-schedule-builder');
                 dayGrid.className = "grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 pt-4 mt-4 border-t border-gray-800";
-                dayGrid.innerHTML = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => `
-                    <button type="button" class="text-center p-2 rounded-lg bg-input-bg day-schedule-btn" data-day="${day}day" data-current-index="0">
-                        <p class="font-semibold text-sm sm:text-base">${day}</p>
-                        <p class="text-xs text-blue-400" id="day-type-${day}">Rest</p>
+                dayGrid.innerHTML = weekDays.map(day => `
+                    <button type="button" class="text-center p-2 rounded-lg bg-input-bg day-schedule-btn" data-day="${day}" data-current-index="0">
+                        <p class="font-semibold text-sm sm:text-base">${day.substring(0, 3)}</p>
+                        <p class="text-xs text-blue-400" id="day-type-${day.substring(0, 3)}">Rest</p>
                     </button>
                 `).join('');
-
+            
                 dayGrid.addEventListener('click', e => {
                     const btn = e.target.closest('.day-schedule-btn');
                     if(btn) {
@@ -1352,16 +1347,16 @@
                 const scheduleButtons = document.querySelectorAll('.day-schedule-btn');
                 let hasWorkoutDay = false;
                 let durationHTML = '';
-
+            
                 scheduleButtons.forEach(btn => {
-                    const day = btn.dataset.day.replace('day','');
+                    const day = btn.dataset.day;
                     const dayType = btn.querySelector('.text-xs').textContent;
                     if(dayType !== 'Rest') {
                         hasWorkoutDay = true;
                         durationHTML += `<div class="flex items-center justify-between gap-2"><label class="text-sm">${day}</label><input type="number" data-day="${day}" class="form-input !w-24 !py-1 day-duration-input" placeholder="${document.getElementById('ai-plan-duration').value || 60}"></div>`;
                     }
                 });
-
+            
                 if(hasWorkoutDay) {
                     container.innerHTML = durationHTML;
                 } else {
@@ -1473,7 +1468,7 @@
                     const schedule = {};
                     let scheduleIsCustomized = false;
                     document.querySelectorAll('.day-schedule-btn').forEach(btn => {
-                        const dayName = btn.dataset.day.replace('day', 'day');
+                        const dayName = btn.dataset.day;
                         const dayType = btn.querySelector('.text-xs').textContent;
                         schedule[dayName] = dayType;
                         if(parseInt(btn.dataset.currentIndex) !== 0) scheduleIsCustomized = true;

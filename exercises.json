@@ -14,6 +14,34 @@
         "favorite": false
     },
     {
+        "name": "Incline Barbell Bench Press",
+        "group": "Chest",
+        "type": "Barbell",
+        "instructions": [
+            "Set a bench to a 30-45 degree incline.",
+            "Lie on the bench and grip the bar slightly wider than shoulder-width.",
+            "Unrack the bar and lower it to your upper chest.",
+            "Press the bar back up until your arms are fully extended."
+        ],
+        "repRange": "8-12 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Decline Barbell Bench Press",
+        "group": "Chest",
+        "type": "Barbell",
+        "instructions": [
+            "Secure your legs at the end of a decline bench.",
+            "Lie back and grip the bar with a medium-width grip.",
+            "Lift the bar from the rack and lower it to your lower chest.",
+            "Press the bar back to the starting position."
+        ],
+        "repRange": "8-12 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
         "name": "Incline Dumbbell Press",
         "group": "Chest",
         "type": "Dumbbell",
@@ -25,6 +53,34 @@
             "Lower them slowly with control."
         ],
         "repRange": "8-15 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Flat Dumbbell Press",
+        "group": "Chest",
+        "type": "Dumbbell",
+        "instructions": [
+            "Lie on a flat bench with a dumbbell in each hand.",
+            "Hold the dumbbells at the sides of your chest, palms facing forward.",
+            "Press the dumbbells up until your arms are fully extended.",
+            "Lower the dumbbells slowly to the starting position."
+        ],
+        "repRange": "8-12 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Dumbbell Flyes",
+        "group": "Chest",
+        "type": "Dumbbell",
+        "instructions": [
+            "Lie on a flat bench with a dumbbell in each hand, palms facing each other.",
+            "Press the weights above your chest.",
+            "With a slight bend in your elbows, lower the weights out to your sides in a wide arc.",
+            "Bring the weights back to the starting position using your chest muscles."
+        ],
+        "repRange": "10-15 reps",
         "notes": "",
         "favorite": false
     },
@@ -43,6 +99,46 @@
         "favorite": false
     },
     {
+        "name": "Machine Chest Press",
+        "group": "Chest",
+        "type": "Machine",
+        "instructions": [
+            "Sit on the machine and adjust the seat so the handles are at chest level.",
+            "Grab the handles and press forward until your arms are fully extended.",
+            "Return slowly to the starting position."
+        ],
+        "repRange": "8-12 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "High-to-low Cable Crossover",
+        "group": "Chest",
+        "type": "Cable",
+        "instructions": [
+            "Set pulleys to a high position.",
+            "Grab the handles and step forward to create tension.",
+            "With a slight bend in your elbows, pull the handles down and across your body.",
+            "Squeeze your chest at the peak contraction."
+        ],
+        "repRange": "10-15 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Push Up",
+        "group": "Chest",
+        "type": "Bodyweight",
+        "instructions": [
+            "Start in a high plank position with hands under your shoulders.",
+            "Lower your body until your chest nearly touches the floor.",
+            "Push back up to the starting position, keeping your body in a straight line."
+        ],
+        "repRange": "As many as possible",
+        "notes": "",
+        "favorite": false
+    },
+    {
         "name": "Overhead Press",
         "group": "Shoulders",
         "type": "Barbell",
@@ -52,6 +148,19 @@
             "Lower the bar back to your shoulders with control."
         ],
         "repRange": "6-12 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Seated Dumbbell Press",
+        "group": "Shoulders",
+        "type": "Dumbbell",
+        "instructions": [
+            "Sit on a bench with back support, holding dumbbells at shoulder height.",
+            "Press the dumbbells overhead until your arms are fully extended.",
+            "Lower the dumbbells back to the starting position with control."
+        ],
+        "repRange": "8-12 reps",
         "notes": "",
         "favorite": false
     },
@@ -83,6 +192,34 @@
         "favorite": false
     },
     {
+        "name": "Cable Lateral Raise",
+        "group": "Shoulders",
+        "type": "Cable",
+        "instructions": [
+            "Stand sideways to a low pulley cable machine.",
+            "Grab the handle with your outside hand.",
+            "Raise your arm out to the side until it's parallel to the floor.",
+            "Lower with control and repeat."
+        ],
+        "repRange": "12-15 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Pike Pushups",
+        "group": "Shoulders",
+        "type": "Bodyweight",
+        "instructions": [
+            "Get into a downward dog yoga position.",
+            "Bend your elbows to lower the top of your head towards the floor.",
+            "Press back up to the starting position.",
+            "Keep your legs as straight as possible."
+        ],
+        "repRange": "8-15 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
         "name": "Tricep Pushdown",
         "group": "Triceps",
         "type": "Machine",
@@ -104,6 +241,33 @@
             "Lie on a flat bench holding an EZ bar or barbell above your chest.",
             "Lower the bar towards your forehead by bending only at the elbows.",
             "Extend your arms to press the weight back to the start, focusing on the triceps contraction."
+        ],
+        "repRange": "8-15 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Dumbbell Overhead Tricep Extension",
+        "group": "Triceps",
+        "type": "Dumbbell",
+        "instructions": [
+            "Sit on a bench and hold one dumbbell with both hands over your head.",
+            "Lower the dumbbell behind your head by bending your elbows.",
+            "Extend your arms to lift the dumbbell back to the starting position.",
+            "Keep your upper arms stationary throughout."
+        ],
+        "repRange": "10-15 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Dips",
+        "group": "Triceps",
+        "type": "Bodyweight",
+        "instructions": [
+            "Use parallel bars or two sturdy chairs.",
+            "Lower your body by bending your elbows until your shoulders are below your elbows.",
+            "Push back up to the starting position."
         ],
         "repRange": "8-15 reps",
         "notes": "",
@@ -137,6 +301,20 @@
         "favorite": false
     },
     {
+        "name": "Single Arm Dumbbell Row",
+        "group": "Back",
+        "type": "Dumbbell",
+        "instructions": [
+            "Place one knee and one hand on a flat bench.",
+            "Hold a dumbbell in the other hand with your arm extended.",
+            "Pull the dumbbell up to the side of your chest, squeezing your back.",
+            "Lower the dumbbell with control."
+        ],
+        "repRange": "8-12 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
         "name": "Lat Pulldown",
         "group": "Back",
         "type": "Machine",
@@ -159,6 +337,20 @@
             "Grab the handle and pull it towards your abdomen, keeping your back straight.",
             "Squeeze your shoulder blades together.",
             "Slowly extend your arms back to the start."
+        ],
+        "repRange": "8-15 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Inverted Row",
+        "group": "Back",
+        "type": "Bodyweight",
+        "instructions": [
+            "Lie under a sturdy table or a barbell in a rack.",
+            "Grab the edge with an overhand grip.",
+            "Keeping your body straight, pull your chest up to the table/bar.",
+            "Lower with control."
         ],
         "repRange": "8-15 reps",
         "notes": "",
@@ -192,6 +384,48 @@
         "favorite": false
     },
     {
+        "name": "Barbell Curl",
+        "group": "Biceps",
+        "type": "Barbell",
+        "instructions": [
+            "Stand holding a barbell with an underhand grip, hands shoulder-width apart.",
+            "Keep your elbows close to your torso and curl the weight up towards your shoulders.",
+            "Squeeze your biceps at the top of the movement.",
+            "Lower the barbell with control."
+        ],
+        "repRange": "8-12 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Preacher Curl Machine",
+        "group": "Biceps",
+        "type": "Machine",
+        "instructions": [
+            "Sit at a preacher curl machine and adjust the seat height.",
+            "Place the back of your upper arms on the pad and grab the handles.",
+            "Curl the weight up towards your shoulders.",
+            "Slowly lower the weight until your arms are almost fully extended."
+        ],
+        "repRange": "10-15 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Chin Ups",
+        "group": "Biceps",
+        "type": "Bodyweight",
+        "instructions": [
+            "Hang from a pull-up bar with an underhand grip, hands shoulder-width apart.",
+            "Pull your chest up to the bar.",
+            "Focus on using your biceps to pull your body up.",
+            "Lower yourself down with control."
+        ],
+        "repRange": "As many as possible",
+        "notes": "",
+        "favorite": false
+    },
+    {
         "name": "Barbell Squat",
         "group": "Quads",
         "type": "Barbell",
@@ -203,6 +437,20 @@
             "Drive back up through your heels."
         ],
         "repRange": "6-12 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Goblet Squat",
+        "group": "Quads",
+        "type": "Dumbbell",
+        "instructions": [
+            "Hold one dumbbell vertically against your chest with both hands.",
+            "Stand with your feet slightly wider than shoulder-width.",
+            "Lower your hips down and back, keeping your chest up.",
+            "Drive back up to the starting position."
+        ],
+        "repRange": "8-15 reps",
         "notes": "",
         "favorite": false
     },
@@ -233,6 +481,20 @@
         "favorite": false
     },
     {
+        "name": "Bodyweight Squat",
+        "group": "Quads",
+        "type": "Bodyweight",
+        "instructions": [
+            "Stand with your feet shoulder-width apart.",
+            "Lower your hips down and back as if sitting in a chair.",
+            "Keep your chest up and back straight.",
+            "Push through your heels to return to the start."
+        ],
+        "repRange": "15-25 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
         "name": "Romanian Deadlift",
         "group": "Hamstrings",
         "type": "Barbell",
@@ -243,6 +505,20 @@
             "Return to the start by squeezing your glutes."
         ],
         "repRange": "8-12 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Dumbbell Romanian Deadlift",
+        "group": "Hamstrings",
+        "type": "Dumbbell",
+        "instructions": [
+            "Hold a dumbbell in each hand in front of your thighs.",
+            "Hinge at your hips, keeping your back straight and knees slightly bent.",
+            "Lower the dumbbells towards the floor until you feel a stretch in your hamstrings.",
+            "Return to the starting position."
+        ],
+        "repRange": "10-15 reps",
         "notes": "",
         "favorite": false
     },
@@ -260,6 +536,20 @@
         "favorite": false
     },
     {
+        "name": "Glute Bridge",
+        "group": "Hamstrings",
+        "type": "Bodyweight",
+        "instructions": [
+            "Lie on your back with your knees bent and feet flat on the floor.",
+            "Lift your hips off the floor until your body forms a straight line from your shoulders to your knees.",
+            "Squeeze your glutes and hamstrings at the top.",
+            "Lower your hips back down."
+        ],
+        "repRange": "15-20 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
         "name": "Hip Thrust",
         "group": "Glutes",
         "type": "Barbell",
@@ -269,6 +559,32 @@
             "Lower with control."
         ],
         "repRange": "8-15 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Dumbbell Hip Thrust",
+        "group": "Glutes",
+        "type": "Dumbbell",
+        "instructions": [
+            "Place your upper back on a bench and hold a dumbbell across your hips.",
+            "With your knees bent, drive your hips up towards the ceiling.",
+            "Squeeze your glutes at the top and lower with control."
+        ],
+        "repRange": "12-20 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Glute Kickback Machine",
+        "group": "Glutes",
+        "type": "Machine",
+        "instructions": [
+            "Position yourself on the glute kickback machine.",
+            "Press the pad back with one leg, focusing on squeezing your glute.",
+            "Return to the starting position with control and repeat."
+        ],
+        "repRange": "12-15 reps",
         "notes": "",
         "favorite": false
     },
@@ -286,6 +602,33 @@
         "favorite": false
     },
     {
+        "name": "Dumbbell Calf Raise",
+        "group": "Calves",
+        "type": "Dumbbell",
+        "instructions": [
+            "Stand holding a dumbbell in each hand.",
+            "Raise your heels off the floor, pressing onto the balls of your feet.",
+            "Hold the contraction at the top, then slowly lower your heels."
+        ],
+        "repRange": "15-25 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Barbell Calf Raise",
+        "group": "Calves",
+        "type": "Barbell",
+        "instructions": [
+            "Stand with a barbell on your upper back.",
+            "Place the balls of your feet on a raised surface.",
+            "Raise your heels as high as possible.",
+            "Lower your heels until you feel a stretch in your calves."
+        ],
+        "repRange": "10-15 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
         "name": "Hanging Leg Raise",
         "group": "Abs",
         "type": "Bodyweight",
@@ -299,42 +642,30 @@
         "favorite": false
     },
     {
-        "name": "Push Up",
-        "group": "Chest",
-        "type": "Bodyweight",
+        "name": "Cable Crunch",
+        "group": "Abs",
+        "type": "Cable",
         "instructions": [
-            "Start in a high plank position with hands under your shoulders.",
-            "Lower your body until your chest nearly touches the floor.",
-            "Push back up to the starting position, keeping your body in a straight line."
+            "Kneel in front of a high pulley with a rope attachment.",
+            "Grab the rope and pull it down so your hands are on either side of your head.",
+            "Crunch your torso downwards, bringing your elbows towards your knees.",
+            "Return to the starting position slowly."
         ],
-        "repRange": "As many as possible",
+        "repRange": "12-20 reps",
         "notes": "",
         "favorite": false
     },
     {
-        "name": "Dips",
-        "group": "Triceps",
-        "type": "Bodyweight",
+        "name": "Ab Crunch Machine",
+        "group": "Abs",
+        "type": "Machine",
         "instructions": [
-            "Use parallel bars or two sturdy chairs.",
-            "Lower your body by bending your elbows until your shoulders are below your elbows.",
-            "Push back up to the starting position."
+            "Sit in the ab crunch machine and select your weight.",
+            "Place your feet under the pads and grab the handles.",
+            "Crunch your upper body forward, contracting your abs.",
+            "Slowly return to the start."
         ],
-        "repRange": "8-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Inverted Row",
-        "group": "Back",
-        "type": "Bodyweight",
-        "instructions": [
-            "Lie under a sturdy table or a barbell in a rack.",
-            "Grab the edge with an overhand grip.",
-            "Keeping your body straight, pull your chest up to the table/bar.",
-            "Lower with control."
-        ],
-        "repRange": "8-15 reps",
+        "repRange": "15-25 reps",
         "notes": "",
         "favorite": false
     },
@@ -353,6 +684,33 @@
         "favorite": false
     },
     {
+        "name": "Barbell Wrist Curls",
+        "group": "Forearms",
+        "type": "Barbell",
+        "instructions": [
+            "Sit on a bench and hold a barbell with both hands, palms up.",
+            "Rest your forearms on your thighs.",
+            "Lower the barbell as far as possible, then curl it up with your wrists.",
+            "Squeeze at the top of the movement."
+        ],
+        "repRange": "12-20 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Farmer's Walk",
+        "group": "Forearms",
+        "type": "Bodyweight",
+        "instructions": [
+            "Hold a heavy dumbbell or kettlebell in each hand.",
+            "Walk for a set distance or time, keeping your back straight and core engaged.",
+            "This exercise primarily builds grip strength."
+        ],
+        "repRange": "30-60 seconds",
+        "notes": "",
+        "favorite": false
+    },
+    {
         "name": "Russian Twists",
         "group": "Obliques",
         "type": "Bodyweight",
@@ -363,6 +721,34 @@
             "For added difficulty, hold a weight."
         ],
         "repRange": "15-20 reps per side",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Dumbbell Side Bends",
+        "group": "Obliques",
+        "type": "Dumbbell",
+        "instructions": [
+            "Stand holding a dumbbell in one hand.",
+            "Bend your torso to the side, lowering the dumbbell towards the floor.",
+            "Use your obliques to pull your torso back to the starting position.",
+            "Complete all reps on one side before switching."
+        ],
+        "repRange": "12-15 reps per side",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Cable Woodchoppers",
+        "group": "Obliques",
+        "type": "Cable",
+        "instructions": [
+            "Set a cable pulley to a high position.",
+            "Stand sideways to the machine and grab the handle with both hands.",
+            "Pull the handle down and across your body in a chopping motion.",
+            "Control the movement back to the start."
+        ],
+        "repRange": "10-15 reps per side",
         "notes": "",
         "favorite": false
     }

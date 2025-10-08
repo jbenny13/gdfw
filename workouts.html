@@ -23,6 +23,10 @@
             --danger: #E53E3E;
         }
 
+        html, body {
+            overscroll-behavior-y: contain;
+        }
+
         body {
             background-color: var(--background);
             color: var(--primary-text);
@@ -160,9 +164,9 @@
         .modal-content {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            padding: 2rem;
+            padding: 1.5rem; /* Reduced padding for mobile */
             border-radius: 0.75rem;
-            width: 90%;
+            width: 95%; /* Increased width for mobile */
             max-width: 550px;
             max-height: 90vh;
             overflow-y: auto;
@@ -399,9 +403,7 @@
                                 <option value="Push, Pull, Legs">Push, Pull, Legs</option>
                                 <option value="Upper, Lower">Upper, Lower</option>
                                 <option value="Full Body">Full Body</option>
-                                <option value="other">Other (Custom)</option>
                             </select>
-                            <input type="text" id="ai-plan-split-custom" class="form-input mt-2 hidden" placeholder="e.g., Chest & Back, Arms, Legs">
                         </div>
                     </div>
                      <div id="ai-plan-goal-text-container" class="hidden">
@@ -513,762 +515,63 @@
             // --- DATABASE DEFAULTS ---
             const exercisesJsonContent = `
 [
-    {
-        "name": "Flat Barbell Bench Press",
-        "group": "Chest",
-        "type": "Barbell",
-        "instructions": [
-            "Lie flat on the bench with your feet on the floor.",
-            "Grip the bar slightly wider than shoulder-width.",
-            "Lower the bar to your mid-chest, keeping your elbows tucked at about a 45-degree angle.",
-            "Press the bar back up to the starting position."
-        ],
-        "repRange": "6-12 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Incline Barbell Bench Press",
-        "group": "Chest",
-        "type": "Barbell",
-        "instructions": [
-            "Set a bench to a 30-45 degree incline.",
-            "Lie on the bench and grip the bar slightly wider than shoulder-width.",
-            "Unrack the bar and lower it to your upper chest.",
-            "Press the bar back up until your arms are fully extended."
-        ],
-        "repRange": "8-12 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Decline Barbell Bench Press",
-        "group": "Chest",
-        "type": "Barbell",
-        "instructions": [
-            "Secure your legs at the end of a decline bench.",
-            "Lie back and grip the bar with a medium-width grip.",
-            "Lift the bar from the rack and lower it to your lower chest.",
-            "Press the bar back to the starting position."
-        ],
-        "repRange": "8-12 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Incline Dumbbell Press",
-        "group": "Chest",
-        "type": "Dumbbell",
-        "instructions": [
-            "Set a bench to a 30-45 degree incline.",
-            "Sit and place dumbbells on your thighs.",
-            "Kick the weights up to your shoulders and lie back.",
-            "Press the dumbbells up and together over your chest.",
-            "Lower them slowly with control."
-        ],
-        "repRange": "8-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Flat Dumbbell Press",
-        "group": "Chest",
-        "type": "Dumbbell",
-        "instructions": [
-            "Lie on a flat bench with a dumbbell in each hand.",
-            "Hold the dumbbells at the sides of your chest, palms facing forward.",
-            "Press the dumbbells up until your arms are fully extended.",
-            "Lower the dumbbells slowly to the starting position."
-        ],
-        "repRange": "8-12 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Dumbbell Flyes",
-        "group": "Chest",
-        "type": "Dumbbell",
-        "instructions": [
-            "Lie on a flat bench with a dumbbell in each hand, palms facing each other.",
-            "Press the weights above your chest.",
-            "With a slight bend in your elbows, lower the weights out to your sides in a wide arc.",
-            "Bring the weights back to the starting position using your chest muscles."
-        ],
-        "repRange": "10-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Pec Deck Fly",
-        "group": "Chest",
-        "type": "Machine",
-        "instructions": [
-            "Sit on the machine with your back flat against the pad.",
-            "Place your forearms on the padded levers or grab the handles.",
-            "Bring the levers together in a hugging motion, squeezing your chest.",
-            "Return slowly to the start."
-        ],
-        "repRange": "10-20 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Machine Chest Press",
-        "group": "Chest",
-        "type": "Machine",
-        "instructions": [
-            "Sit on the machine and adjust the seat so the handles are at chest level.",
-            "Grab the handles and press forward until your arms are fully extended.",
-            "Return slowly to the starting position."
-        ],
-        "repRange": "8-12 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "High-to-low Cable Crossover",
-        "group": "Chest",
-        "type": "Cable",
-        "instructions": [
-            "Set pulleys to a high position.",
-            "Grab the handles and step forward to create tension.",
-            "With a slight bend in your elbows, pull the handles down and across your body.",
-            "Squeeze your chest at the peak contraction."
-        ],
-        "repRange": "10-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Push Up",
-        "group": "Chest",
-        "type": "Bodyweight",
-        "instructions": [
-            "Start in a high plank position with hands under your shoulders.",
-            "Lower your body until your chest nearly touches the floor.",
-            "Push back up to the starting position, keeping your body in a straight line."
-        ],
-        "repRange": "As many as possible",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Overhead Press",
-        "group": "Shoulders",
-        "type": "Barbell",
-        "instructions": [
-            "Stand with the bar on your front shoulders, hands just outside shoulder-width.",
-            "Press the bar straight overhead until your arms are fully extended.",
-            "Lower the bar back to your shoulders with control."
-        ],
-        "repRange": "6-12 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Seated Dumbbell Press",
-        "group": "Shoulders",
-        "type": "Dumbbell",
-        "instructions": [
-            "Sit on a bench with back support, holding dumbbells at shoulder height.",
-            "Press the dumbbells overhead until your arms are fully extended.",
-            "Lower the dumbbells back to the starting position with control."
-        ],
-        "repRange": "8-12 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Dumbbell Lateral Raise",
-        "group": "Shoulders",
-        "type": "Dumbbell",
-        "instructions": [
-            "Stand holding dumbbells at your sides with palms facing in.",
-            "With a slight bend in your elbows, raise the weights out to your sides until they reach shoulder height.",
-            "Lower with control."
-        ],
-        "repRange": "12-20 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Reverse Pec Deck",
-        "group": "Shoulders",
-        "type": "Machine",
-        "instructions": [
-            "Sit facing the machine with your chest against the pad.",
-            "Grab the handles with an overhand grip.",
-            "Keeping your arms mostly straight, pull your arms back, squeezing your rear delts and upper back.",
-            "Return to the start with control."
-        ],
-        "repRange": "12-20 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Cable Lateral Raise",
-        "group": "Shoulders",
-        "type": "Cable",
-        "instructions": [
-            "Stand sideways to a low pulley cable machine.",
-            "Grab the handle with your outside hand.",
-            "Raise your arm out to the side until it's parallel to the floor.",
-            "Lower with control and repeat."
-        ],
-        "repRange": "12-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Pike Pushups",
-        "group": "Shoulders",
-        "type": "Bodyweight",
-        "instructions": [
-            "Get into a downward dog yoga position.",
-            "Bend your elbows to lower the top of your head towards the floor.",
-            "Press back up to the starting position.",
-            "Keep your legs as straight as possible."
-        ],
-        "repRange": "8-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Tricep Pushdown",
-        "group": "Triceps",
-        "type": "Machine",
-        "instructions": [
-            "Attach a straight bar or rope to a high pulley.",
-            "Grab the attachment with an overhand grip and push down until your arms are fully extended.",
-            "Keep your elbows pinned to your sides.",
-            "Slowly let the attachment return to the starting position."
-        ],
-        "repRange": "10-20 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Skull Crushers",
-        "group": "Triceps",
-        "type": "Barbell",
-        "instructions": [
-            "Lie on a flat bench holding an EZ bar or barbell above your chest.",
-            "Lower the bar towards your forehead by bending only at the elbows.",
-            "Extend your arms to press the weight back to the start, focusing on the triceps contraction."
-        ],
-        "repRange": "8-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Dumbbell Overhead Tricep Extension",
-        "group": "Triceps",
-        "type": "Dumbbell",
-        "instructions": [
-            "Sit on a bench and hold one dumbbell with both hands over your head.",
-            "Lower the dumbbell behind your head by bending your elbows.",
-            "Extend your arms to lift the dumbbell back to the starting position.",
-            "Keep your upper arms stationary throughout."
-        ],
-        "repRange": "10-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Dips",
-        "group": "Triceps",
-        "type": "Bodyweight",
-        "instructions": [
-            "Use parallel bars or two sturdy chairs.",
-            "Lower your body by bending your elbows until your shoulders are below your elbows.",
-            "Push back up to the starting position."
-        ],
-        "repRange": "8-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Pull Ups",
-        "group": "Back",
-        "type": "Bodyweight",
-        "instructions": [
-            "Hang from a pull-up bar with an overhand grip, slightly wider than your shoulders.",
-            "Pull your chest up to the bar, leading with your chest and squeezing your back.",
-            "Lower yourself down with control."
-        ],
-        "repRange": "As many as possible",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Barbell Row",
-        "group": "Back",
-        "type": "Barbell",
-        "instructions": [
-            "Stand with your feet shoulder-width apart, holding a barbell with an overhand grip.",
-            "Hinge at your hips until your torso is nearly parallel to the floor.",
-            "Pull the bar towards your lower chest/upper abdomen, squeezing your back muscles.",
-            "Lower the bar with control."
-        ],
-        "repRange": "6-12 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Single Arm Dumbbell Row",
-        "group": "Back",
-        "type": "Dumbbell",
-        "instructions": [
-            "Place one knee and one hand on a flat bench.",
-            "Hold a dumbbell in the other hand with your arm extended.",
-            "Pull the dumbbell up to the side of your chest, squeezing your back.",
-            "Lower the dumbbell with control."
-        ],
-        "repRange": "8-12 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Lat Pulldown",
-        "group": "Back",
-        "type": "Machine",
-        "instructions": [
-            "Sit at the machine and grab the bar with a wide overhand grip.",
-            "Pull the bar down to your upper chest, keeping your torso upright.",
-            "Squeeze your lats at the bottom.",
-            "Slowly return the bar to the starting position."
-        ],
-        "repRange": "8-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Seated Cable Row",
-        "group": "Back",
-        "type": "Machine",
-        "instructions": [
-            "Sit at the cable row machine with your feet on the platform.",
-            "Grab the handle and pull it towards your abdomen, keeping your back straight.",
-            "Squeeze your shoulder blades together.",
-            "Slowly extend your arms back to the start."
-        ],
-        "repRange": "8-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Inverted Row",
-        "group": "Back",
-        "type": "Bodyweight",
-        "instructions": [
-            "Lie under a sturdy table or a barbell in a rack.",
-            "Grab the edge with an overhand grip.",
-            "Keeping your body straight, pull your chest up to the table/bar.",
-            "Lower with control."
-        ],
-        "repRange": "8-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Dumbbell Curl",
-        "group": "Biceps",
-        "type": "Dumbbell",
-        "instructions": [
-            "Stand holding a dumbbell in each hand at your sides, palms facing forward.",
-            "Curl the weights up towards your shoulders, keeping your elbows stationary.",
-            "Squeeze your biceps at the top.",
-            "Lower with control."
-        ],
-        "repRange": "8-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Hammer Curl",
-        "group": "Biceps",
-        "type": "Dumbbell",
-        "instructions": [
-            "Stand holding a dumbbell in each hand with a neutral (hammer) grip.",
-            "Curl the weights up towards your shoulders, keeping your palms facing each other.",
-            "Squeeze at the top and lower with control."
-        ],
-        "repRange": "8-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Barbell Curl",
-        "group": "Biceps",
-        "type": "Barbell",
-        "instructions": [
-            "Stand holding a barbell with an underhand grip, hands shoulder-width apart.",
-            "Keep your elbows close to your torso and curl the weight up towards your shoulders.",
-            "Squeeze your biceps at the top of the movement.",
-            "Lower the barbell with control."
-        ],
-        "repRange": "8-12 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Preacher Curl Machine",
-        "group": "Biceps",
-        "type": "Machine",
-        "instructions": [
-            "Sit at a preacher curl machine and adjust the seat height.",
-            "Place the back of your upper arms on the pad and grab the handles.",
-            "Curl the weight up towards your shoulders.",
-            "Slowly lower the weight until your arms are almost fully extended."
-        ],
-        "repRange": "10-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Chin Ups",
-        "group": "Biceps",
-        "type": "Bodyweight",
-        "instructions": [
-            "Hang from a pull-up bar with an underhand grip, hands shoulder-width apart.",
-            "Pull your chest up to the bar.",
-            "Focus on using your biceps to pull your body up.",
-            "Lower yourself down with control."
-        ],
-        "repRange": "As many as possible",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Barbell Squat",
-        "group": "Quads",
-        "type": "Barbell",
-        "instructions": [
-            "Place a barbell on your upper back.",
-            "Stand with your feet shoulder-width apart, toes slightly out.",
-            "Lower your hips down and back as if sitting in a chair, keeping your chest up.",
-            "Descend until your thighs are at least parallel to the floor.",
-            "Drive back up through your heels."
-        ],
-        "repRange": "6-12 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Goblet Squat",
-        "group": "Quads",
-        "type": "Dumbbell",
-        "instructions": [
-            "Hold one dumbbell vertically against your chest with both hands.",
-            "Stand with your feet slightly wider than shoulder-width.",
-            "Lower your hips down and back, keeping your chest up.",
-            "Drive back up to the starting position."
-        ],
-        "repRange": "8-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Leg Press",
-        "group": "Quads",
-        "type": "Machine",
-        "instructions": [
-            "Sit in the leg press machine and place your feet on the platform shoulder-width apart.",
-            "Push the platform away from you by extending your knees.",
-            "Lower the platform with control, do not let your lower back round off the pad."
-        ],
-        "repRange": "10-20 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Leg Extension",
-        "group": "Quads",
-        "type": "Machine",
-        "instructions": [
-            "Sit on the machine with your legs under the pad.",
-            "Extend your legs to lift the weight, squeezing your quads at the top.",
-            "Lower slowly with control."
-        ],
-        "repRange": "12-20 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Bodyweight Squat",
-        "group": "Quads",
-        "type": "Bodyweight",
-        "instructions": [
-            "Stand with your feet shoulder-width apart.",
-            "Lower your hips down and back as if sitting in a chair.",
-            "Keep your chest up and back straight.",
-            "Push through your heels to return to the start."
-        ],
-        "repRange": "15-25 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Romanian Deadlift",
-        "group": "Hamstrings",
-        "type": "Barbell",
-        "instructions": [
-            "Hold a barbell in front of your thighs.",
-            "Hinge at your hips, pushing them back while keeping your back straight and a slight bend in your knees.",
-            "Lower the bar until you feel a deep stretch in your hamstrings.",
-            "Return to the start by squeezing your glutes."
-        ],
-        "repRange": "8-12 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Dumbbell Romanian Deadlift",
-        "group": "Hamstrings",
-        "type": "Dumbbell",
-        "instructions": [
-            "Hold a dumbbell in each hand in front of your thighs.",
-            "Hinge at your hips, keeping your back straight and knees slightly bent.",
-            "Lower the dumbbells towards the floor until you feel a stretch in your hamstrings.",
-            "Return to the starting position."
-        ],
-        "repRange": "10-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Leg Curl",
-        "group": "Hamstrings",
-        "type": "Machine",
-        "instructions": [
-            "Lie face down on a leg curl machine (or sit in a seated version).",
-            "Curl the weight up by bending your knees and squeezing your hamstrings.",
-            "Lower with control."
-        ],
-        "repRange": "10-20 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Glute Bridge",
-        "group": "Hamstrings",
-        "type": "Bodyweight",
-        "instructions": [
-            "Lie on your back with your knees bent and feet flat on the floor.",
-            "Lift your hips off the floor until your body forms a straight line from your shoulders to your knees.",
-            "Squeeze your glutes and hamstrings at the top.",
-            "Lower your hips back down."
-        ],
-        "repRange": "15-20 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Hip Thrust",
-        "group": "Glutes",
-        "type": "Barbell",
-        "instructions": [
-            "Sit on the floor with your upper back against a bench and a barbell across your hips.",
-            "Drive your hips up towards the ceiling, squeezing your glutes hard at the top.",
-            "Lower with control."
-        ],
-        "repRange": "8-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Dumbbell Hip Thrust",
-        "group": "Glutes",
-        "type": "Dumbbell",
-        "instructions": [
-            "Place your upper back on a bench and hold a dumbbell across your hips.",
-            "With your knees bent, drive your hips up towards the ceiling.",
-            "Squeeze your glutes at the top and lower with control."
-        ],
-        "repRange": "12-20 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Glute Kickback Machine",
-        "group": "Glutes",
-        "type": "Machine",
-        "instructions": [
-            "Position yourself on the glute kickback machine.",
-            "Press the pad back with one leg, focusing on squeezing your glute.",
-            "Return to the starting position with control and repeat."
-        ],
-        "repRange": "12-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Standing Calf Raise",
-        "group": "Calves",
-        "type": "Machine",
-        "instructions": [
-            "Stand on a calf raise machine or a step with a weight.",
-            "Press up onto the balls of your feet as high as possible.",
-            "Hold the peak contraction, then slowly lower your heels below the level of the step."
-        ],
-        "repRange": "10-20 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Dumbbell Calf Raise",
-        "group": "Calves",
-        "type": "Dumbbell",
-        "instructions": [
-            "Stand holding a dumbbell in each hand.",
-            "Raise your heels off the floor, pressing onto the balls of your feet.",
-            "Hold the contraction at the top, then slowly lower your heels."
-        ],
-        "repRange": "15-25 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Barbell Calf Raise",
-        "group": "Calves",
-        "type": "Barbell",
-        "instructions": [
-            "Stand with a barbell on your upper back.",
-            "Place the balls of your feet on a raised surface.",
-            "Raise your heels as high as possible.",
-            "Lower your heels until you feel a stretch in your calves."
-        ],
-        "repRange": "10-15 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Hanging Leg Raise",
-        "group": "Abs",
-        "type": "Bodyweight",
-        "instructions": [
-            "Hang from a pull-up bar.",
-            "Raise your legs up as high as you can, keeping them straight or with a slight bend.",
-            "Lower with control."
-        ],
-        "repRange": "10-20 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Cable Crunch",
-        "group": "Abs",
-        "type": "Cable",
-        "instructions": [
-            "Kneel in front of a high pulley with a rope attachment.",
-            "Grab the rope and pull it down so your hands are on either side of your head.",
-            "Crunch your torso downwards, bringing your elbows towards your knees.",
-            "Return to the starting position slowly."
-        ],
-        "repRange": "12-20 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Ab Crunch Machine",
-        "group": "Abs",
-        "type": "Machine",
-        "instructions": [
-            "Sit in the ab crunch machine and select your weight.",
-            "Place your feet under the pads and grab the handles.",
-            "Crunch your upper body forward, contracting your abs.",
-            "Slowly return to the start."
-        ],
-        "repRange": "15-25 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Wrist Curls",
-        "group": "Forearms",
-        "type": "Dumbbell",
-        "instructions": [
-            "Sit on a bench and rest your forearms on your thighs, with your wrists hanging off your knees.",
-            "Hold a light dumbbell in each hand with your palms facing up.",
-            "Curl your wrists upwards as far as possible.",
-            "Lower the dumbbells with control."
-        ],
-        "repRange": "15-25 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Barbell Wrist Curls",
-        "group": "Forearms",
-        "type": "Barbell",
-        "instructions": [
-            "Sit on a bench and hold a barbell with both hands, palms up.",
-            "Rest your forearms on your thighs.",
-            "Lower the barbell as far as possible, then curl it up with your wrists.",
-            "Squeeze at the top of the movement."
-        ],
-        "repRange": "12-20 reps",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Farmer's Walk",
-        "group": "Forearms",
-        "type": "Bodyweight",
-        "instructions": [
-            "Hold a heavy dumbbell or kettlebell in each hand.",
-            "Walk for a set distance or time, keeping your back straight and core engaged.",
-            "This exercise primarily builds grip strength."
-        ],
-        "repRange": "30-60 seconds",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Russian Twists",
-        "group": "Obliques",
-        "type": "Bodyweight",
-        "instructions": [
-            "Sit on the floor with your knees bent and feet slightly off the ground.",
-            "Lean back slightly to engage your core.",
-            "Twist your torso from side to side, touching your hands to the floor on each side.",
-            "For added difficulty, hold a weight."
-        ],
-        "repRange": "15-20 reps per side",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Dumbbell Side Bends",
-        "group": "Obliques",
-        "type": "Dumbbell",
-        "instructions": [
-            "Stand holding a dumbbell in one hand.",
-            "Bend your torso to the side, lowering the dumbbell towards the floor.",
-            "Use your obliques to pull your torso back to the starting position.",
-            "Complete all reps on one side before switching."
-        ],
-        "repRange": "12-15 reps per side",
-        "notes": "",
-        "favorite": false
-    },
-    {
-        "name": "Cable Woodchoppers",
-        "group": "Obliques",
-        "type": "Cable",
-        "instructions": [
-            "Set a cable pulley to a high position.",
-            "Stand sideways to the machine and grab the handle with both hands.",
-            "Pull the handle down and across your body in a chopping motion.",
-            "Control the movement back to the start."
-        ],
-        "repRange": "10-15 reps per side",
-        "notes": "",
-        "favorite": false
-    }
+    { "name": "Flat Barbell Bench Press", "group": "Chest", "type": "Barbell", "instructions": ["Lie flat on the bench with your feet on the floor.", "Grip the bar slightly wider than shoulder-width.", "Lower the bar to your mid-chest, keeping your elbows tucked at about a 45-degree angle.", "Press the bar back up to the starting position."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Incline Barbell Bench Press", "group": "Chest", "type": "Barbell", "instructions": ["Set a bench to a 30-45 degree incline.", "Lie on the bench and grip the bar slightly wider than shoulder-width.", "Unrack the bar and lower it to your upper chest.", "Press the bar back up until your arms are fully extended."], "repRange": "8-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Decline Barbell Bench Press", "group": "Chest", "type": "Barbell", "instructions": ["Secure your legs at the end of a decline bench.", "Lie back and grip the bar with a medium-width grip.", "Lift the bar from the rack and lower it to your lower chest.", "Press the bar back to the starting position."], "repRange": "8-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Incline Dumbbell Press", "group": "Chest", "type": "Dumbbell", "instructions": ["Set a bench to a 30-45 degree incline.", "Sit and place dumbbells on your thighs.", "Kick the weights up to your shoulders and lie back.", "Press the dumbbells up and together over your chest.", "Lower them slowly with control."], "repRange": "8-15 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Flat Dumbbell Press", "group": "Chest", "type": "Dumbbell", "instructions": ["Lie on a flat bench with a dumbbell in each hand.", "Hold the dumbbells at the sides of your chest, palms facing forward.", "Press the dumbbells up until your arms are fully extended.", "Lower the dumbbells slowly to the starting position."], "repRange": "8-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Dumbbell Flyes", "group": "Chest", "type": "Dumbbell", "instructions": ["Lie on a flat bench with a dumbbell in each hand, palms facing each other.", "Press the weights above your chest.", "With a slight bend in your elbows, lower the weights out to your sides in a wide arc.", "Bring the weights back to the starting position using your chest muscles."], "repRange": "10-15 reps", "notes": "", "favorite": false },
+    { "name": "Pec Deck Fly", "group": "Chest", "type": "Machine", "instructions": ["Sit on the machine with your back flat against the pad.", "Place your forearms on the padded levers or grab the handles.", "Bring the levers together in a hugging motion, squeezing your chest.", "Return slowly to the start."], "repRange": "10-20 reps", "notes": "", "favorite": false },
+    { "name": "Machine Chest Press", "group": "Chest", "type": "Machine", "instructions": ["Sit on the machine and adjust the seat so the handles are at chest level.", "Grab the handles and press forward until your arms are fully extended.", "Return slowly to the starting position."], "repRange": "8-12 reps", "notes": "", "favorite": false },
+    { "name": "High-to-low Cable Crossover", "group": "Chest", "type": "Cable", "instructions": ["Set pulleys to a high position.", "Grab the handles and step forward to create tension.", "With a slight bend in your elbows, pull the handles down and across your body.", "Squeeze your chest at the peak contraction."], "repRange": "10-15 reps", "notes": "", "favorite": false },
+    { "name": "Push Up", "group": "Chest", "type": "Bodyweight", "instructions": ["Start in a high plank position with hands under your shoulders.", "Lower your body until your chest nearly touches the floor.", "Push back up to the starting position, keeping your body in a straight line."], "repRange": "As many as possible", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Overhead Press", "group": "Shoulders", "type": "Barbell", "instructions": ["Stand with the bar on your front shoulders, hands just outside shoulder-width.", "Press the bar straight overhead until your arms are fully extended.", "Lower the bar back to your shoulders with control."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Seated Dumbbell Press", "group": "Shoulders", "type": "Dumbbell", "instructions": ["Sit on a bench with back support, holding dumbbells at shoulder height.", "Press the dumbbells overhead until your arms are fully extended.", "Lower the dumbbells back to the starting position with control."], "repRange": "8-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Dumbbell Lateral Raise", "group": "Shoulders", "type": "Dumbbell", "instructions": ["Stand holding dumbbells at your sides with palms facing in.", "With a slight bend in your elbows, raise the weights out to your sides until they reach shoulder height.", "Lower with control."], "repRange": "12-20 reps", "notes": "", "favorite": false },
+    { "name": "Reverse Pec Deck", "group": "Shoulders", "type": "Machine", "instructions": ["Sit facing the machine with your chest against the pad.", "Grab the handles with an overhand grip.", "Keeping your arms mostly straight, pull your arms back, squeezing your rear delts and upper back.", "Return to the start with control."], "repRange": "12-20 reps", "notes": "", "favorite": false },
+    { "name": "Cable Lateral Raise", "group": "Shoulders", "type": "Cable", "instructions": ["Stand sideways to a low pulley cable machine.", "Grab the handle with your outside hand.", "Raise your arm out to the side until it's parallel to the floor.", "Lower with control and repeat."], "repRange": "12-15 reps", "notes": "", "favorite": false },
+    { "name": "Pike Pushups", "group": "Shoulders", "type": "Bodyweight", "instructions": ["Get into a downward dog yoga position.", "Bend your elbows to lower the top of your head towards the floor.", "Press back up to the starting position.", "Keep your legs as straight as possible."], "repRange": "8-15 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Tricep Pushdown", "group": "Triceps", "type": "Cable", "instructions": ["Attach a straight bar or rope to a high pulley.", "Grab the attachment with an overhand grip and push down until your arms are fully extended.", "Keep your elbows pinned to your sides.", "Slowly let the attachment return to the starting position."], "repRange": "10-20 reps", "notes": "", "favorite": false },
+    { "name": "Skull Crushers", "group": "Triceps", "type": "Barbell", "instructions": ["Lie on a flat bench holding an EZ bar or barbell above your chest.", "Lower the bar towards your forehead by bending only at the elbows.", "Extend your arms to press the weight back to the start, focusing on the triceps contraction."], "repRange": "8-15 reps", "notes": "", "favorite": false },
+    { "name": "Dumbbell Overhead Tricep Extension", "group": "Triceps", "type": "Dumbbell", "instructions": ["Sit on a bench and hold one dumbbell with both hands over your head.", "Lower the dumbbell behind your head by bending your elbows.", "Extend your arms to lift the dumbbell back to the starting position.", "Keep your upper arms stationary throughout."], "repRange": "10-15 reps", "notes": "", "favorite": false },
+    { "name": "Dips", "group": "Triceps", "type": "Bodyweight", "instructions": ["Use parallel bars or two sturdy chairs.", "Lower your body by bending your elbows until your shoulders are below your elbows.", "Push back up to the starting position."], "repRange": "8-15 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Pull Ups", "group": "Back", "type": "Bodyweight", "instructions": ["Hang from a pull-up bar with an overhand grip, slightly wider than your shoulders.", "Pull your chest up to the bar, leading with your chest and squeezing your back.", "Lower yourself down with control."], "repRange": "As many as possible", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Barbell Row", "group": "Back", "type": "Barbell", "instructions": ["Stand with your feet shoulder-width apart, holding a barbell with an overhand grip.", "Hinge at your hips until your torso is nearly parallel to the floor.", "Pull the bar towards your lower chest/upper abdomen, squeezing your back muscles.", "Lower the bar with control."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Single Arm Dumbbell Row", "group": "Back", "type": "Dumbbell", "instructions": ["Place one knee and one hand on a flat bench.", "Hold a dumbbell in the other hand with your arm extended.", "Pull the dumbbell up to the side of your chest, squeezing your back.", "Lower the dumbbell with control."], "repRange": "8-12 reps", "notes": "", "favorite": false },
+    { "name": "Lat Pulldown", "group": "Back", "type": "Machine", "instructions": ["Sit at the machine and grab the bar with a wide overhand grip.", "Pull the bar down to your upper chest, keeping your torso upright.", "Squeeze your lats at the bottom.", "Slowly return the bar to the starting position."], "repRange": "8-15 reps", "notes": "", "favorite": false },
+    { "name": "Seated Cable Row", "group": "Back", "type": "Machine", "instructions": ["Sit at the cable row machine with your feet on the platform.", "Grab the handle and pull it towards your abdomen, keeping your back straight.", "Squeeze your shoulder blades together.", "Slowly extend your arms back to the start."], "repRange": "8-15 reps", "notes": "", "favorite": false },
+    { "name": "Inverted Row", "group": "Back", "type": "Bodyweight", "instructions": ["Lie under a sturdy table or a barbell in a rack.", "Grab the edge with an overhand grip.", "Keeping your body straight, pull your chest up to the table/bar.", "Lower with control."], "repRange": "8-15 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Dumbbell Curl", "group": "Biceps", "type": "Dumbbell", "instructions": ["Stand holding a dumbbell in each hand at your sides, palms facing forward.", "Curl the weights up towards your shoulders, keeping your elbows stationary.", "Squeeze your biceps at the top.", "Lower with control."], "repRange": "8-15 reps", "notes": "", "favorite": false },
+    { "name": "Hammer Curl", "group": "Biceps", "type": "Dumbbell", "instructions": ["Stand holding a dumbbell in each hand with a neutral (hammer) grip.", "Curl the weights up towards your shoulders, keeping your palms facing each other.", "Squeeze at the top and lower with control."], "repRange": "8-15 reps", "notes": "", "favorite": false },
+    { "name": "Barbell Curl", "group": "Biceps", "type": "Barbell", "instructions": ["Stand holding a barbell with an underhand grip, hands shoulder-width apart.", "Keep your elbows close to your torso and curl the weight up towards your shoulders.", "Squeeze your biceps at the top of the movement.", "Lower the barbell with control."], "repRange": "8-12 reps", "notes": "", "favorite": false },
+    { "name": "Preacher Curl Machine", "group": "Biceps", "type": "Machine", "instructions": ["Sit at a preacher curl machine and adjust the seat height.", "Place the back of your upper arms on the pad and grab the handles.", "Curl the weight up towards your shoulders.", "Slowly lower the weight until your arms are almost fully extended."], "repRange": "10-15 reps", "notes": "", "favorite": false },
+    { "name": "Chin Ups", "group": "Biceps", "type": "Bodyweight", "instructions": ["Hang from a pull-up bar with an underhand grip, hands shoulder-width apart.", "Pull your chest up to the bar.", "Focus on using your biceps to pull your body up.", "Lower yourself down with control."], "repRange": "As many as possible", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Barbell Squat", "group": "Quads", "type": "Barbell", "instructions": ["Place a barbell on your upper back.", "Stand with your feet shoulder-width apart, toes slightly out.", "Lower your hips down and back as if sitting in a chair, keeping your chest up.", "Descend until your thighs are at least parallel to the floor.", "Drive back up through your heels."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Goblet Squat", "group": "Quads", "type": "Dumbbell", "instructions": ["Hold one dumbbell vertically against your chest with both hands.", "Stand with your feet slightly wider than shoulder-width.", "Lower your hips down and back, keeping your chest up.", "Drive back up to the starting position."], "repRange": "8-15 reps", "notes": "", "favorite": false },
+    { "name": "Leg Press", "group": "Quads", "type": "Machine", "instructions": ["Sit in the leg press machine and place your feet on the platform shoulder-width apart.", "Push the platform away from you by extending your knees.", "Lower the platform with control, do not let your lower back round off the pad."], "repRange": "10-20 reps", "notes": "", "favorite": false },
+    { "name": "Leg Extension", "group": "Quads", "type": "Machine", "instructions": ["Sit on the machine with your legs under the pad.", "Extend your legs to lift the weight, squeezing your quads at the top.", "Lower slowly with control."], "repRange": "12-20 reps", "notes": "", "favorite": false },
+    { "name": "Bodyweight Squat", "group": "Quads", "type": "Bodyweight", "instructions": ["Stand with your feet shoulder-width apart.", "Lower your hips down and back as if sitting in a chair.", "Keep your chest up and back straight.", "Push through your heels to return to the start."], "repRange": "15-25 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Romanian Deadlift", "group": "Hamstrings", "type": "Barbell", "instructions": ["Hold a barbell in front of your thighs.", "Hinge at your hips, pushing them back while keeping your back straight and a slight bend in your knees.", "Lower the bar until you feel a deep stretch in your hamstrings.", "Return to the start by squeezing your glutes."], "repRange": "8-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "name": "Dumbbell Romanian Deadlift", "group": "Hamstrings", "type": "Dumbbell", "instructions": ["Hold a dumbbell in each hand in front of your thighs.", "Hinge at your hips, keeping your back straight and knees slightly bent.", "Lower the dumbbells towards the floor until you feel a stretch in your hamstrings.", "Return to the starting position."], "repRange": "10-15 reps", "notes": "", "favorite": false },
+    { "name": "Leg Curl", "group": "Hamstrings", "type": "Machine", "instructions": ["Lie face down on a leg curl machine (or sit in a seated version).", "Curl the weight up by bending your knees and squeezing your hamstrings.", "Lower with control."], "repRange": "10-20 reps", "notes": "", "favorite": false },
+    { "name": "Glute Bridge", "group": "Glutes", "type": "Bodyweight", "instructions": ["Lie on your back with your knees bent and feet flat on the floor.", "Lift your hips off the floor until your body forms a straight line from your shoulders to your knees.", "Squeeze your glutes and hamstrings at the top.", "Lower your hips back down."], "repRange": "15-20 reps", "notes": "", "favorite": false },
+    { "name": "Hip Thrust", "group": "Glutes", "type": "Barbell", "instructions": ["Sit on the floor with your upper back against a bench and a barbell across your hips.", "Drive your hips up towards the ceiling, squeezing your glutes hard at the top.", "Lower with control."], "repRange": "8-15 reps", "notes": "", "favorite": false },
+    { "name": "Dumbbell Hip Thrust", "group": "Glutes", "type": "Dumbbell", "instructions": ["Place your upper back on a bench and hold a dumbbell across your hips.", "With your knees bent, drive your hips up towards the ceiling.", "Squeeze your glutes at the top and lower with control."], "repRange": "12-20 reps", "notes": "", "favorite": false },
+    { "name": "Glute Kickback Machine", "group": "Glutes", "type": "Machine", "instructions": ["Position yourself on the glute kickback machine.", "Press the pad back with one leg, focusing on squeezing your glute.", "Return to the starting position with control and repeat."], "repRange": "12-15 reps", "notes": "", "favorite": false },
+    { "name": "Standing Calf Raise", "group": "Calves", "type": "Machine", "instructions": ["Stand on a calf raise machine or a step with a weight.", "Press up onto the balls of your feet as high as possible.", "Hold the peak contraction, then slowly lower your heels below the level of the step."], "repRange": "10-20 reps", "notes": "", "favorite": false },
+    { "name": "Dumbbell Calf Raise", "group": "Calves", "type": "Dumbbell", "instructions": ["Stand holding a dumbbell in each hand.", "Raise your heels off the floor, pressing onto the balls of your feet.", "Hold the contraction at the top, then slowly lower your heels."], "repRange": "15-25 reps", "notes": "", "favorite": false },
+    { "name": "Barbell Calf Raise", "group": "Calves", "type": "Barbell", "instructions": ["Stand with a barbell on your upper back.", "Place the balls of your feet on a raised surface.", "Raise your heels as high as possible.", "Lower your heels until you feel a stretch in your calves."], "repRange": "10-15 reps", "notes": "", "favorite": false },
+    { "name": "Hanging Leg Raise", "group": "Abs", "type": "Bodyweight", "instructions": ["Hang from a pull-up bar.", "Raise your legs up as high as you can, keeping them straight or with a slight bend.", "Lower with control."], "repRange": "10-20 reps", "notes": "", "favorite": false },
+    { "name": "Cable Crunch", "group": "Abs", "type": "Cable", "instructions": ["Kneel in front of a high pulley with a rope attachment.", "Grab the rope and pull it down so your hands are on either side of your head.", "Crunch your torso downwards, bringing your elbows towards your knees.", "Return to the starting position slowly."], "repRange": "12-20 reps", "notes": "", "favorite": false },
+    { "name": "Ab Crunch Machine", "group": "Abs", "type": "Machine", "instructions": ["Sit in the ab crunch machine and select your weight.", "Place your feet under the pads and grab the handles.", "Crunch your upper body forward, contracting your abs.", "Slowly return to the start."], "repRange": "15-25 reps", "notes": "", "favorite": false },
+    { "name": "Wrist Curls", "group": "Forearms", "type": "Dumbbell", "instructions": ["Sit on a bench and rest your forearms on your thighs, with your wrists hanging off your knees.", "Hold a light dumbbell in each hand with your palms facing up.", "Curl your wrists upwards as far as possible.", "Lower the dumbbells with control."], "repRange": "15-25 reps", "notes": "", "favorite": false },
+    { "name": "Barbell Wrist Curls", "group": "Forearms", "type": "Barbell", "instructions": ["Sit on a bench and hold a barbell with both hands, palms up.", "Rest your forearms on your thighs.", "Lower the barbell as far as possible, then curl it up with your wrists.", "Squeeze at the top of the movement."], "repRange": "12-20 reps", "notes": "", "favorite": false },
+    { "name": "Farmer's Walk", "group": "Forearms", "type": "Bodyweight", "instructions": ["Hold a heavy dumbbell or kettlebell in each hand.", "Walk for a set distance or time, keeping your back straight and core engaged.", "This exercise primarily builds grip strength."], "repRange": "30-60 seconds", "notes": "", "favorite": false },
+    { "name": "Russian Twists", "group": "Obliques", "type": "Bodyweight", "instructions": ["Sit on the floor with your knees bent and feet slightly off the ground.", "Lean back slightly to engage your core.", "Twist your torso from side to side, touching your hands to the floor on each side.", "For added difficulty, hold a weight."], "repRange": "15-20 reps per side", "notes": "", "favorite": false },
+    { "name": "Dumbbell Side Bends", "group": "Obliques", "type": "Dumbbell", "instructions": ["Stand holding a dumbbell in one hand.", "Bend your torso to the side, lowering the dumbbell towards the floor.", "Use your obliques to pull your torso back to the starting position.", "Complete all reps on one side before switching."], "repRange": "12-15 reps per side", "notes": "", "favorite": false },
+    { "name": "Cable Woodchoppers", "group": "Obliques", "type": "Cable", "instructions": ["Set a cable pulley to a high position.", "Stand sideways to the machine and grab the handle with both hands.", "Pull the handle down and across your body in a chopping motion.", "Control the movement back to the start."], "repRange": "10-15 reps per side", "notes": "", "favorite": false }
 ]
 `;
-
             const defaultWarmups = {
                 "Push": [{ name: "Arm Circles", instructions: ["Stand with feet shoulder-width apart.", "Extend your arms to the sides.", "Make small circles, gradually increasing to large circles.", "Perform for 30 seconds forward, then 30 seconds backward."], repRange: "1 minute total", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Warm-up" }],
                 "Pull": [{ name: "Cat-Cow", instructions: ["Start on your hands and knees.", "Inhale as you drop your belly towards the mat (Cow).", "Exhale as you round your spine upwards (Cat).", "Repeat for 10-15 repetitions."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Warm-up" }],
@@ -1369,7 +672,7 @@
 
                 ALL_MUSCLE_GROUPS = [...new Set(exerciseDB.map(ex => ex.group))].sort();
 
-                workoutPlan = JSON.parse(localStorage.getItem('fitTrackAI_workoutPlan')) || { name: "Default PPL", schedule: { "Monday": "Push", "Tuesday": "Pull", "Wednesday": "Legs", "Thursday": "Push", "Friday": "Pull", "Saturday": "Legs", "Sunday": "Rest" }, workouts:[] };
+                workoutPlan = JSON.parse(localStorage.getItem('fitTrackAI_workoutPlan')) || {};
                 workoutHistory = JSON.parse(localStorage.getItem('fitTrackAI_workoutHistory')) || [];
                 warmups = JSON.parse(localStorage.getItem('fitTrackAI_warmups')) || defaultWarmups;
                 workoutStatusHistory = JSON.parse(localStorage.getItem('fitTrackAI_workoutStatus')) || {};
@@ -1521,6 +824,8 @@
                 const dayType = getWorkoutDayType(date);
                 const today = new Date(); today.setHours(0,0,0,0);
                 const isFutureDay = date > today;
+                const dateKey = dateToKey(date);
+                const loggedExercisesForDay = new Set(workoutHistory.filter(log => log.date === dateKey).map(l => l.name));
 
                 let exercisesHtml = '';
 
@@ -1529,6 +834,7 @@
                     return exercises.map(exName => {
                         const ex = exerciseDB.find(e => e.name === exName);
                         if (!ex) return '';
+                        const isLogged = loggedExercisesForDay.has(ex.name);
                         return `<li class="text-base text-gray-300 exercise-item flex justify-between items-center group p-1 rounded-md" draggable="true" data-exercise-name="${ex.name}">
                             <div class="flex-grow flex items-center gap-2">
                                 <i data-lucide="grip-vertical" class="w-4 h-4 text-gray-600 drag-handle"></i>
@@ -1539,6 +845,7 @@
                                     <p class="text-xs text-secondary-text">${ex.group}</p>
                                 </div>
                             </div>
+                            ${isLogged ? '<i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>' : ''}
                         </li>`;
                     }).join('');
                 };
@@ -1565,7 +872,9 @@
 
             function renderHistoryForDate(date) {
                 const dateKey = dateToKey(date);
-                const logsForDay = workoutHistory.filter(log => log.date === dateKey);
+                const logsForDay = workoutHistory
+                    .filter(log => log.date === dateKey)
+                    .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort by creation time, recent first
 
                 if (logsForDay.length === 0) {
                     ui.historyDayContent.innerHTML = `<p class="text-secondary-text">No workouts logged.</p>`;
@@ -1584,7 +893,6 @@
             
             // --- REST TIMER FUNCTIONS ---
             function startRestTimer(timerDisplayElement) {
-                // Clear any existing timer for this spot
                 if (timerDisplayElement.dataset.timerId) {
                     clearInterval(parseInt(timerDisplayElement.dataset.timerId));
                 }
@@ -1614,7 +922,6 @@
             }
 
             function stopRestTimer() {
-                // Clear all active timers when closing the modal
                 document.querySelectorAll('.rest-timer-spot').forEach(spot => {
                     if (spot.dataset.timerId) {
                         clearInterval(parseInt(spot.dataset.timerId));
@@ -1622,7 +929,6 @@
                         delete spot.dataset.timerId;
                     }
                 });
-                 // Also clear the main interval variable if it's running
                 if (restTimerInterval) {
                     clearInterval(restTimerInterval);
                     restTimerInterval = null;
@@ -1636,19 +942,16 @@
                 if (dayType === 'Rest') return showCustomAlert("Rest Day", "Cannot add exercises to a rest day.");
                 
                 libraryModalContext.purpose = 'add';
-                openExerciseLibrary(); // No argument to show all exercises
+                openExerciseLibrary();
             });
 
             ui.closeExerciseLibraryModalBtn.addEventListener('click', () => hideModal(ui.exerciseLibraryModal));
             
             ui.addSelectedExercisesBtn.addEventListener('click', () => {
                 const selected = Array.from(document.querySelectorAll('#exercise-library-list input:checked')).map(cb => cb.value);
-                if (selected.length === 0) {
-                    hideModal(ui.exerciseLibraryModal);
-                    return;
-                }
-
+                
                 if (libraryModalContext.purpose === 'add') {
+                    if (selected.length === 0) { hideModal(ui.exerciseLibraryModal); return; }
                     const dayType = getWorkoutDayType(viewDate);
                      if (!workoutPlan.workouts) workoutPlan.workouts = [];
                     let workoutForDay = workoutPlan.workouts.find(w => w.day === dayType);
@@ -1666,8 +969,14 @@
                     updateUI();
                 } else if (libraryModalContext.purpose === 'pref') {
                     const group = libraryModalContext.group;
-                    exercisePrefs[group] = selected;
-                    renderExercisePreferences(); // Re-render to update the count
+                    // If all are selected (default), store an empty array to mean "no preference"
+                    const allInGroup = exerciseDB.filter(ex => ex.group === group).length;
+                    if(selected.length === allInGroup) {
+                         delete exercisePrefs[group];
+                    } else {
+                        exercisePrefs[group] = selected;
+                    }
+                    renderExercisePreferences();
                 }
 
                 hideModal(ui.exerciseLibraryModal);
@@ -1693,7 +1002,7 @@
                     const result = await response.json();
                     let text = result.candidates[0].content.parts[0].text;
                     ui.aiAdviceOutput.innerHTML = `<p>${text}</p>`;
-                } catch (error) { console.error("AI Workout Advice Error:", error); ui.aiAdviceOutput.innerHTML = `<p class="text-red-400">Could not get AI advice. Make sure your API key is set correctly.</p>`;
+                } catch (error) { console.error("AI Workout Advice Error:", error); ui.aiAdviceOutput.innerHTML = `<p class="text-red-400">Could not get AI advice.</p>`;
                 } finally { btn.disabled = false; btn.querySelector('.btn-text').style.display = 'inline'; btn.querySelector('.loader').classList.add('hidden'); }
             });
 
@@ -1806,12 +1115,12 @@
                 const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
                 const payload = { contents: [{ parts: [{ text: userPrompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
                 try {
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                     if (!response.ok) throw new Error(`API Error: ${response.status}`);
                     const result = await response.json();
                     let text = result.candidates[0].content.parts[0].text;
                     ui.aiGeneralOutput.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`;
-                } catch (error) { console.error("AI General Advice Error:", error); ui.aiGeneralOutput.innerHTML = `<p class="text-red-400">Could not get AI advice. Make sure your API key is set correctly.</p>`;
+                } catch (error) { console.error("AI General Advice Error:", error); ui.aiGeneralOutput.innerHTML = `<p class="text-red-400">Could not get AI advice.</p>`;
                 } finally { btn.disabled = false; btn.querySelector('.btn-text').style.display = 'inline'; btn.querySelector('.loader').classList.add('hidden'); }
             }
 
@@ -2026,6 +1335,7 @@
                         workoutHistory[logIndex].sets = JSON.stringify(sets);
                         workoutHistory[logIndex].date = dateString;
                         workoutHistory[logIndex].name = currentlyLoggingExercise;
+                        workoutHistory[logIndex].createdAt = new Date().toISOString(); // Update timestamp on edit
                     }
                 } else {
                      const newLog = { id: crypto.randomUUID(), name: currentlyLoggingExercise, date: dateString, sets: JSON.stringify(sets), createdAt: new Date().toISOString() };
@@ -2122,8 +1432,8 @@
                 
                 ui.aiPlanSetsContainer.innerHTML = ALL_MUSCLE_GROUPS.map(group => `<div class="flex items-center gap-2"><label for="sets-${group}" class="form-label text-sm flex-1">${group}</label><input type="number" id="sets-${group}" class="form-input !w-20 !py-1 text-center" placeholder="Auto"></div>`).join('');
                 
-                splitSelect.dispatchEvent(new Event('change')); // Trigger initial schedule build
-                focusMuscleContainer.dispatchEvent(new Event('change')); // Trigger initial prefs build
+                splitSelect.dispatchEvent(new Event('change'));
+                focusMuscleContainer.dispatchEvent(new Event('change'));
                 showModal(ui.aiPlanGeneratorModal);
             });
 
@@ -2134,12 +1444,20 @@
                 const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
                 const dayGrid = document.getElementById('ai-plan-schedule-builder');
                 dayGrid.className = "grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 pt-4 mt-4 border-t border-gray-800";
-                dayGrid.innerHTML = weekDays.map(day => `
-                    <button type="button" class="text-center p-2 rounded-lg bg-input-bg day-schedule-btn" data-day="${day}" data-current-index="0">
+                
+                const isPPL = splitTypes.join(',') === 'Push,Pull,Legs';
+                const defaultPPLSchedule = { Monday: "Push", Tuesday: "Pull", Wednesday: "Legs", Thursday: "Push", Friday: "Pull", Saturday: "Legs", Sunday: "Rest" };
+
+                dayGrid.innerHTML = weekDays.map(day => {
+                    const defaultType = isPPL ? defaultPPLSchedule[day] : 'Rest';
+                    const defaultIndex = allTypes.indexOf(defaultType);
+
+                    return `
+                    <button type="button" class="text-center p-2 rounded-lg bg-input-bg day-schedule-btn" data-day="${day}" data-current-index="${defaultIndex > -1 ? defaultIndex : 0}">
                         <p class="font-semibold text-sm sm:text-base">${day.substring(0, 3)}</p>
-                        <p class="text-xs text-blue-400" id="day-type-${day.substring(0, 3)}">Rest</p>
+                        <p class="text-xs text-blue-400" id="day-type-${day.substring(0, 3)}">${defaultType}</p>
                     </button>
-                `).join('');
+                `}).join('');
             
                 dayGrid.addEventListener('click', e => {
                     const btn = e.target.closest('.day-schedule-btn');
@@ -2148,29 +1466,17 @@
                         if (currentIndex >= allTypes.length) currentIndex = 0;
                         btn.dataset.currentIndex = currentIndex;
                         btn.querySelector('.text-xs').textContent = allTypes[currentIndex];
-                        renderDurations(); // Update durations when schedule changes
+                        renderDurations();
                     }
                 });
                 renderDurations();
             };
 
             const splitSelect = document.getElementById('ai-plan-split-select');
-            const customSplitInput = document.getElementById('ai-plan-split-custom');
-
-            const updateSplit = () => {
-                let splitTypes;
-                if (splitSelect.value === 'other') {
-                    customSplitInput.classList.remove('hidden');
-                    splitTypes = customSplitInput.value.split(',').map(s => s.trim()).filter(Boolean);
-                } else {
-                    customSplitInput.classList.add('hidden');
-                    splitTypes = splitSelect.value.split(',').map(s => s.trim()).filter(Boolean);
-                }
+            splitSelect.addEventListener('change', () => {
+                const splitTypes = splitSelect.value.split(',').map(s => s.trim()).filter(Boolean);
                 renderScheduleBuilder(splitTypes);
-            };
-
-            splitSelect.addEventListener('change', updateSplit);
-            customSplitInput.addEventListener('input', updateSplit);
+            });
 
             const renderDurations = () => {
                 const container = ui.aiPlanDurationsContainer;
@@ -2214,7 +1520,7 @@
                     ui.exerciseLibraryTitle.textContent = 'Add Exercises to Plan';
                     ui.addSelectedExercisesBtn.textContent = 'Add Selected';
                 } else { // 'pref'
-                    ui.exerciseLibraryTitle.textContent = `Select Exercises for ${group}`;
+                    ui.exerciseLibraryTitle.textContent = `Select Preferred Exercises for ${group}`;
                     ui.addSelectedExercisesBtn.textContent = 'Confirm Selection';
                 }
                 
@@ -2233,7 +1539,7 @@
                         .filter(ex => (filter ? ex.group === filter : true) && (search ? ex.name.toLowerCase().includes(search.toLowerCase()) : true))
                         .sort((a,b) => a.name.localeCompare(b.name))
                         .map(ex => `<label class="flex items-center gap-3 p-2 rounded-md hover:bg-input-bg">
-                            <input type="checkbox" value="${ex.name}" ${(libraryModalContext.purpose === 'pref' && (preSelected === undefined || preSelected.includes(ex.name))) ? 'checked' : ''} class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500">
+                            <input type="checkbox" value="${ex.name}" ${ (libraryModalContext.purpose === 'add' && false) || (libraryModalContext.purpose === 'pref' && (preSelected === undefined || preSelected.includes(ex.name))) ? 'checked' : ''} class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500">
                             <div><p>${ex.name}</p><p class="text-xs text-secondary-text">${ex.group}</p></div>
                         </label>`).join('');
                 };
@@ -2255,16 +1561,23 @@
                 }
                 
                 container.innerHTML = checkedMuscles.map(muscle => {
-                    const prefCount = (exercisePrefs[muscle] || exerciseDB.filter(ex => ex.group === muscle)).length;
+                    const allInGroupCount = exerciseDB.filter(ex => ex.group === muscle).length;
+                    const prefCount = (exercisePrefs[muscle] || []).length;
+                    const countText = prefCount === 0 ? `All (${allInGroupCount})` : `${prefCount} selected`;
+
                     return `
                     <button type="button" class="btn btn-secondary w-full justify-between" data-group="${muscle}">
                         <span>${muscle}</span>
-                        <span class="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full" id="pref-count-${muscle}">${prefCount} selected</span>
+                        <span class="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full" id="pref-count-${muscle}">${countText}</span>
                     </button>
                 `}).join('');
 
                 container.querySelectorAll('button').forEach(btn => {
-                    btn.addEventListener('click', () => openExerciseLibrary(btn.dataset.group));
+                    btn.addEventListener('click', () => {
+                         libraryModalContext.purpose = 'pref';
+                         libraryModalContext.group = btn.dataset.group;
+                         openExerciseLibrary(btn.dataset.group);
+                    });
                 });
             };
             document.getElementById('ai-plan-focus-muscle-container').addEventListener('change', renderExercisePreferences);
@@ -2298,12 +1611,10 @@
                     const goal = document.getElementById('ai-plan-goal').value;
                     
                     const schedule = {};
-                    let scheduleIsCustomized = false;
                     document.querySelectorAll('.day-schedule-btn').forEach(btn => {
                         const dayName = btn.dataset.day;
                         const dayType = btn.querySelector('.text-xs').textContent;
                         schedule[dayName] = dayType;
-                        if(parseInt(btn.dataset.currentIndex) !== 0) scheduleIsCustomized = true;
                     });
                     
                     const equipment = Array.from(document.querySelectorAll('input[name="equipment"]:checked')).map(cb => cb.value);
@@ -2328,10 +1639,14 @@
                     
                     const restTime = document.getElementById('ai-plan-rest').value;
 
+                    // Check if today's workout has been logged
+                    const todayKey = dateToKey(new Date());
+                    const hasWorkedOutToday = workoutHistory.some(log => log.date === todayKey);
+                    let startDayInstruction = hasWorkedOutToday ? "IMPORTANT: The plan must start from tomorrow." : "The plan should start today if possible.";
 
                     let prompt = `Create a weekly workout plan based on these user inputs:
                     - Primary Goal: ${goalText}
-                    ${scheduleIsCustomized ? `- Weekly Schedule: ${JSON.stringify(schedule)}` : `- Workout Split: ${splitSelect.value === 'other' ? customSplitInput.value : splitSelect.value}`}
+                    - Weekly Schedule: ${JSON.stringify(schedule)}
                     - Default Duration: ${defaultDuration} minutes.
                     - Specific Durations: ${JSON.stringify(durations)}
                     - Rest Time Between Sets: ${restTime} minutes.
@@ -2340,16 +1655,17 @@
                     - Preferred Exercises: ${JSON.stringify(exercisePrefs)}
                     - Default Sets Per Muscle: ${defaultSets || 'Auto'}
                     - Specific Target Sets: ${JSON.stringify(targetSets)}
-                    - Full List of Available Exercises: ${exerciseDB.map(ex => ex.name).join(', ')}
+                    - Full List of Available Exercises: ${exerciseDB.map(ex => `${ex.name} (${ex.group}, isCompound: ${!!ex.isCompound})`).join(', ')}
 
                     Important Rules:
                     1. For 'Legs' days, you MUST include at least one 'Abs' exercise.
                     2. For 'Pull' days, you MUST include at least one 'Shoulders' exercise (likely for rear/side delts).
                     3. For 'Push' days, you MUST include at least one 'Forearms' exercise.
+                    4. If an exercise is a compound lift (isCompound: true), place it under its primary muscle mover group (e.g., Squat under Quads).
 
                     Respond with a valid JSON object ONLY. The root object must have "name", "schedule", "workouts", "restTime", and "reasoning" keys.
                     - "name": A creative name for the plan.
-                    - "schedule": This MUST be the schedule object based on user input. If they did not customize, create a logical one based on their split.
+                    - "schedule": This MUST be the schedule object provided: ${JSON.stringify(schedule)}.
                     - "workouts": An array of objects. Each object must have a "day" key (matching a workout type from the schedule) and an "exercises" key (an array of exercise names selected from the provided list, respecting user preferences if provided).
                     - "restTime": The rest time in minutes (a number).
                     - "reasoning": A brief paragraph (under 100 words) explaining the plan's structure.`;
@@ -2376,20 +1692,40 @@
             });
             ui.cancelNewPlanBtn.addEventListener('click', () => ui.aiPlanOutput.classList.add('hidden'));
             ui.saveNewPlanBtn.addEventListener('click', () => {
-                showConfirmModal("Replace Current Plan?", "This will overwrite your current workout plan and schedule. This action cannot be undone.", () => {
-                    try {
-                        const newPlan = JSON.parse(ui.aiPlanJsonOutput.textContent);
-                        delete newPlan.reasoning;
-                        workoutPlan = newPlan;
-                        saveData();
-                        updateUI();
-                        hideModal(ui.aiPlanGeneratorModal);
-                        showCustomAlert("Success", "Your new workout plan has been applied!");
-                    } catch (error) {
-                        showCustomAlert("Error", "Could not save the new plan. The generated data might be invalid.");
-                    }
-                });
+                const todayKey = dateToKey(new Date());
+                const hasWorkedOutToday = workoutHistory.some(log => log.date === todayKey);
+
+                if (hasWorkedOutToday) {
+                    showConfirmModal("Apply Plan From Tomorrow?", "You've already logged a workout today. Your new plan will start tomorrow, preserving today's history. Is that okay?", applyNewPlan);
+                } else {
+                     showConfirmModal("Replace Current Plan?", "This will overwrite your current workout plan and schedule. Is that okay?", applyNewPlan);
+                }
             });
+
+            function applyNewPlan() {
+                 try {
+                    const newPlan = JSON.parse(ui.aiPlanJsonOutput.textContent);
+                    delete newPlan.reasoning;
+                    
+                    // Intelligent date application
+                    const todayKey = dateToKey(new Date());
+                    const hasWorkedOutToday = workoutHistory.some(log => log.date === todayKey);
+                    
+                    if(hasWorkedOutToday) {
+                        // Keep today's workout type from old plan
+                        const oldTodayType = getWorkoutDayType(new Date());
+                        newPlan.schedule[(new Date()).toLocaleDateString('en-US', { weekday: 'long' })] = oldTodayType;
+                    }
+
+                    workoutPlan = newPlan;
+                    saveData();
+                    updateUI();
+                    hideModal(ui.aiPlanGeneratorModal);
+                    showCustomAlert("Success", "Your new workout plan has been applied!");
+                } catch (error) {
+                    showCustomAlert("Error", "Could not save the new plan. The generated data might be invalid.");
+                }
+            }
             
             // Custom Exercise AI Listeners
             ui.addCustomExerciseBtn.addEventListener('click', () => {
@@ -2452,7 +1788,7 @@
 
                 } catch (error) {
                     console.error("AI Custom Exercise Error:", error);
-                    showCustomAlert("AI Error", "Could not generate all details. Please try again or fill them manually. Make sure your API key is set correctly.");
+                    showCustomAlert("AI Error", "Could not generate all details. Please try again or fill them manually.");
                 } finally {
                     ui.customExerciseImgLoader.classList.add('hidden');
                     ui.customExerciseImg.classList.remove('hidden');
@@ -2481,7 +1817,7 @@
                 const imageUrl = document.getElementById('custom-img-url').value.trim();
 
                 const newExercise = {
-                    id: crypto.randomUUID(), // Add ID for custom exercises
+                    id: crypto.randomUUID(),
                     isCustom: true,
                     name: ui.customExerciseNameInput.value.trim(),
                     instructions: ui.customExerciseInstructions.value.split('\n'),
@@ -2550,6 +1886,20 @@
             // --- INITIALIZATION ---
             function initializeApp() {
                 loadAllData();
+                 // If no plan exists, create a default PPL
+                if (!workoutPlan || !workoutPlan.schedule || Object.keys(workoutPlan.schedule).length === 0) {
+                    workoutPlan = {
+                        name: "Default PPL",
+                        schedule: { "Monday": "Push", "Tuesday": "Pull", "Wednesday": "Legs", "Thursday": "Push", "Friday": "Pull", "Saturday": "Legs", "Sunday": "Rest" },
+                        workouts: [
+                            { day: "Push", exercises: ["Flat Barbell Bench Press", "Incline Dumbbell Press", "Seated Dumbbell Press", "Dumbbell Lateral Raise", "Tricep Pushdown", "Dumbbell Overhead Tricep Extension"] },
+                            { day: "Pull", exercises: ["Pull Ups", "Barbell Row", "Lat Pulldown", "Seated Cable Row", "Dumbbell Curl", "Hammer Curl"] },
+                            { day: "Legs", exercises: ["Barbell Squat", "Leg Press", "Romanian Deadlift", "Leg Curl", "Standing Calf Raise", "Hanging Leg Raise"] }
+                        ],
+                        restTime: 2
+                    };
+                    saveData();
+                }
                 updateUI();
             }
 

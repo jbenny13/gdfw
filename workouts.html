@@ -209,7 +209,7 @@
             color: var(--secondary-text);
         }
 
-        .status-btn.selected-full {
+        .status-btn.selected-full, .unit-toggle-btn.selected-full {
             background-color: #10b981;
             color: var(--background);
             border-color: #10b981;
@@ -403,7 +403,9 @@
                                 <option value="Push, Pull, Legs">Push, Pull, Legs</option>
                                 <option value="Upper, Lower">Upper, Lower</option>
                                 <option value="Full Body">Full Body</option>
+                                <option value="custom">Custom</option>
                             </select>
+                            <input type="text" id="ai-plan-split-custom" class="form-input mt-2 hidden" placeholder="e.g., Chest & Back, Arms, Legs">
                         </div>
                     </div>
                      <div id="ai-plan-goal-text-container" class="hidden">
@@ -483,10 +485,10 @@
         </div>
     </div>
     <div id="custom-exercise-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-6"><h2 id="custom-exercise-modal-title" class="text-2xl font-bold">Add Custom Exercise</h2><button id="close-custom-exercise-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div id="custom-exercise-initial-choice" class="flex gap-4"><button id="custom-exercise-ai-choice-btn" class="btn btn-primary w-full"><i data-lucide="sparkles"></i>Use AI Assistant</button><button id="custom-exercise-manual-choice-btn" class="btn btn-secondary w-full"><i data-lucide="edit-3"></i>Enter Manually</button></div><form id="custom-exercise-form" class="hidden space-y-4 mt-4"><div><label for="custom-exercise-name" class="form-label">Exercise Name *</label><div class="flex gap-2"><input type="text" id="custom-exercise-name" class="form-input" required placeholder="e.g., Kneeling Landmine Press"><button type="button" id="ai-generate-exercise-details-btn" class="btn btn-secondary !px-3 hidden"><i data-lucide="sparkles"></i></button></div></div><div id="custom-exercise-details-container" class="space-y-4 pt-4 border-t border-border-color"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-border-color"><div id="custom-exercise-img-loader" class="loader hidden"></div><img id="custom-exercise-img" src="" class="w-full h-full object-contain hidden"></div><div class="grid grid-cols-2 gap-2"><label for="custom-img-upload" class="btn btn-secondary !py-1 text-xs cursor-pointer">Upload Image<input type="file" id="custom-img-upload" class="hidden" accept="image/*"></label><input type="url" id="custom-img-url" class="form-input !py-1 text-xs" placeholder="Or paste image/video URL"></div><div><label for="custom-exercise-instructions" class="form-label">Instructions</label><textarea id="custom-exercise-instructions" rows="5" class="form-input mt-1"></textarea></div><div><label for="custom-exercise-rep-range" class="form-label">Rep Range</label><input type="text" id="custom-exercise-rep-range" class="form-input mt-1"></div><div class="grid grid-cols-2 gap-4"><div><label for="custom-exercise-group" class="form-label">Muscle Group</label><select id="custom-exercise-group" class="form-select mt-1"></select></div><div><label for="custom-exercise-type" class="form-label">Equipment</label><select id="custom-exercise-type" class="form-select mt-1"><option>Barbell</option><option>Dumbbell</option><option>Machine</option><option>Cable</option><option>Bodyweight</option><option>Other</option></select></div></div><button type="submit" id="save-custom-exercise-btn" class="w-full btn btn-primary">Save Custom Exercise</button></div></form></div></div>
-    <div id="exercise-detail-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 id="exercise-detail-title" class="text-2xl font-bold">Exercise Details</h2><button id="close-exercise-detail-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-gray-800"><img id="exercise-detail-video" src="" alt="Exercise demonstration" class="w-full h-full object-contain"></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Instructions</h3><textarea id="exercise-detail-instructions" rows="6" class="form-input mt-1 w-full bg-input-bg"></textarea><button id="save-instructions-btn" class="mt-2 w-full btn btn-secondary">Save Instructions</button></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Rep Range</h3><p id="exercise-detail-rep-range" class="text-gray-300"></p></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Personal Notes & Advice</h3><textarea id="exercise-detail-notes" rows="4" class="form-input mt-1" placeholder="Add your personal cues, weight progression goals, etc."></textarea><button id="save-exercise-notes-btn" class="mt-2 w-full btn btn-secondary">Save Notes</button></div><button id="log-from-detail-btn" class="w-full btn btn-primary mt-4">Log This Exercise</button></div></div></div>
+    <div id="exercise-detail-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 id="exercise-detail-title" class="text-2xl font-bold">Exercise Details</h2><button id="close-exercise-detail-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-gray-800"><img id="exercise-detail-video" src="" alt="Exercise demonstration" class="w-full h-full object-contain"></div><div class="custom-scrollbar overflow-y-auto max-h-48 pr-2"><h3 class="font-bold text-lg text-blue-400 mb-2">Instructions</h3><textarea id="exercise-detail-instructions" rows="6" class="form-input mt-1 w-full bg-input-bg"></textarea><button id="save-instructions-btn" class="mt-2 w-full btn btn-secondary">Save Instructions</button></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Rep Range</h3><p id="exercise-detail-rep-range" class="text-gray-300"></p></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Personal Notes & Advice</h3><textarea id="exercise-detail-notes" rows="4" class="form-input mt-1" placeholder="Add your personal cues, weight progression goals, etc."></textarea><button id="save-exercise-notes-btn" class="mt-2 w-full btn btn-secondary">Save Notes</button></div><button id="log-from-detail-btn" class="w-full btn btn-primary mt-4">Log This Exercise</button></div></div></div>
     <div id="warmup-manage-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Manage Warm-ups</h2><button id="close-warmup-manage-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div><label for="warmup-day-select" class="form-label">Workout Day</label><select id="warmup-day-select" class="form-select mt-1"></select></div><div id="warmup-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div><hr class="border-gray-800"><form id="warmup-form" class="space-y-3"><h3 id="warmup-form-title" class="font-bold text-lg text-blue-400">Add New Warm-up</h3><div><label for="warmup-name" class="form-label">Name</label><input type="text" id="warmup-name" class="form-input mt-1" required></div><div><label for="warmup-instructions" class="form-label">Instructions (one per line)</label><textarea id="warmup-instructions" rows="4" class="form-input mt-1"></textarea></div><button type="submit" id="save-warmup-btn" class="w-full btn btn-primary">Add Warm-up</button></form></div></div></div>
-    <div id="workout-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="modal-title" class="text-2xl font-bold">Log Exercise</h2><button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="workout-log-form"><div class="space-y-4"><div id="sets-container"></div><button type="button" id="add-set-btn" class="w-full btn btn-secondary">Add Set</button><button type="submit" id="save-workout-btn" class="w-full btn btn-primary mt-2">Save Workout</button></div></form></div></div>
-    <div id="exercise-library-modal" class="modal-backdrop"><div class="modal-content !max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold" id="exercise-library-title">Exercise Library</h2><button id="close-exercise-library-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="flex gap-2 mb-4"><input type="search" id="exercise-library-search" class="form-input" placeholder="Search exercises..."><select id="exercise-library-filter" class="form-select w-48"><option value="">All Groups</option></select></div><div id="exercise-library-list" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-2"></div><button id="add-selected-exercises-btn" class="btn btn-primary w-full mt-4">Add Selected</button></div></div>
+    <div id="workout-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="modal-title" class="text-2xl font-bold">Log Exercise</h2><div class="flex items-center gap-1 border border-border-color rounded-lg p-1"><button type="button" id="unit-toggle-kg" class="btn !py-1 !px-3 text-sm unit-toggle-btn">kg</button><button type="button" id="unit-toggle-lbs" class="btn !py-1 !px-3 text-sm unit-toggle-btn">lbs</button></div><button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="workout-log-form"><div class="space-y-4"><div id="sets-container"></div><button type="button" id="add-set-btn" class="w-full btn btn-secondary">Add Set</button><button type="submit" id="save-workout-btn" class="w-full btn btn-primary mt-2">Save Workout</button></div></form></div></div>
+    <div id="exercise-library-modal" class="modal-backdrop"><div class="modal-content !max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold" id="exercise-library-title">Exercise Library</h2><button id="close-exercise-library-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="flex gap-2 mb-4"><input type="search" id="exercise-library-search" class="form-input" placeholder="Search exercises..."><select id="exercise-library-filter" class="form-select w-48"><option value="">All Groups</option></select><button id="create-new-exercise-from-library-btn" class="btn btn-secondary !px-3" title="Create New Exercise"><i data-lucide="plus"></i></button></div><div id="exercise-library-list" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-2"></div><button id="add-selected-exercises-btn" class="btn btn-primary w-full mt-4">Add Selected</button></div></div>
     <div id="confirm-modal" class="modal-backdrop"><div class="modal-content"><h2 id="confirm-modal-title" class="text-xl font-bold mb-4">Are you sure?</h2><p id="confirm-modal-text" class="text-gray-300 mb-6">This action cannot be undone.</p><div class="flex justify-end gap-4"><button id="confirm-modal-cancel-btn" class="btn btn-secondary">Cancel</button><button id="confirm-modal-confirm-btn" class="btn btn-danger">Confirm</button></div></div></div>
     <div id="alert-modal" class="modal-backdrop"><div class="modal-content"><h2 id="alert-modal-title" class="text-xl font-bold mb-4">Alert</h2><p id="alert-modal-text" class="text-gray-300 mb-6"></p><div class="flex justify-end"><button id="alert-modal-ok-btn" class="btn btn-primary">OK</button></div></div></div>
     
@@ -510,6 +512,8 @@
             let exercisePrefs = {}; // For AI plan generator
             let libraryModalContext = { purpose: 'add', group: '' }; // 'add' or 'pref'
             let restTimerInterval = null;
+            let isAddingFromLibrary = false;
+            let modalUnit = 'kg';
 
 
             // --- DATABASE DEFAULTS ---
@@ -578,7 +582,7 @@
                 "Legs": [{ name: "Leg Swings", instructions: ["Hold onto a stable surface for balance.", "Swing one leg forward and backward in a controlled motion.", "Perform 10-15 swings per leg."], repRange: "10-15 reps per leg", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Warm-up" }]
             };
 
-            const defaultExerciseDB = []; // Will be loaded from exercises.json content
+            const defaultExerciseDB = [];
 
             let ALL_MUSCLE_GROUPS = [];
 
@@ -609,6 +613,7 @@
                 aiTabSpecific: document.getElementById('ai-tab-specific'), aiTabGeneral: document.getElementById('ai-tab-general'), aiPanelSpecific: document.getElementById('ai-panel-specific'), aiPanelGeneral: document.getElementById('ai-panel-general'),
                 aiGeneralPrompt: document.getElementById('ai-general-prompt'), getAIGeneralAdviceBtn: document.getElementById('get-ai-general-advice-btn'), aiGeneralOutput: document.getElementById('ai-general-output'),
                 workoutStatusControls: document.getElementById('workout-status-controls'),
+                unitToggleKg: document.getElementById('unit-toggle-kg'), unitToggleLbs: document.getElementById('unit-toggle-lbs'),
                 // Plan Generator
                 aiPlanGeneratorModal: document.getElementById('ai-plan-generator-modal'), closeAiPlanGeneratorModalBtn: document.getElementById('close-ai-plan-generator-modal-btn'),
                 aiPlanGeneratorForm: document.getElementById('ai-plan-generator-form'), aiPlanGeneratorBtn: document.getElementById('ai-plan-generator-btn'),
@@ -629,6 +634,7 @@
                 customExerciseImgLoader: document.getElementById('custom-exercise-img-loader'), customExerciseImg: document.getElementById('custom-exercise-img'),
                 customExerciseInstructions: document.getElementById('custom-exercise-instructions'), customExerciseRepRange: document.getElementById('custom-exercise-rep-range'),
                 customExerciseGroup: document.getElementById('custom-exercise-group'), saveCustomExerciseBtn: document.getElementById('save-custom-exercise-btn'),
+                createNewExerciseFromLibraryBtn: document.getElementById('create-new-exercise-from-library-btn'),
                 // Edit Mode Toolbar
                 planViewHeader: document.getElementById('plan-view-header'),
                 editModeToolbar: document.getElementById('edit-mode-toolbar'),
@@ -693,7 +699,7 @@
             function updateUI() {
                 updateDayView(viewDate);
                 populateProgressSelect();
-                renderProgressionChart(ui.progressExerciseSelect.value || 'general');
+                renderProgressionChart(ui.progressExerciseSelect.value || 'today-general');
                 document.getElementById('plan-main-title').textContent = workoutPlan.name || "Your Workout Plan";
                 lucide.createIcons();
             }
@@ -718,6 +724,8 @@
                 ui.saveWorkoutBtn.textContent = 'Save Workout';
                 ui.setsContainer.innerHTML = '';
                 addSetRow(); addSetRow(); addSetRow();
+                modalUnit = userSettings.unit;
+                updateUnitToggleUI(modalUnit);
                 showModal(ui.workoutModal);
             };
 
@@ -731,14 +739,14 @@
                 
                 const partsContainer = row.querySelector('.parts-container');
                 setParts.forEach(part => {
-                    const displayWeight = userSettings.unit === 'lbs' ? (part.weight ? kgToLbs(part.weight).toFixed(1) : '') : part.weight;
+                    const displayWeight = userSettings.unit === 'lbs' ? (part.weight ? kgToLbs(part.weight).toFixed(1) : '') : (part.weight || '');
                     addWeightRepPart(partsContainer, displayWeight, part.reps, part.partial)
                 });
                 row.querySelector('.add-part-btn').addEventListener('click', () => addWeightRepPart(partsContainer));
             };
 
             function addWeightRepPart(container, weight='', reps='', isPartial=false) {
-                const partHtml = `<div class="set-part-row grid grid-cols-12 gap-2 items-center"><input type="number" step="any" min="0" placeholder="Weight (${userSettings.unit})" value="${weight}" class="form-input !py-2 col-span-4 set-weight"><span class="text-center col-span-1">x</span><input type="number" min="1" step="1" placeholder="Reps" value="${reps}" class="form-input !py-2 col-span-3 set-reps"><div class="col-span-3 flex items-center justify-center"><input type="checkbox" ${isPartial ? 'checked' : ''} class="form-checkbox h-5 w-5 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500 set-partial"><label class="ml-2 text-sm">Partial</label></div><button type="button" class="remove-part-btn text-gray-500 hover:text-red-400 p-1 col-span-1"><i data-lucide="x-circle" class="w-4 h-4 pointer-events-none"></i></button></div>`;
+                const partHtml = `<div class="set-part-row grid grid-cols-12 gap-2 items-center"><input type="number" step="any" min="0" placeholder="Weight (${modalUnit})" value="${weight}" class="form-input !py-2 col-span-4 set-weight"><span class="text-center col-span-1">x</span><input type="number" min="1" step="1" placeholder="Reps" value="${reps}" class="form-input !py-2 col-span-3 set-reps"><div class="col-span-3 flex items-center justify-center"><input type="checkbox" ${isPartial ? 'checked' : ''} class="form-checkbox h-5 w-5 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500 set-partial"><label class="ml-2 text-sm">Partial</label></div><button type="button" class="remove-part-btn text-gray-500 hover:text-red-400 p-1 col-span-1"><i data-lucide="x-circle" class="w-4 h-4 pointer-events-none"></i></button></div>`;
                 container.insertAdjacentHTML('beforeend', partHtml);
                 lucide.createIcons();
             };
@@ -845,7 +853,7 @@
                                     <p class="text-xs text-secondary-text">${ex.group}</p>
                                 </div>
                             </div>
-                            ${isLogged ? '<i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>' : ''}
+                            ${isLogged ? '<i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>' : (!isFutureDay ? '<i data-lucide="x-circle" class="w-5 h-5 text-red-500/70"></i>' : '')}
                         </li>`;
                     }).join('');
                 };
@@ -1033,16 +1041,22 @@
                 const exercisedNames = [...new Set(workoutHistory.map(log => log.name))].sort();
                 const singleExerciseOptions = exercisedNames.map(name => `<option value="${name}">${name}</option>`).join('');
                 
-                ui.progressExerciseSelect.innerHTML = `<option value="general">General Progression</option><optgroup label="Specific Exercises">${singleExerciseOptions}</optgroup>`;
-                ui.progressExerciseSelect.value = currentSelection || 'general';
+                ui.progressExerciseSelect.innerHTML = `<option value="today-general">Today's General Progression</option><option value="general">Overall General Progression</option><optgroup label="Specific Exercises">${singleExerciseOptions}</optgroup>`;
+                ui.progressExerciseSelect.value = currentSelection || 'today-general';
 
                 ui.aiAdviceExerciseSelect.innerHTML = '<option value="">Select an exercise...</option>' + singleExerciseOptions;
             };
 
-            function renderProgressionChart(exerciseName) {
-                if (exerciseName === "general" || !exerciseName) { renderGeneralProgressionChart(); return; }
-                const exerciseLogs = workoutHistory.filter(log => log.name === exerciseName).sort((a,b) => new Date(a.date) - new Date(b.date));
-                const labels = exerciseLogs.map(log => new Date(log.date.replace(/-/g, '/')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+            function renderProgressionChart(selection) {
+                if (selection === "today-general") { renderTodaysGeneralProgressionChart(); return; }
+                if (selection === "general" || !selection) { renderGeneralProgressionChart(); return; }
+                
+                const exerciseLogs = workoutHistory.filter(log => log.name === selection).sort((a,b) => new Date(a.date) - new Date(b.date));
+                const labels = exerciseLogs.map(log => {
+                    if (!log.date || typeof log.date !== 'string') return 'Unknown';
+                    return new Date(log.date.replace(/-/g, '/')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                });
+
                 const maxWeightData = exerciseLogs.map(log => {
                     const sets = typeof log.sets === 'string' ? JSON.parse(log.sets) : log.sets;
                     const maxWeightKg = Math.max(...sets.flatMap(set => set.map(s => s.weight || 0)));
@@ -1074,13 +1088,55 @@
                 });
 
                 const sortedDates = Object.keys(volumeByDay).sort((a, b) => new Date(a) - new Date(b));
-                const labels = sortedDates.map(dateStr => new Date(dateStr.replace(/-/g, '/')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+                const labels = sortedDates.map(dateStr => {
+                    if (!dateStr || typeof dateStr !== 'string') return 'Unknown';
+                    return new Date(dateStr.replace(/-/g, '/')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                });
                 const volumeData = sortedDates.map(date => {
                     const volumeKg = volumeByDay[date];
                     return userSettings.unit === 'lbs' ? kgToLbs(volumeKg) : volumeKg;
                 });
                 progressChart.data.labels = labels;
                 progressChart.data.datasets = [{ label: `Total Daily Volume (${userSettings.unit})`, data: volumeData, borderColor: '#a78bfa', backgroundColor: '#a78bfa', tension: 0.1 }];
+                progressChart.update();
+            }
+
+            function renderTodaysGeneralProgressionChart() {
+                const dayType = getWorkoutDayType(new Date());
+                if (dayType === 'Rest') { renderGeneralProgressionChart(); return; }
+
+                const workoutForDay = (workoutPlan.workouts || []).find(w => w.day === dayType);
+                if (!workoutForDay || !workoutForDay.exercises) { renderGeneralProgressionChart(); return; }
+                const todaysExercises = new Set(workoutForDay.exercises);
+
+                const volumeByDay = {};
+                workoutHistory
+                    .filter(log => todaysExercises.has(log.name))
+                    .forEach(log => {
+                        const sets = typeof log.sets === 'string' ? JSON.parse(log.sets) : log.sets;
+                        const dateKey = log.date;
+                        const logVolume = sets.flat().reduce((total, s) => total + (s.weight * s.reps), 0);
+                        if (!volumeByDay[dateKey]) { volumeByDay[dateKey] = 0; }
+                        volumeByDay[dateKey] += logVolume;
+                    });
+
+                if (Object.keys(volumeByDay).length === 0) {
+                    progressChart.data.labels = [];
+                    progressChart.data.datasets = [ { label: `Volume for Today's Workout (${userSettings.unit})`, data: [], borderColor: '#34d399', backgroundColor: '#34d399', tension: 0.1 }];
+                    progressChart.update();
+                    return;
+                }
+                const sortedDates = Object.keys(volumeByDay).sort((a, b) => new Date(a) - new Date(b));
+                const labels = sortedDates.map(dateStr => {
+                     if (!dateStr || typeof dateStr !== 'string') return 'Unknown';
+                    return new Date(dateStr.replace(/-/g, '/')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                });
+                const volumeData = sortedDates.map(date => {
+                    const volumeKg = volumeByDay[date];
+                    return userSettings.unit === 'lbs' ? kgToLbs(volumeKg) : volumeKg;
+                });
+                progressChart.data.labels = labels;
+                progressChart.data.datasets = [{ label: `Volume for Today's Workout (${userSettings.unit})`, data: volumeData, borderColor: '#34d399', backgroundColor: '#34d399', tension: 0.1 }];
                 progressChart.update();
             }
             
@@ -1096,6 +1152,8 @@
                 ui.setsContainer.innerHTML = '';
                 const sets = typeof logEntry.sets === 'string' ? JSON.parse(logEntry.sets) : logEntry.sets;
                 sets.forEach(set => addSetRow(set));
+                modalUnit = userSettings.unit;
+                updateUnitToggleUI(modalUnit);
                 showModal(ui.workoutModal);
             };
 
@@ -1314,7 +1372,7 @@
                 const sets = Array.from(document.querySelectorAll('.set-row')).map(row => 
                     Array.from(row.querySelectorAll('.set-part-row')).map(partRow => {
                         let weightKg = parseFloat(partRow.querySelector('.set-weight').value) || 0;
-                        if (userSettings.unit === 'lbs') {
+                        if (modalUnit === 'lbs') {
                             weightKg = lbsToKg(weightKg);
                         }
                         return {
@@ -1473,10 +1531,22 @@
             };
 
             const splitSelect = document.getElementById('ai-plan-split-select');
-            splitSelect.addEventListener('change', () => {
-                const splitTypes = splitSelect.value.split(',').map(s => s.trim()).filter(Boolean);
-                renderScheduleBuilder(splitTypes);
-            });
+            const customSplitInput = document.getElementById('ai-plan-split-custom');
+            
+            const updateSplit = () => {
+                let splitTypes;
+                if (splitSelect.value === 'custom') {
+                    customSplitInput.classList.remove('hidden');
+                    splitTypes = customSplitInput.value.split(',').map(s => s.trim()).filter(Boolean);
+                } else {
+                    customSplitInput.classList.add('hidden');
+                    splitTypes = splitSelect.value.split(',').map(s => s.trim()).filter(Boolean);
+                }
+                renderScheduleBuilder(splitTypes.length > 0 ? splitTypes : ['Workout']);
+            };
+
+            splitSelect.addEventListener('change', updateSplit);
+            customSplitInput.addEventListener('input', updateSplit);
 
             const renderDurations = () => {
                 const container = ui.aiPlanDurationsContainer;
@@ -1638,15 +1708,13 @@
                     });
                     
                     const restTime = document.getElementById('ai-plan-rest').value;
-
-                    // Check if today's workout has been logged
-                    const todayKey = dateToKey(new Date());
-                    const hasWorkedOutToday = workoutHistory.some(log => log.date === todayKey);
-                    let startDayInstruction = hasWorkedOutToday ? "IMPORTANT: The plan must start from tomorrow." : "The plan should start today if possible.";
+                    
+                    let activeSplit = splitSelect.value === 'custom' ? customSplitInput.value : splitSelect.value;
 
                     let prompt = `Create a weekly workout plan based on these user inputs:
                     - Primary Goal: ${goalText}
                     - Weekly Schedule: ${JSON.stringify(schedule)}
+                    - Workout Split: ${activeSplit}
                     - Default Duration: ${defaultDuration} minutes.
                     - Specific Durations: ${JSON.stringify(durations)}
                     - Rest Time Between Sets: ${restTime} minutes.
@@ -1672,7 +1740,7 @@
                     
                     const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
                     const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } }) });
-                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                    if (!response.ok) throw new Error(`API Error: ${response.status} - ${await response.text()}`);
                     const result = await response.json();
                     const planJsonText = result.candidates[0].content.parts[0].text;
                     const parsedPlan = JSON.parse(planJsonText);
@@ -1707,12 +1775,10 @@
                     const newPlan = JSON.parse(ui.aiPlanJsonOutput.textContent);
                     delete newPlan.reasoning;
                     
-                    // Intelligent date application
                     const todayKey = dateToKey(new Date());
                     const hasWorkedOutToday = workoutHistory.some(log => log.date === todayKey);
                     
                     if(hasWorkedOutToday) {
-                        // Keep today's workout type from old plan
                         const oldTodayType = getWorkoutDayType(new Date());
                         newPlan.schedule[(new Date()).toLocaleDateString('en-US', { weekday: 'long' })] = oldTodayType;
                     }
@@ -1751,7 +1817,12 @@
                 ui.customExerciseImgLoader.classList.add('hidden');
             });
 
-            ui.closeCustomExerciseModalBtn.addEventListener('click', () => hideModal(ui.customExerciseModal));
+            ui.closeCustomExerciseModalBtn.addEventListener('click', () => {
+                hideModal(ui.customExerciseModal);
+                if (isAddingFromLibrary) {
+                    openExerciseLibrary(libraryModalContext.group);
+                }
+            });
 
             ui.aiGenerateExerciseDetailsBtn.addEventListener('click', async () => {
                 const exerciseName = ui.customExerciseNameInput.value.trim();
@@ -1838,6 +1909,10 @@
                 
                 hideModal(ui.customExerciseModal);
                 showCustomAlert("Success", "Custom exercise saved!");
+                if(isAddingFromLibrary) {
+                    openExerciseLibrary(libraryModalContext.group);
+                    isAddingFromLibrary = false;
+                }
             });
 
             ui.editPlanBtn.addEventListener('click', () => {
@@ -1879,6 +1954,41 @@
                 saveData();
                 updateUI();
             });
+
+            ui.createNewExerciseFromLibraryBtn.addEventListener('click', () => {
+                isAddingFromLibrary = true;
+                hideModal(ui.exerciseLibraryModal);
+                ui.addCustomExerciseBtn.click();
+            });
+
+            function updateUnitToggleUI(unit) {
+                modalUnit = unit;
+                ui.unitToggleKg.classList.toggle('selected-full', unit === 'kg');
+                ui.unitToggleLbs.classList.toggle('selected-full', unit === 'lbs');
+                ui.workoutModal.querySelectorAll('.set-weight').forEach(input => {
+                    input.placeholder = `Weight (${modalUnit})`;
+                });
+            }
+
+            function convertModalWeights(newUnit) {
+                const oldUnit = modalUnit;
+                if (oldUnit === newUnit) return;
+                
+                ui.workoutModal.querySelectorAll('.set-weight').forEach(input => {
+                    const currentValue = parseFloat(input.value);
+                    if (!isNaN(currentValue)) {
+                        if (newUnit === 'lbs' && oldUnit === 'kg') {
+                            input.value = kgToLbs(currentValue).toFixed(1);
+                        } else if (newUnit === 'kg' && oldUnit === 'lbs') {
+                            input.value = lbsToKg(currentValue).toFixed(1);
+                        }
+                    }
+                });
+                updateUnitToggleUI(newUnit);
+            }
+
+            ui.unitToggleKg.addEventListener('click', () => convertModalWeights('kg'));
+            ui.unitToggleLbs.addEventListener('click', () => convertModalWeights('lbs'));
 
             // Unload protection
             window.addEventListener('beforeunload', (e) => { if (isLogging) { e.preventDefault(); e.returnValue = ''; } });

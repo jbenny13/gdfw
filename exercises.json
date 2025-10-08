@@ -589,6 +589,36 @@
         "favorite": false
     },
     {
+        "name": "Cable Glute Kickback",
+        "group": "Glutes",
+        "type": "Cable",
+        "instructions": [
+            "Attach an ankle strap to a low pulley cable.",
+            "Face the machine and step back to create tension.",
+            "Hinge at your hips slightly, keeping your back straight.",
+            "Kick your leg straight back, squeezing your glute at the peak of the movement.",
+            "Lower with control."
+        ],
+        "repRange": "12-20 reps per leg",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Bodyweight Hip Thrust",
+        "group": "Glutes",
+        "type": "Bodyweight",
+        "instructions": [
+            "Lie on your back with your knees bent and feet flat on the floor, hip-width apart.",
+            "Place your arms at your sides with palms down.",
+            "Drive through your heels to lift your hips towards the ceiling until your body forms a straight line from your shoulders to your knees.",
+            "Squeeze your glutes hard at the top.",
+            "Lower with control."
+        ],
+        "repRange": "15-25 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
         "name": "Standing Calf Raise",
         "group": "Calves",
         "type": "Machine",
@@ -625,6 +655,21 @@
             "Lower your heels until you feel a stretch in your calves."
         ],
         "repRange": "10-15 reps",
+        "notes": "",
+        "favorite": false
+    },
+     {
+        "name": "Bodyweight Calf Raise",
+        "group": "Calves",
+        "type": "Bodyweight",
+        "instructions": [
+            "Stand on the edge of a step with your heels hanging off.",
+            "Hold onto something for balance if needed.",
+            "Raise your heels as high as possible, squeezing your calves.",
+            "Slowly lower your heels below the level of the step to feel a stretch.",
+            "For more difficulty, perform one leg at a time."
+        ],
+        "repRange": "20-30 reps",
         "notes": "",
         "favorite": false
     },
@@ -666,6 +711,21 @@
             "Slowly return to the start."
         ],
         "repRange": "15-25 reps",
+        "notes": "",
+        "favorite": false
+    },
+    {
+        "name": "Dumbbell Crunch",
+        "group": "Abs",
+        "type": "Dumbbell",
+        "instructions": [
+            "Lie on your back with your knees bent and feet flat on the floor.",
+            "Hold a single dumbbell across your chest with both hands.",
+            "Lift your shoulders off the floor, crunching your abs.",
+            "Keep your lower back pressed into the floor.",
+            "Lower with control."
+        ],
+        "repRange": "12-20 reps",
         "notes": "",
         "favorite": false
     },

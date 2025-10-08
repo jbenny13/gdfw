@@ -278,6 +278,18 @@
                                 <span id="day-view-date-span" class="text-base text-secondary-text"></span>
                             </button>
                         </div>
+                        <div class="flex items-center justify-center gap-4">
+                            <button id="prev-day-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                <span id="day-view-status" class="text-sm font-bold text-secondary-text"></span>
+                                <div id="workout-status-controls" class="flex gap-2 text-sm">
+                                    <button class="status-btn btn !p-2 !py-1" data-status="full">Full</button>
+                                    <button class="status-btn btn !p-2 !py-1" data-status="partial">Partial</button>
+                                    <button class="status-btn btn !p-2 !py-1" data-status="none">None</button>
+                                </div>
+                            </div>
+                            <button id="next-day-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                        </div>
                     </div>
                      <div id="edit-mode-toolbar" class="hidden flex justify-between items-center mb-4 p-2 bg-input-bg rounded-lg">
                         <div class="flex items-center gap-2">
@@ -285,18 +297,6 @@
                             <button id="edit-mode-delete-btn" class="btn btn-secondary !p-2 !text-red-400" title="Delete Selected"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
                         <button id="edit-mode-done-btn" class="btn btn-primary">Done</button>
-                    </div>
-                    <div class="flex items-center justify-center gap-4 mb-6">
-                        <button id="prev-day-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-                        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <span id="day-view-status" class="text-sm font-bold text-secondary-text"></span>
-                            <div id="workout-status-controls" class="flex gap-2 text-sm">
-                                <button class="status-btn btn !p-2 !py-1" data-status="full">Full</button>
-                                <button class="status-btn btn !p-2 !py-1" data-status="partial">Partial</button>
-                                <button class="status-btn btn !p-2 !py-1" data-status="none">None</button>
-                            </div>
-                        </div>
-                        <button id="next-day-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
                     </div>
                     <div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mt-4">
@@ -486,46 +486,7 @@
     <div id="alert-modal" class="modal-backdrop"><div class="modal-content"><h2 id="alert-modal-title" class="text-xl font-bold mb-4">Alert</h2><p id="alert-modal-text" class="text-gray-300 mb-6"></p><div class="flex justify-end"><button id="alert-modal-ok-btn" class="btn btn-primary">OK</button></div></div></div>
     
     <script type="module">
-        // Firebase Imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, writeBatch, query, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            // --- FIREBASE & AUTH SETUP ---
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {}; 
-            
-            let app, db, auth, userId, unsubscribeAll;
-            
-            async function initializeFirebase() {
-                try {
-                    if (Object.keys(firebaseConfig).length === 0) {
-                        throw new Error("Firebase config is missing.");
-                    }
-                    app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    auth = getAuth(app);
-                    
-                    onAuthStateChanged(auth, async (user) => {
-                        if (user) {
-                            userId = user.uid;
-                            if (unsubscribeAll) unsubscribeAll.forEach(unsub => unsub());
-                            unsubscribeAll = setupFirestoreListeners();
-                        } else {
-                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                                await signInWithCustomToken(auth, __initial_auth_token);
-                            } else {
-                                await signInAnonymously(auth);
-                            }
-                        }
-                    });
-                } catch (error) {
-                    console.error("Firebase Initialization Error:", error);
-                    showCustomAlert("Connection Error", "Could not connect to the database. Please refresh the page.");
-                }
-            }
-
+        document.addEventListener('DOMContentLoaded', () => {
             // --- STATE MANAGEMENT ---
             let workoutPlan = {};
             let workoutHistory = [];
@@ -534,7 +495,7 @@
             let workoutStatusHistory = {};
             let userSettings = { unit: 'kg' };
             let currentlyLoggingExercise = null;
-            let editingWorkoutLogIndex = null;
+            let editingWorkoutLogId = null;
             let editingExerciseName = null;
             let editingWarmupIndex = null;
             let confirmCallback = null;
@@ -647,58 +608,30 @@
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { color: '#FFFFFF' }, grid: { color: 'rgba(255, 255, 255, 0.2)' } }, x: { ticks: { color: '#FFFFFF' }, grid: { color: 'rgba(255, 255, 255, 0.2)' } } }, plugins: { legend: { labels: { color: '#FFFFFF' } } } }
             });
 
-            // --- FIRESTORE FUNCTIONS ---
-            function setupFirestoreListeners() {
-                const docRef = (path) => doc(db, path);
-                const unsub1 = onSnapshot(docRef(`/artifacts/${appId}/users/${userId}/app_data/workout_plan`), (doc) => {
-                    workoutPlan = doc.exists() ? doc.data().plan : { name: "Default PPL", schedule: { "Monday": "Push", "Tuesday": "Pull", "Wednesday": "Legs", "Thursday": "Push", "Friday": "Pull", "Saturday": "Legs", "Sunday": "Rest" } };
-                    updateUI();
-                });
-                const unsub2 = onSnapshot(collection(db, `/artifacts/${appId}/users/${userId}/workout_history`), (snapshot) => {
-                    workoutHistory = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    updateUI();
-                });
-                const unsub3 = onSnapshot(docRef(`/artifacts/${appId}/public/data/exercises/default`), async (doc) => {
-                    if (doc.exists() && doc.data().exercises) {
-                        exerciseDB = doc.data().exercises;
-                    } else {
-                        await setDoc(docRef(`/artifacts/${appId}/public/data/exercises/default`), { exercises: defaultExerciseDB });
-                        exerciseDB = defaultExerciseDB;
-                    }
-                     updateUI();
-                });
-                const unsub4 = onSnapshot(collection(db, `/artifacts/${appId}/users/${userId}/custom_exercises`), (snapshot) => {
-                    const customExercises = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    const defaultExercises = exerciseDB.filter(ex => !ex.id);
-                    exerciseDB = [...defaultExercises, ...customExercises];
-                    updateUI();
-                });
-                const unsub5 = onSnapshot(docRef(`/artifacts/${appId}/users/${userId}/app_data/warmups`), (doc) => {
-                    warmups = doc.exists() ? doc.data() : JSON.parse(JSON.stringify(defaultWarmups));
-                    updateUI();
-                });
-                const unsub6 = onSnapshot(docRef(`/artifacts/${appId}/users/${userId}/app_data/workout_status`), (doc) => {
-                    workoutStatusHistory = doc.exists() ? doc.data() : {};
-                    updateUI();
-                });
-                 const unsub7 = onSnapshot(docRef(`/artifacts/${appId}/users/${userId}/app_data/settings`), (doc) => {
-                    userSettings = doc.exists() ? doc.data() : { unit: 'kg' };
-                    updateUI();
-                });
-
-                return [unsub1, unsub2, unsub3, unsub4, unsub5, unsub6, unsub7];
+            // --- LOCALSTORAGE FUNCTIONS ---
+            function saveData() {
+                localStorage.setItem('fitTrackAI_workoutPlan', JSON.stringify(workoutPlan));
+                localStorage.setItem('fitTrackAI_workoutHistory', JSON.stringify(workoutHistory));
+                localStorage.setItem('fitTrackAI_exerciseDB', JSON.stringify(exerciseDB));
+                localStorage.setItem('fitTrackAI_warmups', JSON.stringify(warmups));
+                localStorage.setItem('fitTrackAI_workoutStatus', JSON.stringify(workoutStatusHistory));
+                localStorage.setItem('fitTrackAI_userSettings', JSON.stringify(userSettings));
             }
 
-            async function saveDataToFirestore(collectionPath, data) {
-                if (!userId) return;
-                try {
-                    await setDoc(doc(db, `/artifacts/${appId}/users/${userId}/app_data/${collectionPath}`), data);
-                } catch (error) { console.error(`Error saving ${collectionPath}:`, error); }
+            function loadData() {
+                workoutPlan = JSON.parse(localStorage.getItem('fitTrackAI_workoutPlan')) || { name: "Default PPL", schedule: { "Monday": "Push", "Tuesday": "Pull", "Wednesday": "Legs", "Thursday": "Push", "Friday": "Pull", "Saturday": "Legs", "Sunday": "Rest" } };
+                workoutHistory = JSON.parse(localStorage.getItem('fitTrackAI_workoutHistory')) || [];
+                exerciseDB = JSON.parse(localStorage.getItem('fitTrackAI_exerciseDB')) || defaultExerciseDB;
+                warmups = JSON.parse(localStorage.getItem('fitTrackAI_warmups')) || defaultWarmups;
+                workoutStatusHistory = JSON.parse(localStorage.getItem('fitTrackAI_workoutStatus')) || {};
+                userSettings = JSON.parse(localStorage.getItem('fitTrackAI_userSettings')) || { unit: 'kg' };
             }
 
             // --- CORE & HELPER FUNCTIONS ---
             const getApiUrl = (model, action = 'generateContent') => {
-                 const apiKey = "";
+                // IMPORTANT: To use AI features, add your Google AI API key here.
+                // You can get one for free from Google AI Studio.
+                const apiKey = "AIzaSyDY48xF1byvU05kS9qKvN8iyrIR3hheP8w"; // <--- PASTE YOUR API KEY HERE
                 return `https://generativelanguage.googleapis.com/v1beta/models/${model}:${action}?key=${apiKey}`;
             };
             
@@ -708,7 +641,6 @@
             function showConfirmModal(title, text, onConfirm) { ui.confirmModalTitle.textContent = title; ui.confirmModalText.textContent = text; confirmCallback = onConfirm; showModal(ui.confirmModal); };
             function showCustomAlert(title, text) { ui.alertModalTitle.textContent = title; ui.alertModalText.textContent = text; showModal(ui.alertModal); };
             function updateUI() {
-                if(!userId) return;
                 updateDayView(viewDate);
                 populateProgressSelect();
                 renderProgressionChart(ui.progressExerciseSelect.value || 'general');
@@ -730,7 +662,7 @@
             
             function openWorkoutModal(exerciseName) {
                 isLogging = true; 
-                editingWorkoutLogIndex = null;
+                editingWorkoutLogId = null;
                 currentlyLoggingExercise = exerciseName;
                 ui.modalTitle.textContent = `Log: ${exerciseName}`;
                 ui.saveWorkoutBtn.textContent = 'Save Workout';
@@ -795,7 +727,7 @@
                 if (plannedExercises.length === 0) return 'none';
                 
                 const dateKey = dateToKey(date);
-                const loggedExercises = new Set(workoutHistory.filter(log => dateToKey(new Date(log.date)) === dateKey).map(log => log.name));
+                const loggedExercises = new Set(workoutHistory.filter(log => log.date === dateKey).map(log => log.name));
                 
                 const completedCount = plannedExercises.filter(ex => loggedExercises.has(ex)).length;
 
@@ -886,7 +818,7 @@
 
             function renderHistoryForDate(date) {
                 const dateKey = dateToKey(date);
-                const logsForDay = workoutHistory.filter(log => dateToKey(new Date(log.date)) === dateKey);
+                const logsForDay = workoutHistory.filter(log => log.date === dateKey);
 
                 if (logsForDay.length === 0) {
                     ui.historyDayContent.innerHTML = `<p class="text-secondary-text">No workouts logged.</p>`;
@@ -914,7 +846,7 @@
 
             ui.closeExerciseLibraryModalBtn.addEventListener('click', () => hideModal(ui.exerciseLibraryModal));
             
-            ui.addSelectedExercisesBtn.addEventListener('click', async () => {
+            ui.addSelectedExercisesBtn.addEventListener('click', () => {
                 const selected = Array.from(document.querySelectorAll('#exercise-library-list input:checked')).map(cb => cb.value);
                 if (selected.length === 0) {
                     hideModal(ui.exerciseLibraryModal);
@@ -932,7 +864,7 @@
                     } else {
                         workoutPlan.workouts.push({ day: dayType, exercises: selected });
                     }
-                    await saveDataToFirestore('workout_plan', { plan: workoutPlan });
+                    saveData();
                 } else if (libraryModalContext.purpose === 'pref') {
                     const group = libraryModalContext.group;
                     exercisePrefs[group] = selected;
@@ -943,7 +875,29 @@
             });
 
 
-            ui.getAIAdviceBtn.addEventListener('click', getAIWorkoutAdvice);
+            ui.getAIAdviceBtn.addEventListener('click', async () => {
+                const exerciseName = ui.aiAdviceExerciseSelect.value;
+                if (!exerciseName) { ui.aiAdviceOutput.innerHTML = `<p class="text-yellow-400">Please select an exercise first.</p>`; return; }
+                
+                const btn = ui.getAIAdviceBtn;
+                btn.disabled = true; btn.querySelector('.btn-text').style.display = 'none'; btn.querySelector('.loader').classList.remove('hidden'); ui.aiAdviceOutput.innerHTML = '';
+                const exerciseLogs = workoutHistory.filter(log => log.name === exerciseName).slice(-3);
+                const prompt = `Act as an expert fitness coach. A user performed these recent sessions for ${exerciseName}: ${exerciseLogs.map((log, i) => {
+                    const sets = typeof log.sets === 'string' ? JSON.parse(log.sets) : log.sets;
+                    return `Session ${i+1} (${new Date(log.date.replace(/-/g, '/')).toLocaleDateString()}): ${sets.map(set => set.map(part => `${part.weight}kg x ${part.reps} reps`).join(' + ')).join(', ')}`
+                }).join('\n')} Based on progressive overload, give a clear, actionable recommendation for their *next* session. Be specific (e.g., "Aim for 6-8 reps with 52.5kg"). Keep it under 75 words.`;
+
+                const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                    const result = await response.json();
+                    let text = result.candidates[0].content.parts[0].text;
+                    ui.aiAdviceOutput.innerHTML = `<p>${text}</p>`;
+                } catch (error) { console.error("AI Workout Advice Error:", error); ui.aiAdviceOutput.innerHTML = `<p class="text-red-400">Could not get AI advice. Make sure your API key is set correctly.</p>`;
+                } finally { btn.disabled = false; btn.querySelector('.btn-text').style.display = 'inline'; btn.querySelector('.loader').classList.add('hidden'); }
+            });
+
             ui.closeModalBtn.addEventListener('click', () => { hideModal(ui.workoutModal); isLogging = false; });
             ui.addSetBtn.addEventListener('click', () => addSetRow());
             ui.alertModalOkBtn.addEventListener('click', () => hideModal(ui.alertModal));
@@ -955,13 +909,13 @@
             ui.prevDayBtn.addEventListener('click', () => { viewDate.setDate(viewDate.getDate() - 1); updateUI(); });
             ui.nextDayBtn.addEventListener('click', () => { const today = new Date(); today.setHours(0,0,0,0); const nextDay = new Date(viewDate); nextDay.setDate(nextDay.getDate() + 1); if (nextDay.getTime() <= today.getTime()) { viewDate.setDate(viewDate.getDate() + 1); updateUI(); } });
             
-            ui.workoutStatusControls.addEventListener('click', async (e) => {
+            ui.workoutStatusControls.addEventListener('click', (e) => {
                 const btn = e.target.closest('.status-btn');
                 if (btn) {
                     const status = btn.dataset.status;
                     const dateKey = dateToKey(viewDate);
                     workoutStatusHistory[dateKey] = status;
-                    await saveDataToFirestore('workout_status', workoutStatusHistory);
+                    saveData();
                     updateWorkoutStatusControls(viewDate);
                 }
             });
@@ -1027,7 +981,7 @@
                 if (!logEntry) return;
 
                 isLogging = true;
-                editingWorkoutLogIndex = logId;
+                editingWorkoutLogId = logId;
                 currentlyLoggingExercise = logEntry.name;
                 ui.modalTitle.textContent = `Edit: ${logEntry.name}`;
                 ui.saveWorkoutBtn.textContent = 'Update Workout';
@@ -1037,31 +991,10 @@
                 showModal(ui.workoutModal);
             };
 
-            async function getAIWorkoutAdvice() {
-                const exerciseName = ui.aiAdviceExerciseSelect.value;
-                if (!exerciseName) { ui.aiAdviceOutput.innerHTML = `<p class="text-yellow-400">Please select an exercise first.</p>`; return; }
-                const btn = ui.getAIAdviceBtn;
-                btn.disabled = true; btn.querySelector('.btn-text').style.display = 'none'; btn.querySelector('.loader').classList.remove('hidden'); ui.aiAdviceOutput.innerHTML = '';
-                const exerciseLogs = workoutHistory.filter(log => log.name === exerciseName).slice(-3);
-                const prompt = `Act as an expert fitness coach. A user performed these recent sessions for ${exerciseName}: ${exerciseLogs.map((log, i) => {
-                    const sets = typeof log.sets === 'string' ? JSON.parse(log.sets) : log.sets;
-                    return `Session ${i+1} (${new Date(log.date.replace(/-/g, '/')).toLocaleDateString()}): ${sets.map(set => set.map(part => `${part.weight}kg x ${part.reps} reps`).join(' + ')).join(', ')}`
-                }).join('\n')} Based on progressive overload, give a clear, actionable recommendation for their *next* session. Be specific (e.g., "Aim for 6-8 reps with 52.5kg"). Keep it under 75 words.`;
-
-                const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
-                try {
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
-                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
-                    const result = await response.json();
-                    let text = result.candidates[0].content.parts[0].text;
-                    ui.aiAdviceOutput.innerHTML = `<p>${text}</p>`;
-                } catch (error) { console.error("AI Workout Advice Error:", error); ui.aiAdviceOutput.innerHTML = `<p class="text-red-400">Could not get AI advice.</p>`;
-                } finally { btn.disabled = false; btn.querySelector('.btn-text').style.display = 'inline'; btn.querySelector('.loader').classList.add('hidden'); }
-            }
-
             async function getAIGeneralAdvice() {
                 const userPrompt = ui.aiGeneralPrompt.value.trim();
                 if (!userPrompt) { ui.aiGeneralOutput.innerHTML = `<p class="text-yellow-400">Please enter a question.</p>`; return; }
+                
                 const btn = ui.getAIGeneralAdviceBtn;
                 btn.disabled = true; btn.querySelector('.btn-text').style.display = 'none'; btn.querySelector('.loader').classList.remove('hidden'); ui.aiGeneralOutput.innerHTML = '';
                 const twoWeeksAgo = new Date(); twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
@@ -1079,7 +1012,7 @@
                     const result = await response.json();
                     let text = result.candidates[0].content.parts[0].text;
                     ui.aiGeneralOutput.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`;
-                } catch (error) { console.error("AI General Advice Error:", error); ui.aiGeneralOutput.innerHTML = `<p class="text-red-400">Could not get AI advice.</p>`;
+                } catch (error) { console.error("AI General Advice Error:", error); ui.aiGeneralOutput.innerHTML = `<p class="text-red-400">Could not get AI advice. Make sure your API key is set correctly.</p>`;
                 } finally { btn.disabled = false; btn.querySelector('.btn-text').style.display = 'inline'; btn.querySelector('.loader').classList.add('hidden'); }
             }
 
@@ -1111,7 +1044,7 @@
             }
 
             // Event Listeners
-            ui.workoutPlanForDay.addEventListener('click', async (e) => {
+            ui.workoutPlanForDay.addEventListener('click', (e) => {
                 const logBtn = e.target.closest('.log-workout-btn');
                 const warmupBtn = e.target.closest('.warmup-detail-btn');
                 
@@ -1152,7 +1085,7 @@
                 }
             });
 
-            ui.workoutPlanForDay.addEventListener('drop', async (e) => {
+            ui.workoutPlanForDay.addEventListener('drop', (e) => {
                 e.preventDefault();
                 const list = e.target.closest('.exercise-list');
                 if (!list || !workoutPlan.workouts) return;
@@ -1163,7 +1096,7 @@
                 if (workoutIndex > -1) {
                     const newOrder = Array.from(list.querySelectorAll('.exercise-item')).map(item => item.dataset.exerciseName);
                     workoutPlan.workouts[workoutIndex].exercises = newOrder;
-                    await saveDataToFirestore('workout_plan', { plan: workoutPlan });
+                    saveData();
                 }
             });
 
@@ -1188,44 +1121,67 @@
                 const deleteBtn = e.target.closest('.delete-history-btn');
                 if (editBtn) openEditWorkoutModal(editBtn.dataset.id);
                 if (deleteBtn) {
-                    const docId = deleteBtn.dataset.id;
-                    showConfirmModal('Delete Log?', 'Are you sure?', async () => {
-                        await deleteDoc(doc(db, `/artifacts/${appId}/users/${userId}/workout_history/${docId}`));
+                    const logId = deleteBtn.dataset.id;
+                    showConfirmModal('Delete Log?', 'Are you sure?', () => {
+                        workoutHistory = workoutHistory.filter(log => log.id !== logId);
+                        saveData();
+                        updateUI();
                     });
                 }
             });
 
             ui.closeExerciseDetailModalBtn.addEventListener('click', () => hideModal(ui.exerciseDetailModal));
             ui.logFromDetailBtn.addEventListener('click', () => { hideModal(ui.exerciseDetailModal); openWorkoutModal(currentlyLoggingExercise); });
-            ui.saveExerciseNotesBtn.addEventListener('click', async () => { 
-                const ex = exerciseDB.find(e => e.name === currentlyLoggingExercise); 
-                if (ex) { 
-                    ex.notes = ui.exerciseDetailNotes.value; 
-                    if(ex.id){
-                         await setDoc(doc(db, `/artifacts/${appId}/users/${userId}/custom_exercises/${ex.id}`), ex, {merge: true});
-                    } else {
-                        const defaultExercises = exerciseDB.filter(e => !e.id);
-                        await setDoc(doc(db, `/artifacts/${appId}/public/data/exercises/default`), { exercises: defaultExercises }, { merge: true });
-                    }
+            
+            ui.saveExerciseNotesBtn.addEventListener('click', () => { 
+                const exIndex = exerciseDB.findIndex(e => e.name === currentlyLoggingExercise); 
+                if (exIndex > -1) { 
+                    exerciseDB[exIndex].notes = ui.exerciseDetailNotes.value;
+                    saveData();
                     const btn = ui.saveExerciseNotesBtn; btn.textContent = 'Saved!'; setTimeout(() => { btn.textContent = 'Save Notes'; }, 2000); 
                 }
             });
+
             ui.manageWarmupsBtn.addEventListener('click', () => { editingWarmupIndex = null; ui.warmupForm.reset(); ui.warmupFormTitle.textContent = "Add New Warm-up"; ui.saveWarmupBtn.textContent = "Add"; ui.warmupDaySelect.innerHTML = [...new Set(Object.values(workoutPlan.schedule || {}))].filter(d => d !== 'Rest').map(day => `<option value="${day}">${day}</option>`).join(''); renderWarmupManagementList(); showModal(ui.warmupManageModal); });
             ui.closeWarmupManageModalBtn.addEventListener('click', () => hideModal(ui.warmupManageModal));
             ui.warmupDaySelect.addEventListener('change', () => { editingWarmupIndex = null; ui.warmupForm.reset(); ui.warmupFormTitle.textContent = "Add"; ui.saveWarmupBtn.textContent = "Add"; renderWarmupManagementList(); });
-            ui.warmupListDiv.addEventListener('click', (e) => { /* Logic handled by workoutPlanForDay listener */ });
-            ui.warmupForm.addEventListener('submit', async (e) => {
+            
+            ui.warmupListDiv.addEventListener('click', (e) => {
+                const editBtn = e.target.closest('.edit-warmup-btn');
+                const deleteBtn = e.target.closest('.delete-warmup-btn');
+                const dayType = e.target.closest('[data-day-type]')?.dataset.dayType;
+                if (!dayType) return;
+                
+                if(editBtn){
+                    const index = parseInt(editBtn.dataset.index);
+                    const warmup = warmups[dayType][index];
+                    editingWarmupIndex = index;
+                    ui.warmupNameInput.value = warmup.name;
+                    ui.warmupInstructionsInput.value = Array.isArray(warmup.instructions) ? warmup.instructions.join('\n') : '';
+                    ui.warmupFormTitle.textContent = "Edit Warm-up";
+                    ui.saveWarmupBtn.textContent = "Update";
+                }
+                if(deleteBtn){
+                    const index = parseInt(deleteBtn.dataset.index);
+                     warmups[dayType].splice(index, 1);
+                    saveData();
+                    renderWarmupManagementList();
+                    updateUI();
+                }
+            });
+
+            ui.warmupForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const day = ui.warmupDaySelect.value, name = ui.warmupNameInput.value.trim(), instructions = ui.warmupInstructionsInput.value.split('\n').filter(l => l.trim() !== '');
                 if (!name) return;
                 const newWarmup = { name, instructions, repRange: "As needed", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Warm-up" };
                 if (!warmups[day]) warmups[day] = [];
                 if (editingWarmupIndex !== null) { warmups[day][editingWarmupIndex] = newWarmup; } else { warmups[day].push(newWarmup); }
-                await saveDataToFirestore('warmups', warmups);
+                saveData();
                 renderWarmupManagementList(); updateUI(); ui.warmupForm.reset(); editingWarmupIndex = null; ui.warmupFormTitle.textContent = "Add"; ui.saveWarmupBtn.textContent = "Add";
             });
             
-             ui.workoutLogForm.addEventListener('submit', async (e) => {
+             ui.workoutLogForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 let formIsValid = true;
                 document.querySelectorAll('.set-row .set-part-row').forEach(partRow => {
@@ -1255,34 +1211,39 @@
                 if(sets.length === 0) return showCustomAlert('Empty Workout', 'Please log at least one valid set.');
                 
                 const dateString = dateToKey(viewDate);
-                const newLog = { name: currentlyLoggingExercise, date: dateString, sets: JSON.stringify(sets), createdAt: new Date() };
                 
-                if (editingWorkoutLogIndex !== null) {
-                    await setDoc(doc(db, `/artifacts/${appId}/users/${userId}/workout_history/${editingWorkoutLogIndex}`), newLog);
+                if (editingWorkoutLogId) {
+                    const logIndex = workoutHistory.findIndex(log => log.id === editingWorkoutLogId);
+                    if(logIndex > -1){
+                        workoutHistory[logIndex].sets = JSON.stringify(sets);
+                        workoutHistory[logIndex].date = dateString;
+                        workoutHistory[logIndex].name = currentlyLoggingExercise;
+                    }
                 } else {
-                    await setDoc(doc(collection(db, `/artifacts/${appId}/users/${userId}/workout_history`)), newLog);
+                     const newLog = { id: crypto.randomUUID(), name: currentlyLoggingExercise, date: dateString, sets: JSON.stringify(sets), createdAt: new Date().toISOString() };
+                     workoutHistory.push(newLog);
                 }
 
-                editingWorkoutLogIndex = null;
+                editingWorkoutLogId = null;
                 if (workoutStatusHistory[dateString] !== undefined) {
                     delete workoutStatusHistory[dateString];
-                    await saveDataToFirestore('workout_status', workoutStatusHistory);
                 }
-                
-                updateUI(); hideModal(ui.workoutModal); isLogging = false;
+                saveData();
+                updateUI();
+                hideModal(ui.workoutModal);
+                isLogging = false;
             });
+
             ui.setsContainer.addEventListener('click', (e) => {
                 const removeSetBtn = e.target.closest('.remove-set-btn'), removePartBtn = e.target.closest('.remove-part-btn');
                 if (removeSetBtn) { removeSetBtn.closest('.set-row').remove(); document.querySelectorAll('.set-row').forEach((row, index) => { row.querySelector('label').textContent = `Set ${index + 1}`; }); }
                 else if (removePartBtn) { const partRow = removePartBtn.closest('.set-part-row'), partsContainer = partRow.parentElement; if (partsContainer.children.length > 1) { partRow.remove(); } else { showCustomAlert("Action blocked", "A set must have at least one part."); } }
             });
-            ui.clearHistoryBtn.addEventListener('click', () => { showConfirmModal('Clear History?', 'This will delete all workout logs.', async () => { 
-                const q = query(collection(db, `/artifacts/${appId}/users/${userId}/workout_history`));
-                const querySnapshot = await getDocs(q);
-                const batch = writeBatch(db);
-                querySnapshot.forEach((doc) => batch.delete(doc.ref));
-                await batch.commit();
-                await saveDataToFirestore('workout_status', {});
+            ui.clearHistoryBtn.addEventListener('click', () => { showConfirmModal('Clear History?', 'This will delete all workout logs.', () => { 
+                workoutHistory = [];
+                workoutStatusHistory = {};
+                saveData();
+                updateUI();
             })});
             if (ui.planActionsBtn) {
                 ui.planActionsBtn.addEventListener('click', (e) => { 
@@ -1293,8 +1254,10 @@
             }
 
              ui.deletePlanBtn.addEventListener('click', () => {
-                showConfirmModal('Delete Plan?', 'This will delete your current workout plan and schedule. This action cannot be undone.', async () => {
-                    await saveDataToFirestore('workout_plan', { plan: { name: "No Plan", schedule: {}, workouts: [] } });
+                showConfirmModal('Delete Plan?', 'This will delete your current workout plan and schedule. This action cannot be undone.', () => {
+                    workoutPlan = { name: "No Plan", schedule: {}, workouts: [] };
+                    saveData();
+                    updateUI();
                     showCustomAlert("Plan Deleted", "Your workout plan has been removed.");
                 });
                 ui.planActionsDropdown.classList.add('hidden');
@@ -1436,14 +1399,14 @@
                 filterSelect.value = group;
                 searchInput.value = '';
                 
-                const preSelected = exercisePrefs[group] || [];
+                const preSelected = exercisePrefs[group];
 
                 const renderLibrary = (filter = '', search = '') => {
                     libraryList.innerHTML = exerciseDB
                         .filter(ex => (filter ? ex.group === filter : true) && (search ? ex.name.toLowerCase().includes(search.toLowerCase()) : true))
                         .sort((a,b) => a.name.localeCompare(b.name))
                         .map(ex => `<label class="flex items-center gap-3 p-2 rounded-md hover:bg-input-bg">
-                            <input type="checkbox" value="${ex.name}" ${preSelected.includes(ex.name) ? 'checked' : ''} class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500">
+                            <input type="checkbox" value="${ex.name}" ${preSelected === undefined || preSelected.includes(ex.name) ? 'checked' : ''} class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500">
                             <div><p>${ex.name}</p><p class="text-xs text-secondary-text">${ex.group}</p></div>
                         </label>`).join('');
                 };
@@ -1464,12 +1427,14 @@
                     return;
                 }
                 
-                container.innerHTML = checkedMuscles.map(muscle => `
+                container.innerHTML = checkedMuscles.map(muscle => {
+                    const prefCount = (exercisePrefs[muscle] || exerciseDB.filter(ex => ex.group === muscle)).length;
+                    return `
                     <button type="button" class="btn btn-secondary w-full justify-between" data-group="${muscle}">
                         <span>${muscle}</span>
-                        <span class="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full" id="pref-count-${muscle}">${(exercisePrefs[muscle] || []).length} selected</span>
+                        <span class="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full" id="pref-count-${muscle}">${prefCount} selected</span>
                     </button>
-                `).join('');
+                `}).join('');
 
                 container.querySelectorAll('button').forEach(btn => {
                     btn.addEventListener('click', () => openExerciseLibrary(btn.dataset.group));
@@ -1487,6 +1452,7 @@
 
             ui.aiPlanGeneratorForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+
                 const btn = e.target.querySelector('button[type="submit"]');
                 btn.disabled = true;
                 btn.querySelector('.loader').classList.remove('hidden');
@@ -1518,7 +1484,7 @@
                     const goalText = goal === 'custom' ? document.getElementById('ai-plan-goal-text').value : goal;
                     const unit = document.getElementById('ai-plan-unit').value;
                     userSettings.unit = unit; 
-                    await saveDataToFirestore('settings', userSettings);
+                    saveData();
                     
                     const defaultSets = document.getElementById('ai-plan-default-sets').value;
                     const targetSets = {};
@@ -1573,11 +1539,13 @@
                 }
             });
             ui.cancelNewPlanBtn.addEventListener('click', () => ui.aiPlanOutput.classList.add('hidden'));
-            ui.saveNewPlanBtn.addEventListener('click', async () => {
+            ui.saveNewPlanBtn.addEventListener('click', () => {
                 try {
                     const newPlan = JSON.parse(ui.aiPlanJsonOutput.textContent);
                     delete newPlan.reasoning;
-                    await saveDataToFirestore('workout_plan', { plan: newPlan });
+                    workoutPlan = newPlan;
+                    saveData();
+                    updateUI();
                     hideModal(ui.aiPlanGeneratorModal);
                     showCustomAlert("Success", "Your new workout plan has been applied!");
                 } catch (error) {
@@ -1646,7 +1614,7 @@
 
                 } catch (error) {
                     console.error("AI Custom Exercise Error:", error);
-                    showCustomAlert("AI Error", "Could not generate all details. Please try again or fill them manually.");
+                    showCustomAlert("AI Error", "Could not generate all details. Please try again or fill them manually. Make sure your API key is set correctly.");
                 } finally {
                     ui.customExerciseImgLoader.classList.add('hidden');
                     ui.customExerciseImg.classList.remove('hidden');
@@ -1670,11 +1638,13 @@
             });
 
 
-            ui.customExerciseForm.addEventListener('submit', async(e) => {
+            ui.customExerciseForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const imageUrl = document.getElementById('custom-img-url').value.trim();
 
                 const newExercise = {
+                    id: crypto.randomUUID(), // Add ID for custom exercises
+                    isCustom: true,
                     name: ui.customExerciseNameInput.value.trim(),
                     instructions: ui.customExerciseInstructions.value.split('\n'),
                     repRange: ui.customExerciseRepRange.value,
@@ -1689,8 +1659,8 @@
                     return;
                 }
                 
-                // Add to user's custom collection
-                await setDoc(doc(collection(db, `/artifacts/${appId}/users/${userId}/custom_exercises`)), newExercise);
+                exerciseDB.push(newExercise);
+                saveData();
                 
                 hideModal(ui.customExerciseModal);
                 showCustomAlert("Success", "Custom exercise saved!");
@@ -1709,7 +1679,7 @@
                 ui.editModeToolbar.classList.add('hidden');
             });
 
-            ui.editModeDeleteBtn.addEventListener('click', async () => {
+            ui.editModeDeleteBtn.addEventListener('click', () => {
                 const dayType = getWorkoutDayType(viewDate);
                 const workoutIndex = workoutPlan.workouts?.findIndex(w => w.day === dayType);
                 if (workoutIndex > -1) {
@@ -1717,50 +1687,31 @@
                     if (selected.size === 0) return;
                     
                     workoutPlan.workouts[workoutIndex].exercises = workoutPlan.workouts[workoutIndex].exercises.filter(ex => !selected.has(ex));
-                    await saveDataToFirestore('workout_plan', { plan: workoutPlan });
+                    saveData();
+                    updateUI();
                 }
             });
 
-            ui.editModeFavoriteBtn.addEventListener('click', async () => {
+            ui.editModeFavoriteBtn.addEventListener('click', () => {
                 const selected = Array.from(ui.workoutPlanForDay.querySelectorAll('.edit-mode-controls input:checked')).map(cb => cb.value);
                 if(selected.length === 0) return;
 
-                const updates = {};
                 selected.forEach(exName => {
-                    const exercise = exerciseDB.find(ex => ex.name === exName);
-                    if(exercise) {
-                        exercise.favorite = !exercise.favorite;
-                        if(exercise.id) {
-                            updates[`custom-${exercise.id}`] = exercise;
-                        } else {
-                            updates[`default-${exercise.name}`] = exercise;
-                        }
+                    const exIndex = exerciseDB.findIndex(ex => ex.name === exName);
+                    if(exIndex > -1) {
+                         exerciseDB[exIndex].favorite = !exerciseDB[exIndex].favorite;
                     }
                 });
-
-                const customUpdates = Object.values(updates).filter(ex => ex.id);
-                const defaultDB = exerciseDB.filter(ex => !ex.id);
-
-                const batch = writeBatch(db);
-                customUpdates.forEach(ex => {
-                    const docRef = doc(db, `/artifacts/${appId}/users/${userId}/custom_exercises/${ex.id}`);
-                    batch.set(docRef, ex, { merge: true });
-                });
-                
-                if(Object.keys(updates).some(k => k.startsWith('default'))) {
-                    const docRef = doc(db, `/artifacts/${appId}/public/data/exercises/default`);
-                    batch.set(docRef, { exercises: defaultDB }, { merge: true });
-                }
-
-                await batch.commit();
+                saveData();
+                updateUI();
             });
-
 
             // Unload protection
             window.addEventListener('beforeunload', (e) => { if (isLogging) { e.preventDefault(); e.returnValue = ''; } });
 
             // --- INITIALIZATION ---
-            await initializeFirebase();
+            loadData();
+            updateUI();
         });
     </script>
 </body>

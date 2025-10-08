@@ -237,6 +237,12 @@
         details[open] > summary .lucide-chevron-down {
             transform: rotate(180deg);
         }
+        .submenu {
+            display: none;
+        }
+        .group:hover .submenu, .group.open .submenu {
+            display: block;
+        }
 
     </style>
 </head>
@@ -310,11 +316,32 @@
                                     <div class="relative">
                                         <button id="plan-actions-btn" class="btn btn-secondary !p-1.5"><i data-lucide="settings-2" class="w-4 h-4"></i></button>
                                         <div id="plan-actions-dropdown" class="absolute right-0 mt-2 w-56 border border-border-color rounded-md shadow-lg hidden actions-dropdown">
-                                            <button id="edit-plan-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-t-md"><i data-lucide="edit" class="w-4 h-4"></i> Edit Plan</button>
-                                            <button id="add-exercise-to-plan-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2"><i data-lucide="list-plus" class="w-4 h-4"></i> Add Exercises</button>
-                                            <button id="manage-warmups-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2"><i data-lucide="flame" class="w-4 h-4"></i> Manage Warm-ups</button>
-                                            <button id="add-custom-exercise-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4"></i> Add Custom Exercise</button>
-                                            <button id="delete-plan-btn" class="w-full text-left px-4 py-2 text-sm btn-danger hover:bg-input-bg flex items-center gap-2 rounded-b-md"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete Plan</button>
+                                            <div class="relative group" data-menu-item>
+                                                <div class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center justify-between rounded-t-md cursor-pointer">
+                                                    <span><i data-lucide="clipboard-list" class="w-4 h-4 inline-block mr-2"></i>Plan Settings</span><i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                                </div>
+                                                <div class="absolute left-full -top-px ml-1 w-56 border border-border-color rounded-md shadow-lg submenu bg-card-bg">
+                                                    <button id="edit-plan-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-t-md"><i data-lucide="edit" class="w-4 h-4"></i> Edit Plan</button>
+                                                    <button id="delete-plan-btn" class="w-full text-left px-4 py-2 text-sm btn-danger hover:bg-input-bg flex items-center gap-2 rounded-b-md"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete Plan</button>
+                                                </div>
+                                            </div>
+                                            <div class="relative group" data-menu-item>
+                                                <div class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center justify-between cursor-pointer">
+                                                    <span><i data-lucide="dumbbell" class="w-4 h-4 inline-block mr-2"></i>Exercise Settings</span><i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                                </div>
+                                                <div class="absolute left-full -top-px ml-1 w-56 border border-border-color rounded-md shadow-lg submenu bg-card-bg">
+                                                    <button id="add-exercise-to-plan-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-t-md"><i data-lucide="list-plus" class="w-4 h-4"></i> Add Exercise to Plan</button>
+                                                    <button id="manage-library-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-b-md"><i data-lucide="library" class="w-4 h-4"></i> Manage Library</button>
+                                                </div>
+                                            </div>
+                                            <div class="relative group" data-menu-item>
+                                                <div class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center justify-between rounded-b-md cursor-pointer">
+                                                     <span><i data-lucide="flame" class="w-4 h-4 inline-block mr-2"></i>Warm-up Settings</span><i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                                </div>
+                                                <div class="absolute left-full -top-px ml-1 w-56 border border-border-color rounded-md shadow-lg submenu bg-card-bg">
+                                                     <button id="manage-warmups-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-md"><i data-lucide="flame" class="w-4 h-4"></i> Manage Warm-ups</button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -323,12 +350,7 @@
                             <div>
                                 <div class="flex justify-between items-center mb-2 border-b border-border-color pb-1">
                                     <h5 class="font-semibold text-lg">History</h5>
-                                    <div class="relative">
-                                        <button id="history-actions-btn" class="btn btn-secondary !p-1.5"><i data-lucide="history" class="w-4 h-4"></i></button>
-                                        <div id="history-actions-dropdown" class="absolute right-0 mt-2 w-56 border border-border-color rounded-md shadow-lg hidden actions-dropdown">
-                                             <button id="clear-history-btn" class="w-full text-left px-4 py-2 text-sm btn-danger hover:bg-input-bg flex items-center gap-2 rounded-md"><i data-lucide="trash-2" class="w-4 h-4"></i> Clear All History</button>
-                                        </div>
-                                    </div>
+                                    <button id="clear-history-btn" class="btn btn-secondary !p-1.5 !text-red-400" title="Clear All History"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                                 </div>
                                 <div id="history-day-content" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar pr-2">
                                     <p class="text-secondary-text">No workouts logged.</p>
@@ -484,7 +506,7 @@
             </div>
         </div>
     </div>
-    <div id="custom-exercise-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-6"><h2 id="custom-exercise-modal-title" class="text-2xl font-bold">Add Custom Exercise</h2><button id="close-custom-exercise-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div id="custom-exercise-initial-choice" class="flex gap-4"><button id="custom-exercise-ai-choice-btn" class="btn btn-primary w-full"><i data-lucide="sparkles"></i>Use AI Assistant</button><button id="custom-exercise-manual-choice-btn" class="btn btn-secondary w-full"><i data-lucide="edit-3"></i>Enter Manually</button></div><form id="custom-exercise-form" class="hidden space-y-4 mt-4"><div><label for="custom-exercise-name" class="form-label">Exercise Name *</label><div class="flex gap-2"><input type="text" id="custom-exercise-name" class="form-input" required placeholder="e.g., Kneeling Landmine Press"><button type="button" id="ai-generate-exercise-details-btn" class="btn btn-secondary !px-3 hidden"><i data-lucide="sparkles"></i></button></div></div><div id="custom-exercise-details-container" class="space-y-4 pt-4 border-t border-border-color"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-border-color"><div id="custom-exercise-img-loader" class="loader hidden"></div><img id="custom-exercise-img" src="" class="w-full h-full object-contain hidden"></div><div class="grid grid-cols-2 gap-2"><label for="custom-img-upload" class="btn btn-secondary !py-1 text-xs cursor-pointer">Upload Image<input type="file" id="custom-img-upload" class="hidden" accept="image/*"></label><input type="url" id="custom-img-url" class="form-input !py-1 text-xs" placeholder="Or paste image/video URL"></div><div><label for="custom-exercise-instructions" class="form-label">Instructions</label><textarea id="custom-exercise-instructions" rows="5" class="form-input mt-1"></textarea></div><div><label for="custom-exercise-rep-range" class="form-label">Rep Range</label><input type="text" id="custom-exercise-rep-range" class="form-input mt-1"></div><div class="grid grid-cols-2 gap-4"><div><label for="custom-exercise-group" class="form-label">Muscle Group</label><select id="custom-exercise-group" class="form-select mt-1"></select></div><div><label for="custom-exercise-type" class="form-label">Equipment</label><select id="custom-exercise-type" class="form-select mt-1"><option>Barbell</option><option>Dumbbell</option><option>Machine</option><option>Cable</option><option>Bodyweight</option><option>Other</option></select></div></div><button type="submit" id="save-custom-exercise-btn" class="w-full btn btn-primary">Save Custom Exercise</button></div></form></div></div>
+    <div id="custom-exercise-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-6"><h2 id="custom-exercise-modal-title" class="text-2xl font-bold">Add Custom Exercise</h2><button id="close-custom-exercise-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div id="custom-exercise-initial-choice" class="flex gap-4"><button id="custom-exercise-ai-choice-btn" class="btn btn-primary w-full"><i data-lucide="sparkles"></i>Use AI Assistant</button><button id="custom-exercise-manual-choice-btn" class="btn btn-secondary w-full"><i data-lucide="edit-3"></i>Enter Manually</button></div><form id="custom-exercise-form" class="hidden space-y-4 mt-4"><div><label for="custom-exercise-name" class="form-label">Exercise Name *</label><div class="flex gap-2"><input type="text" id="custom-exercise-name" class="form-input" required placeholder="e.g., Kneeling Landmine Press"><button type="button" id="ai-generate-exercise-details-btn" class="btn btn-secondary !px-3 hidden"><i data-lucide="sparkles"></i></button></div></div><div id="custom-exercise-details-container" class="space-y-4 pt-4 border-t border-border-color"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-border-color"><div id="custom-exercise-img-loader" class="loader hidden"></div><img id="custom-exercise-img" src="" class="w-full h-full object-contain hidden"></div><div class="grid grid-cols-2 gap-2"><label for="custom-img-upload" class="btn btn-secondary !py-1 text-xs cursor-pointer">Upload Image<input type="file" id="custom-img-upload" class="hidden" accept="image/*"></label><input type="url" id="custom-img-url" class="form-input !py-1 text-xs" placeholder="Or paste image/video URL"></div><div><label for="custom-exercise-instructions" class="form-label">Instructions</label><textarea id="custom-exercise-instructions" rows="5" class="form-input mt-1"></textarea></div><div><label for="custom-exercise-rep-range" class="form-label">Rep Range</label><input type="text" id="custom-exercise-rep-range" class="form-input mt-1"></div><div class="grid grid-cols-2 gap-4"><div><label for="custom-exercise-group" class="form-label">Muscle Group</label><select id="custom-exercise-group" class="form-select mt-1"></select></div><div><label for="custom-exercise-type" class="form-label">Equipment</label><select id="custom-exercise-type" class="form-select mt-1"><option>Barbell</option><option>Dumbbell</option><option>Machine</option><option>Cable</option><option>Bodyweight</option><option>Other</option></select></div></div><div id="custom-exercise-action-buttons" class="flex flex-col sm:flex-row gap-2 pt-2"></div></div></form></div></div>
     <div id="exercise-detail-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 id="exercise-detail-title" class="text-2xl font-bold">Exercise Details</h2><button id="close-exercise-detail-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-gray-800"><img id="exercise-detail-video" src="" alt="Exercise demonstration" class="w-full h-full object-contain"></div><div class="custom-scrollbar overflow-y-auto max-h-48 pr-2"><h3 class="font-bold text-lg text-blue-400 mb-2">Instructions</h3><textarea id="exercise-detail-instructions" rows="6" class="form-input mt-1 w-full bg-input-bg"></textarea><button id="save-instructions-btn" class="mt-2 w-full btn btn-secondary">Save Instructions</button></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Rep Range</h3><p id="exercise-detail-rep-range" class="text-gray-300"></p></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Personal Notes & Advice</h3><textarea id="exercise-detail-notes" rows="4" class="form-input mt-1" placeholder="Add your personal cues, weight progression goals, etc."></textarea><button id="save-exercise-notes-btn" class="mt-2 w-full btn btn-secondary">Save Notes</button></div><button id="log-from-detail-btn" class="w-full btn btn-primary mt-4">Log This Exercise</button></div></div></div>
     <div id="warmup-manage-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Manage Warm-ups</h2><button id="close-warmup-manage-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div><label for="warmup-day-select" class="form-label">Workout Day</label><select id="warmup-day-select" class="form-select mt-1"></select></div><div id="warmup-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div><hr class="border-gray-800"><form id="warmup-form" class="space-y-3"><h3 id="warmup-form-title" class="font-bold text-lg text-blue-400">Add New Warm-up</h3><div><label for="warmup-name" class="form-label">Name</label><input type="text" id="warmup-name" class="form-input mt-1" required></div><div><label for="warmup-instructions" class="form-label">Instructions (one per line)</label><textarea id="warmup-instructions" rows="4" class="form-input mt-1"></textarea></div><button type="submit" id="save-warmup-btn" class="w-full btn btn-primary">Add Warm-up</button></form></div></div></div>
     <div id="workout-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="modal-title" class="text-2xl font-bold">Log Exercise</h2><div class="flex items-center gap-1 border border-border-color rounded-lg p-1"><button type="button" id="unit-toggle-kg" class="btn !py-1 !px-3 text-sm unit-toggle-btn">kg</button><button type="button" id="unit-toggle-lbs" class="btn !py-1 !px-3 text-sm unit-toggle-btn">lbs</button></div><button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="workout-log-form"><div class="space-y-4"><div id="sets-container"></div><button type="button" id="add-set-btn" class="w-full btn btn-secondary">Add Set</button><button type="submit" id="save-workout-btn" class="w-full btn btn-primary mt-2">Save Workout</button></div></form></div></div>
@@ -503,7 +525,7 @@
             let userSettings = { unit: 'kg' };
             let currentlyLoggingExercise = null;
             let editingWorkoutLogId = null;
-            let editingExerciseName = null;
+            let editingExerciseId = null;
             let editingWarmupIndex = null;
             let confirmCallback = null;
             let viewDate = new Date();
@@ -519,61 +541,22 @@
             // --- DATABASE DEFAULTS ---
             const exercisesJsonContent = `
 [
-    { "name": "Flat Barbell Bench Press", "group": "Chest", "type": "Barbell", "instructions": ["Lie flat on the bench with your feet on the floor.", "Grip the bar slightly wider than shoulder-width.", "Lower the bar to your mid-chest, keeping your elbows tucked at about a 45-degree angle.", "Press the bar back up to the starting position."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Incline Barbell Bench Press", "group": "Chest", "type": "Barbell", "instructions": ["Set a bench to a 30-45 degree incline.", "Lie on the bench and grip the bar slightly wider than shoulder-width.", "Unrack the bar and lower it to your upper chest.", "Press the bar back up until your arms are fully extended."], "repRange": "8-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Decline Barbell Bench Press", "group": "Chest", "type": "Barbell", "instructions": ["Secure your legs at the end of a decline bench.", "Lie back and grip the bar with a medium-width grip.", "Lift the bar from the rack and lower it to your lower chest.", "Press the bar back to the starting position."], "repRange": "8-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Incline Dumbbell Press", "group": "Chest", "type": "Dumbbell", "instructions": ["Set a bench to a 30-45 degree incline.", "Sit and place dumbbells on your thighs.", "Kick the weights up to your shoulders and lie back.", "Press the dumbbells up and together over your chest.", "Lower them slowly with control."], "repRange": "8-15 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Flat Dumbbell Press", "group": "Chest", "type": "Dumbbell", "instructions": ["Lie on a flat bench with a dumbbell in each hand.", "Hold the dumbbells at the sides of your chest, palms facing forward.", "Press the dumbbells up until your arms are fully extended.", "Lower the dumbbells slowly to the starting position."], "repRange": "8-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Dumbbell Flyes", "group": "Chest", "type": "Dumbbell", "instructions": ["Lie on a flat bench with a dumbbell in each hand, palms facing each other.", "Press the weights above your chest.", "With a slight bend in your elbows, lower the weights out to your sides in a wide arc.", "Bring the weights back to the starting position using your chest muscles."], "repRange": "10-15 reps", "notes": "", "favorite": false },
-    { "name": "Pec Deck Fly", "group": "Chest", "type": "Machine", "instructions": ["Sit on the machine with your back flat against the pad.", "Place your forearms on the padded levers or grab the handles.", "Bring the levers together in a hugging motion, squeezing your chest.", "Return slowly to the start."], "repRange": "10-20 reps", "notes": "", "favorite": false },
-    { "name": "Machine Chest Press", "group": "Chest", "type": "Machine", "instructions": ["Sit on the machine and adjust the seat so the handles are at chest level.", "Grab the handles and press forward until your arms are fully extended.", "Return slowly to the starting position."], "repRange": "8-12 reps", "notes": "", "favorite": false },
-    { "name": "High-to-low Cable Crossover", "group": "Chest", "type": "Cable", "instructions": ["Set pulleys to a high position.", "Grab the handles and step forward to create tension.", "With a slight bend in your elbows, pull the handles down and across your body.", "Squeeze your chest at the peak contraction."], "repRange": "10-15 reps", "notes": "", "favorite": false },
-    { "name": "Push Up", "group": "Chest", "type": "Bodyweight", "instructions": ["Start in a high plank position with hands under your shoulders.", "Lower your body until your chest nearly touches the floor.", "Push back up to the starting position, keeping your body in a straight line."], "repRange": "As many as possible", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Overhead Press", "group": "Shoulders", "type": "Barbell", "instructions": ["Stand with the bar on your front shoulders, hands just outside shoulder-width.", "Press the bar straight overhead until your arms are fully extended.", "Lower the bar back to your shoulders with control."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Seated Dumbbell Press", "group": "Shoulders", "type": "Dumbbell", "instructions": ["Sit on a bench with back support, holding dumbbells at shoulder height.", "Press the dumbbells overhead until your arms are fully extended.", "Lower the dumbbells back to the starting position with control."], "repRange": "8-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Dumbbell Lateral Raise", "group": "Shoulders", "type": "Dumbbell", "instructions": ["Stand holding dumbbells at your sides with palms facing in.", "With a slight bend in your elbows, raise the weights out to your sides until they reach shoulder height.", "Lower with control."], "repRange": "12-20 reps", "notes": "", "favorite": false },
-    { "name": "Reverse Pec Deck", "group": "Shoulders", "type": "Machine", "instructions": ["Sit facing the machine with your chest against the pad.", "Grab the handles with an overhand grip.", "Keeping your arms mostly straight, pull your arms back, squeezing your rear delts and upper back.", "Return to the start with control."], "repRange": "12-20 reps", "notes": "", "favorite": false },
-    { "name": "Cable Lateral Raise", "group": "Shoulders", "type": "Cable", "instructions": ["Stand sideways to a low pulley cable machine.", "Grab the handle with your outside hand.", "Raise your arm out to the side until it's parallel to the floor.", "Lower with control and repeat."], "repRange": "12-15 reps", "notes": "", "favorite": false },
-    { "name": "Pike Pushups", "group": "Shoulders", "type": "Bodyweight", "instructions": ["Get into a downward dog yoga position.", "Bend your elbows to lower the top of your head towards the floor.", "Press back up to the starting position.", "Keep your legs as straight as possible."], "repRange": "8-15 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Tricep Pushdown", "group": "Triceps", "type": "Cable", "instructions": ["Attach a straight bar or rope to a high pulley.", "Grab the attachment with an overhand grip and push down until your arms are fully extended.", "Keep your elbows pinned to your sides.", "Slowly let the attachment return to the starting position."], "repRange": "10-20 reps", "notes": "", "favorite": false },
-    { "name": "Skull Crushers", "group": "Triceps", "type": "Barbell", "instructions": ["Lie on a flat bench holding an EZ bar or barbell above your chest.", "Lower the bar towards your forehead by bending only at the elbows.", "Extend your arms to press the weight back to the start, focusing on the triceps contraction."], "repRange": "8-15 reps", "notes": "", "favorite": false },
-    { "name": "Dumbbell Overhead Tricep Extension", "group": "Triceps", "type": "Dumbbell", "instructions": ["Sit on a bench and hold one dumbbell with both hands over your head.", "Lower the dumbbell behind your head by bending your elbows.", "Extend your arms to lift the dumbbell back to the starting position.", "Keep your upper arms stationary throughout."], "repRange": "10-15 reps", "notes": "", "favorite": false },
-    { "name": "Dips", "group": "Triceps", "type": "Bodyweight", "instructions": ["Use parallel bars or two sturdy chairs.", "Lower your body by bending your elbows until your shoulders are below your elbows.", "Push back up to the starting position."], "repRange": "8-15 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Pull Ups", "group": "Back", "type": "Bodyweight", "instructions": ["Hang from a pull-up bar with an overhand grip, slightly wider than your shoulders.", "Pull your chest up to the bar, leading with your chest and squeezing your back.", "Lower yourself down with control."], "repRange": "As many as possible", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Barbell Row", "group": "Back", "type": "Barbell", "instructions": ["Stand with your feet shoulder-width apart, holding a barbell with an overhand grip.", "Hinge at your hips until your torso is nearly parallel to the floor.", "Pull the bar towards your lower chest/upper abdomen, squeezing your back muscles.", "Lower the bar with control."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Single Arm Dumbbell Row", "group": "Back", "type": "Dumbbell", "instructions": ["Place one knee and one hand on a flat bench.", "Hold a dumbbell in the other hand with your arm extended.", "Pull the dumbbell up to the side of your chest, squeezing your back.", "Lower the dumbbell with control."], "repRange": "8-12 reps", "notes": "", "favorite": false },
-    { "name": "Lat Pulldown", "group": "Back", "type": "Machine", "instructions": ["Sit at the machine and grab the bar with a wide overhand grip.", "Pull the bar down to your upper chest, keeping your torso upright.", "Squeeze your lats at the bottom.", "Slowly return the bar to the starting position."], "repRange": "8-15 reps", "notes": "", "favorite": false },
-    { "name": "Seated Cable Row", "group": "Back", "type": "Machine", "instructions": ["Sit at the cable row machine with your feet on the platform.", "Grab the handle and pull it towards your abdomen, keeping your back straight.", "Squeeze your shoulder blades together.", "Slowly extend your arms back to the start."], "repRange": "8-15 reps", "notes": "", "favorite": false },
-    { "name": "Inverted Row", "group": "Back", "type": "Bodyweight", "instructions": ["Lie under a sturdy table or a barbell in a rack.", "Grab the edge with an overhand grip.", "Keeping your body straight, pull your chest up to the table/bar.", "Lower with control."], "repRange": "8-15 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Dumbbell Curl", "group": "Biceps", "type": "Dumbbell", "instructions": ["Stand holding a dumbbell in each hand at your sides, palms facing forward.", "Curl the weights up towards your shoulders, keeping your elbows stationary.", "Squeeze your biceps at the top.", "Lower with control."], "repRange": "8-15 reps", "notes": "", "favorite": false },
-    { "name": "Hammer Curl", "group": "Biceps", "type": "Dumbbell", "instructions": ["Stand holding a dumbbell in each hand with a neutral (hammer) grip.", "Curl the weights up towards your shoulders, keeping your palms facing each other.", "Squeeze at the top and lower with control."], "repRange": "8-15 reps", "notes": "", "favorite": false },
-    { "name": "Barbell Curl", "group": "Biceps", "type": "Barbell", "instructions": ["Stand holding a barbell with an underhand grip, hands shoulder-width apart.", "Keep your elbows close to your torso and curl the weight up towards your shoulders.", "Squeeze your biceps at the top of the movement.", "Lower the barbell with control."], "repRange": "8-12 reps", "notes": "", "favorite": false },
-    { "name": "Preacher Curl Machine", "group": "Biceps", "type": "Machine", "instructions": ["Sit at a preacher curl machine and adjust the seat height.", "Place the back of your upper arms on the pad and grab the handles.", "Curl the weight up towards your shoulders.", "Slowly lower the weight until your arms are almost fully extended."], "repRange": "10-15 reps", "notes": "", "favorite": false },
-    { "name": "Chin Ups", "group": "Biceps", "type": "Bodyweight", "instructions": ["Hang from a pull-up bar with an underhand grip, hands shoulder-width apart.", "Pull your chest up to the bar.", "Focus on using your biceps to pull your body up.", "Lower yourself down with control."], "repRange": "As many as possible", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Barbell Squat", "group": "Quads", "type": "Barbell", "instructions": ["Place a barbell on your upper back.", "Stand with your feet shoulder-width apart, toes slightly out.", "Lower your hips down and back as if sitting in a chair, keeping your chest up.", "Descend until your thighs are at least parallel to the floor.", "Drive back up through your heels."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Goblet Squat", "group": "Quads", "type": "Dumbbell", "instructions": ["Hold one dumbbell vertically against your chest with both hands.", "Stand with your feet slightly wider than shoulder-width.", "Lower your hips down and back, keeping your chest up.", "Drive back up to the starting position."], "repRange": "8-15 reps", "notes": "", "favorite": false },
-    { "name": "Leg Press", "group": "Quads", "type": "Machine", "instructions": ["Sit in the leg press machine and place your feet on the platform shoulder-width apart.", "Push the platform away from you by extending your knees.", "Lower the platform with control, do not let your lower back round off the pad."], "repRange": "10-20 reps", "notes": "", "favorite": false },
-    { "name": "Leg Extension", "group": "Quads", "type": "Machine", "instructions": ["Sit on the machine with your legs under the pad.", "Extend your legs to lift the weight, squeezing your quads at the top.", "Lower slowly with control."], "repRange": "12-20 reps", "notes": "", "favorite": false },
-    { "name": "Bodyweight Squat", "group": "Quads", "type": "Bodyweight", "instructions": ["Stand with your feet shoulder-width apart.", "Lower your hips down and back as if sitting in a chair.", "Keep your chest up and back straight.", "Push through your heels to return to the start."], "repRange": "15-25 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Romanian Deadlift", "group": "Hamstrings", "type": "Barbell", "instructions": ["Hold a barbell in front of your thighs.", "Hinge at your hips, pushing them back while keeping your back straight and a slight bend in your knees.", "Lower the bar until you feel a deep stretch in your hamstrings.", "Return to the start by squeezing your glutes."], "repRange": "8-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "name": "Dumbbell Romanian Deadlift", "group": "Hamstrings", "type": "Dumbbell", "instructions": ["Hold a dumbbell in each hand in front of your thighs.", "Hinge at your hips, keeping your back straight and knees slightly bent.", "Lower the dumbbells towards the floor until you feel a stretch in your hamstrings.", "Return to the starting position."], "repRange": "10-15 reps", "notes": "", "favorite": false },
-    { "name": "Leg Curl", "group": "Hamstrings", "type": "Machine", "instructions": ["Lie face down on a leg curl machine (or sit in a seated version).", "Curl the weight up by bending your knees and squeezing your hamstrings.", "Lower with control."], "repRange": "10-20 reps", "notes": "", "favorite": false },
-    { "name": "Glute Bridge", "group": "Glutes", "type": "Bodyweight", "instructions": ["Lie on your back with your knees bent and feet flat on the floor.", "Lift your hips off the floor until your body forms a straight line from your shoulders to your knees.", "Squeeze your glutes and hamstrings at the top.", "Lower your hips back down."], "repRange": "15-20 reps", "notes": "", "favorite": false },
-    { "name": "Hip Thrust", "group": "Glutes", "type": "Barbell", "instructions": ["Sit on the floor with your upper back against a bench and a barbell across your hips.", "Drive your hips up towards the ceiling, squeezing your glutes hard at the top.", "Lower with control."], "repRange": "8-15 reps", "notes": "", "favorite": false },
-    { "name": "Dumbbell Hip Thrust", "group": "Glutes", "type": "Dumbbell", "instructions": ["Place your upper back on a bench and hold a dumbbell across your hips.", "With your knees bent, drive your hips up towards the ceiling.", "Squeeze your glutes at the top and lower with control."], "repRange": "12-20 reps", "notes": "", "favorite": false },
-    { "name": "Glute Kickback Machine", "group": "Glutes", "type": "Machine", "instructions": ["Position yourself on the glute kickback machine.", "Press the pad back with one leg, focusing on squeezing your glute.", "Return to the starting position with control and repeat."], "repRange": "12-15 reps", "notes": "", "favorite": false },
-    { "name": "Standing Calf Raise", "group": "Calves", "type": "Machine", "instructions": ["Stand on a calf raise machine or a step with a weight.", "Press up onto the balls of your feet as high as possible.", "Hold the peak contraction, then slowly lower your heels below the level of the step."], "repRange": "10-20 reps", "notes": "", "favorite": false },
-    { "name": "Dumbbell Calf Raise", "group": "Calves", "type": "Dumbbell", "instructions": ["Stand holding a dumbbell in each hand.", "Raise your heels off the floor, pressing onto the balls of your feet.", "Hold the contraction at the top, then slowly lower your heels."], "repRange": "15-25 reps", "notes": "", "favorite": false },
-    { "name": "Barbell Calf Raise", "group": "Calves", "type": "Barbell", "instructions": ["Stand with a barbell on your upper back.", "Place the balls of your feet on a raised surface.", "Raise your heels as high as possible.", "Lower your heels until you feel a stretch in your calves."], "repRange": "10-15 reps", "notes": "", "favorite": false },
-    { "name": "Hanging Leg Raise", "group": "Abs", "type": "Bodyweight", "instructions": ["Hang from a pull-up bar.", "Raise your legs up as high as you can, keeping them straight or with a slight bend.", "Lower with control."], "repRange": "10-20 reps", "notes": "", "favorite": false },
-    { "name": "Cable Crunch", "group": "Abs", "type": "Cable", "instructions": ["Kneel in front of a high pulley with a rope attachment.", "Grab the rope and pull it down so your hands are on either side of your head.", "Crunch your torso downwards, bringing your elbows towards your knees.", "Return to the starting position slowly."], "repRange": "12-20 reps", "notes": "", "favorite": false },
-    { "name": "Ab Crunch Machine", "group": "Abs", "type": "Machine", "instructions": ["Sit in the ab crunch machine and select your weight.", "Place your feet under the pads and grab the handles.", "Crunch your upper body forward, contracting your abs.", "Slowly return to the start."], "repRange": "15-25 reps", "notes": "", "favorite": false },
-    { "name": "Wrist Curls", "group": "Forearms", "type": "Dumbbell", "instructions": ["Sit on a bench and rest your forearms on your thighs, with your wrists hanging off your knees.", "Hold a light dumbbell in each hand with your palms facing up.", "Curl your wrists upwards as far as possible.", "Lower the dumbbells with control."], "repRange": "15-25 reps", "notes": "", "favorite": false },
-    { "name": "Barbell Wrist Curls", "group": "Forearms", "type": "Barbell", "instructions": ["Sit on a bench and hold a barbell with both hands, palms up.", "Rest your forearms on your thighs.", "Lower the barbell as far as possible, then curl it up with your wrists.", "Squeeze at the top of the movement."], "repRange": "12-20 reps", "notes": "", "favorite": false },
-    { "name": "Farmer's Walk", "group": "Forearms", "type": "Bodyweight", "instructions": ["Hold a heavy dumbbell or kettlebell in each hand.", "Walk for a set distance or time, keeping your back straight and core engaged.", "This exercise primarily builds grip strength."], "repRange": "30-60 seconds", "notes": "", "favorite": false },
-    { "name": "Russian Twists", "group": "Obliques", "type": "Bodyweight", "instructions": ["Sit on the floor with your knees bent and feet slightly off the ground.", "Lean back slightly to engage your core.", "Twist your torso from side to side, touching your hands to the floor on each side.", "For added difficulty, hold a weight."], "repRange": "15-20 reps per side", "notes": "", "favorite": false },
-    { "name": "Dumbbell Side Bends", "group": "Obliques", "type": "Dumbbell", "instructions": ["Stand holding a dumbbell in one hand.", "Bend your torso to the side, lowering the dumbbell towards the floor.", "Use your obliques to pull your torso back to the starting position.", "Complete all reps on one side before switching."], "repRange": "12-15 reps per side", "notes": "", "favorite": false },
-    { "name": "Cable Woodchoppers", "group": "Obliques", "type": "Cable", "instructions": ["Set a cable pulley to a high position.", "Stand sideways to the machine and grab the handle with both hands.", "Pull the handle down and across your body in a chopping motion.", "Control the movement back to the start."], "repRange": "10-15 reps per side", "notes": "", "favorite": false }
+    { "id": "uuid-bench-flat", "name": "Flat Barbell Bench Press", "group": "Chest", "type": "Barbell", "instructions": ["Lie flat on the bench with your feet on the floor.", "Grip the bar slightly wider than shoulder-width.", "Lower the bar to your mid-chest, keeping your elbows tucked at about a 45-degree angle.", "Press the bar back up to the starting position."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "id": "uuid-bench-incline", "name": "Incline Barbell Bench Press", "group": "Chest", "type": "Barbell", "instructions": ["Set a bench to a 30-45 degree incline.", "Lie on the bench and grip the bar slightly wider than shoulder-width.", "Unrack the bar and lower it to your upper chest.", "Press the bar back up until your arms are fully extended."], "repRange": "8-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "id": "uuid-pushup", "name": "Push Up", "group": "Chest", "type": "Bodyweight", "instructions": ["Start in a high plank position with hands under your shoulders.", "Lower your body until your chest nearly touches the floor.", "Push back up to the starting position, keeping your body in a straight line."], "repRange": "As many as possible", "notes": "", "favorite": false, "isCompound": true },
+    { "id": "uuid-overhead-press", "name": "Overhead Press", "group": "Shoulders", "type": "Barbell", "instructions": ["Stand with the bar on your front shoulders, hands just outside shoulder-width.", "Press the bar straight overhead until your arms are fully extended.", "Lower the bar back to your shoulders with control."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "id": "uuid-lat-raise-db", "name": "Dumbbell Lateral Raise", "group": "Shoulders", "type": "Dumbbell", "instructions": ["Stand holding dumbbells at your sides with palms facing in.", "With a slight bend in your elbows, raise the weights out to your sides until they reach shoulder height.", "Lower with control."], "repRange": "12-20 reps", "notes": "", "favorite": false },
+    { "id": "uuid-pullup", "name": "Pull Ups", "group": "Back", "type": "Bodyweight", "instructions": ["Hang from a pull-up bar with an overhand grip, slightly wider than your shoulders.", "Pull your chest up to the bar, leading with your chest and squeezing your back.", "Lower yourself down with control."], "repRange": "As many as possible", "notes": "", "favorite": false, "isCompound": true },
+    { "id": "uuid-row-bb", "name": "Barbell Row", "group": "Back", "type": "Barbell", "instructions": ["Stand with your feet shoulder-width apart, holding a barbell with an overhand grip.", "Hinge at your hips until your torso is nearly parallel to the floor.", "Pull the bar towards your lower chest/upper abdomen, squeezing your back muscles.", "Lower the bar with control."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "id": "uuid-lat-pulldown", "name": "Lat Pulldown", "group": "Back", "type": "Machine", "instructions": ["Sit at the machine and grab the bar with a wide overhand grip.", "Pull the bar down to your upper chest, keeping your torso upright.", "Squeeze your lats at the bottom.", "Slowly return the bar to the starting position."], "repRange": "8-15 reps", "notes": "", "favorite": false },
+    { "id": "uuid-curl-db", "name": "Dumbbell Curl", "group": "Biceps", "type": "Dumbbell", "instructions": ["Stand holding a dumbbell in each hand at your sides, palms facing forward.", "Curl the weights up towards your shoulders, keeping your elbows stationary.", "Squeeze your biceps at the top.", "Lower with control."], "repRange": "8-15 reps", "notes": "", "favorite": false },
+    { "id": "uuid-squat-bb", "name": "Barbell Squat", "group": "Quads", "type": "Barbell", "instructions": ["Place a barbell on your upper back.", "Stand with your feet shoulder-width apart, toes slightly out.", "Lower your hips down and back as if sitting in a chair, keeping your chest up.", "Descend until your thighs are at least parallel to the floor.", "Drive back up through your heels."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "id": "uuid-leg-press", "name": "Leg Press", "group": "Quads", "type": "Machine", "instructions": ["Sit in the leg press machine and place your feet on the platform shoulder-width apart.", "Push the platform away from you by extending your knees.", "Lower the platform with control, do not let your lower back round off the pad."], "repRange": "10-20 reps", "notes": "", "favorite": false },
+    { "id": "uuid-rdl-bb", "name": "Romanian Deadlift", "group": "Hamstrings", "type": "Barbell", "instructions": ["Hold a barbell in front of your thighs.", "Hinge at your hips, pushing them back while keeping your back straight and a slight bend in your knees.", "Lower the bar until you feel a deep stretch in your hamstrings.", "Return to the start by squeezing your glutes."], "repRange": "8-12 reps", "notes": "", "favorite": false, "isCompound": true },
+    { "id": "uuid-leg-curl", "name": "Leg Curl", "group": "Hamstrings", "type": "Machine", "instructions": ["Lie face down on a leg curl machine (or sit in a seated version).", "Curl the weight up by bending your knees and squeezing your hamstrings.", "Lower with control."], "repRange": "10-20 reps", "notes": "", "favorite": false },
+    { "id": "uuid-calf-raise", "name": "Standing Calf Raise", "group": "Calves", "type": "Machine", "instructions": ["Stand on a calf raise machine or a step with a weight.", "Press up onto the balls of your feet as high as possible.", "Hold the peak contraction, then slowly lower your heels below the level of the step."], "repRange": "10-20 reps", "notes": "", "favorite": false },
+    { "id": "uuid-leg-raise", "name": "Hanging Leg Raise", "group": "Abs", "type": "Bodyweight", "instructions": ["Hang from a pull-up bar.", "Raise your legs up as high as you can, keeping them straight or with a slight bend.", "Lower with control."], "repRange": "10-20 reps", "notes": "", "favorite": false },
+    { "id": "uuid-hammer-curl", "name": "Hammer Curl", "group": "Biceps", "type": "Dumbbell", "instructions": ["Stand holding a dumbbell in each hand with a neutral (hammer) grip.", "Curl the weights up towards your shoulders, keeping your palms facing each other.", "Squeeze at the top and lower with control."], "repRange": "8-15 reps", "notes": "", "favorite": false }
 ]
 `;
             const defaultWarmups = {
@@ -608,7 +591,7 @@
                 workoutPlanForDay: document.getElementById('workout-plan-for-day'), historyDayContent: document.getElementById('history-day-content'), 
                 planActionsBtn: document.getElementById('plan-actions-btn'), planActionsDropdown: document.getElementById('plan-actions-dropdown'),
                 deletePlanBtn: document.getElementById('delete-plan-btn'), 
-                historyActionsBtn: document.getElementById('history-actions-btn'), historyActionsDropdown: document.getElementById('history-actions-dropdown'),
+                historyActionsBtn: document.getElementById('history-actions-btn'), 
                 prevDayBtn: document.getElementById('prev-day-btn'), nextDayBtn: document.getElementById('next-day-btn'),
                 aiTabSpecific: document.getElementById('ai-tab-specific'), aiTabGeneral: document.getElementById('ai-tab-general'), aiPanelSpecific: document.getElementById('ai-panel-specific'), aiPanelGeneral: document.getElementById('ai-panel-general'),
                 aiGeneralPrompt: document.getElementById('ai-general-prompt'), getAIGeneralAdviceBtn: document.getElementById('get-ai-general-advice-btn'), aiGeneralOutput: document.getElementById('ai-general-output'),
@@ -625,7 +608,7 @@
                 aiPlanPanel: document.getElementById('ai-plan-panel'),
                 aiPlanExercisePrefsContainer: document.getElementById('ai-plan-exercise-prefs-container'),
                 // Custom Exercise AI Modal
-                addCustomExerciseBtn: document.getElementById('add-custom-exercise-btn'),
+                manageLibraryBtn: document.getElementById('manage-library-btn'),
                 customExerciseModal: document.getElementById('custom-exercise-modal'), closeCustomExerciseModalBtn: document.getElementById('close-custom-exercise-modal-btn'),
                 customExerciseInitialChoice: document.getElementById('custom-exercise-initial-choice'), customExerciseAiChoiceBtn: document.getElementById('custom-exercise-ai-choice-btn'),
                 customExerciseManualChoiceBtn: document.getElementById('custom-exercise-manual-choice-btn'),
@@ -633,7 +616,8 @@
                 aiGenerateExerciseDetailsBtn: document.getElementById('ai-generate-exercise-details-btn'), customExerciseDetailsContainer: document.getElementById('custom-exercise-details-container'),
                 customExerciseImgLoader: document.getElementById('custom-exercise-img-loader'), customExerciseImg: document.getElementById('custom-exercise-img'),
                 customExerciseInstructions: document.getElementById('custom-exercise-instructions'), customExerciseRepRange: document.getElementById('custom-exercise-rep-range'),
-                customExerciseGroup: document.getElementById('custom-exercise-group'), saveCustomExerciseBtn: document.getElementById('save-custom-exercise-btn'),
+                customExerciseGroup: document.getElementById('custom-exercise-group'),
+                customExerciseActionButtons: document.getElementById('custom-exercise-action-buttons'),
                 createNewExerciseFromLibraryBtn: document.getElementById('create-new-exercise-from-library-btn'),
                 // Edit Mode Toolbar
                 planViewHeader: document.getElementById('plan-view-header'),
@@ -675,6 +659,8 @@
                         exerciseDB = defaultExerciseDB; // Fallback to empty
                     }
                 }
+                 // Ensure all exercises have a unique ID
+                exerciseDB.forEach(ex => { if (!ex.id) ex.id = crypto.randomUUID(); });
 
                 ALL_MUSCLE_GROUPS = [...new Set(exerciseDB.map(ex => ex.group))].sort();
 
@@ -765,8 +751,9 @@
                 ui.dayViewDateDisplay.querySelector('#day-view-title-span').textContent = date.toLocaleDateString(undefined, { weekday: 'long' }) + (isToday ? ' (Today)' : '');
                 ui.dayViewDateDisplay.querySelector('#day-view-date-span').textContent = date.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
                 
-                const nextDay = new Date(date); nextDay.setDate(nextDay.getDate() + 1);
-                ui.nextDayBtn.disabled = nextDay > today;
+                // Allow viewing future days, but buttons will be disabled.
+                ui.nextDayBtn.disabled = false; 
+                
                 lucide.createIcons();
             }
 
@@ -850,7 +837,7 @@
                                 <i data-lucide="star" class="w-4 h-4 favorite-indicator ${ex.favorite ? 'text-yellow-400 fill-yellow-400' : 'hidden'}"></i>
                                 <div>
                                     <button class="flex-grow text-left log-workout-btn" data-name="${ex.name}" ${isFutureDay ? 'disabled' : ''}>${ex.name}</button>
-                                    <p class="text-xs text-secondary-text">${ex.group}</p>
+                                    <p class="text-xs text-blue-400">${ex.group}</p>
                                 </div>
                             </div>
                             ${isLogged ? '<i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>' : (!isFutureDay ? '<i data-lucide="x-circle" class="w-5 h-5 text-red-500/70"></i>' : '')}
@@ -1023,7 +1010,7 @@
             
             ui.dayViewDateDisplayBtn.addEventListener('click', () => { const today = new Date(); today.setHours(0,0,0,0); viewDate = today; updateUI(); });
             ui.prevDayBtn.addEventListener('click', () => { viewDate.setDate(viewDate.getDate() - 1); updateUI(); });
-            ui.nextDayBtn.addEventListener('click', () => { const today = new Date(); today.setHours(0,0,0,0); const nextDay = new Date(viewDate); nextDay.setDate(nextDay.getDate() + 1); if (nextDay.getTime() <= today.getTime()) { viewDate.setDate(viewDate.getDate() + 1); updateUI(); } });
+            ui.nextDayBtn.addEventListener('click', () => { viewDate.setDate(viewDate.getDate() + 1); updateUI(); });
             
             ui.workoutStatusControls.addEventListener('click', (e) => {
                 const btn = e.target.closest('.status-btn');
@@ -1040,8 +1027,10 @@
                 const currentSelection = ui.progressExerciseSelect.value;
                 const exercisedNames = [...new Set(workoutHistory.map(log => log.name))].sort();
                 const singleExerciseOptions = exercisedNames.map(name => `<option value="${name}">${name}</option>`).join('');
-                
-                ui.progressExerciseSelect.innerHTML = `<option value="today-general">Today's General Progression</option><option value="general">Overall General Progression</option><optgroup label="Specific Exercises">${singleExerciseOptions}</optgroup>`;
+                const dayType = getWorkoutDayType(new Date());
+                const todayOptionText = dayType === 'Rest' ? "Overall Progression" : `Progression for ${dayType} Day`;
+
+                ui.progressExerciseSelect.innerHTML = `<option value="today-general">${todayOptionText}</option><option value="general">Overall General Progression</option><optgroup label="Specific Exercises">${singleExerciseOptions}</optgroup>`;
                 ui.progressExerciseSelect.value = currentSelection || 'today-general';
 
                 ui.aiAdviceExerciseSelect.innerHTML = '<option value="">Select an exercise...</option>' + singleExerciseOptions;
@@ -1442,7 +1431,6 @@
                 ui.planActionsBtn.addEventListener('click', (e) => { 
                     e.stopPropagation(); 
                     ui.planActionsDropdown.classList.toggle('hidden'); 
-                    ui.historyActionsDropdown.classList.add('hidden');
                 });
             }
 
@@ -1456,22 +1444,25 @@
                 ui.planActionsDropdown.classList.add('hidden');
             });
             
-            if (ui.historyActionsBtn) {
-                ui.historyActionsBtn.addEventListener('click', (e) => { 
-                    e.stopPropagation(); 
-                    ui.historyActionsDropdown.classList.toggle('hidden');
-                    ui.planActionsDropdown.classList.add('hidden'); 
-                });
-            }
 
             document.addEventListener('click', (e) => { 
                 if (ui.planActionsBtn && !ui.planActionsBtn.contains(e.target) && !ui.planActionsDropdown.contains(e.target)) { 
                     ui.planActionsDropdown.classList.add('hidden'); 
                 }
-                if (ui.historyActionsBtn && !ui.historyActionsBtn.contains(e.target) && !ui.historyActionsDropdown.contains(e.target)) { 
-                    ui.historyActionsDropdown.classList.add('hidden'); 
+                const allMenuItems = document.querySelectorAll('[data-menu-item]');
+                allMenuItems.forEach(item => item.classList.remove('open'));
+            });
+            
+            ui.planActionsDropdown.addEventListener('click', e => {
+                const menuItem = e.target.closest('[data-menu-item]');
+                if(menuItem) {
+                    e.stopPropagation();
+                    const wasOpen = menuItem.classList.contains('open');
+                    document.querySelectorAll('[data-menu-item]').forEach(item => item.classList.remove('open'));
+                    if(!wasOpen) menuItem.classList.add('open');
                 }
             });
+
 
             // AI Coach Tab Listeners
             ui.aiTabSpecific.addEventListener('click', () => { ui.aiTabSpecific.classList.add('border-accent', 'text-primary-text'); ui.aiTabSpecific.classList.remove('border-transparent', 'text-secondary-text'); ui.aiTabGeneral.classList.add('border-transparent', 'text-secondary-text'); ui.aiTabGeneral.classList.remove('border-accent', 'text-primary-text'); ui.aiPanelSpecific.classList.remove('hidden'); ui.aiPanelGeneral.classList.add('hidden'); });
@@ -1589,7 +1580,11 @@
                 if (libraryModalContext.purpose === 'add') {
                     ui.exerciseLibraryTitle.textContent = 'Add Exercises to Plan';
                     ui.addSelectedExercisesBtn.textContent = 'Add Selected';
-                } else { // 'pref'
+                } else if (libraryModalContext.purpose === 'manage') {
+                    ui.exerciseLibraryTitle.textContent = 'Manage Exercise Library';
+                    ui.addSelectedExercisesBtn.textContent = 'Done';
+                }
+                else { // 'pref'
                     ui.exerciseLibraryTitle.textContent = `Select Preferred Exercises for ${group}`;
                     ui.addSelectedExercisesBtn.textContent = 'Confirm Selection';
                 }
@@ -1602,16 +1597,24 @@
                 filterSelect.value = group || "";
                 searchInput.value = '';
                 
-                const preSelected = libraryModalContext.purpose === 'pref' ? exercisePrefs[group] : [];
+                const preSelected = libraryModalContext.purpose === 'pref' ? exercisePrefs[group] : undefined;
 
                 const renderLibrary = (filter = '', search = '') => {
                     libraryList.innerHTML = exerciseDB
                         .filter(ex => (filter ? ex.group === filter : true) && (search ? ex.name.toLowerCase().includes(search.toLowerCase()) : true))
                         .sort((a,b) => a.name.localeCompare(b.name))
-                        .map(ex => `<label class="flex items-center gap-3 p-2 rounded-md hover:bg-input-bg">
-                            <input type="checkbox" value="${ex.name}" ${ (libraryModalContext.purpose === 'add' && false) || (libraryModalContext.purpose === 'pref' && (preSelected === undefined || preSelected.includes(ex.name))) ? 'checked' : ''} class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500">
-                            <div><p>${ex.name}</p><p class="text-xs text-secondary-text">${ex.group}</p></div>
-                        </label>`).join('');
+                        .map(ex => `
+                        <div class="flex items-center justify-between p-2 rounded-md hover:bg-input-bg group">
+                            <label class="flex-grow flex items-center gap-3 cursor-pointer">
+                                <input type="checkbox" value="${ex.name}" ${ (libraryModalContext.purpose === 'add' && false) || (libraryModalContext.purpose === 'pref' && (preSelected === undefined || preSelected.includes(ex.name))) ? 'checked' : ''} class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500">
+                                <div><p>${ex.name}</p><p class="text-xs text-blue-400">${ex.group}</p></div>
+                            </label>
+                            <div class="hidden group-hover:flex items-center gap-1">
+                                <button class="btn !p-1.5 !bg-transparent edit-exercise-library-btn" data-id="${ex.id}" title="Edit"><i data-lucide="pencil" class="w-4 h-4 pointer-events-none"></i></button>
+                                <button class="btn !p-1.5 !bg-transparent delete-exercise-library-btn" data-id="${ex.id}" title="Delete"><i data-lucide="trash-2" class="w-4 h-4 text-red-500/80 pointer-events-none"></i></button>
+                            </div>
+                        </div>`).join('');
+                        lucide.createIcons();
                 };
                 
                 renderLibrary(group || '');
@@ -1620,6 +1623,7 @@
                 
                 showModal(ui.exerciseLibraryModal);
             };
+
             
             const renderExercisePreferences = () => {
                 const container = ui.aiPlanExercisePrefsContainer;
@@ -1794,13 +1798,47 @@
             }
             
             // Custom Exercise AI Listeners
-            ui.addCustomExerciseBtn.addEventListener('click', () => {
+            ui.manageLibraryBtn.addEventListener('click', () => {
+                 libraryModalContext.purpose = 'manage';
+                openExerciseLibrary();
+            });
+
+            function openCustomExerciseModal(exercise = null) {
                 ui.customExerciseForm.reset();
-                ui.customExerciseForm.classList.add('hidden');
+                ui.customExerciseDetailsContainer.classList.add('hidden');
                 ui.customExerciseInitialChoice.classList.remove('hidden');
                 ui.customExerciseGroup.innerHTML = ALL_MUSCLE_GROUPS.map(g => `<option value="${g}">${g}</option>`).join('');
+
+                editingExerciseId = exercise ? exercise.id : null;
+
+                if(exercise) {
+                    ui.customExerciseInitialChoice.classList.add('hidden');
+                    ui.customExerciseForm.classList.remove('hidden');
+                    ui.customExerciseDetailsContainer.classList.remove('hidden');
+                    ui.customExerciseNameInput.value = exercise.name;
+                    ui.customExerciseInstructions.value = Array.isArray(exercise.instructions) ? exercise.instructions.join('\n') : '';
+                    ui.customExerciseRepRange.value = exercise.repRange || '';
+                    ui.customExerciseGroup.value = exercise.group;
+                    document.getElementById('custom-exercise-type').value = exercise.type;
+                    
+                    if(exercise.videoPlaceholder && (exercise.videoPlaceholder.startsWith('http') || exercise.videoPlaceholder.startsWith('data:'))){
+                        ui.customExerciseImg.src = exercise.videoPlaceholder;
+                        ui.customExerciseImg.classList.remove('hidden');
+                    } else {
+                        ui.customExerciseImg.classList.add('hidden');
+                    }
+                     // Configure buttons for editing
+                    ui.customExerciseActionButtons.innerHTML = `
+                        <button type="submit" id="save-custom-exercise-changes-btn" class="btn btn-primary w-full">Save Changes</button>
+                        <button type="button" id="save-as-variation-btn" class="btn btn-secondary w-full">Save as New Variation</button>
+                    `;
+                } else {
+                    // Configure for creating a new exercise
+                    ui.customExerciseActionButtons.innerHTML = '<button type="submit" id="save-new-custom-exercise-btn" class="w-full btn btn-primary">Save Custom Exercise</button>';
+                }
+
                 showModal(ui.customExerciseModal);
-            });
+            }
 
             ui.customExerciseAiChoiceBtn.addEventListener('click', () => {
                 ui.customExerciseInitialChoice.classList.add('hidden');
@@ -1821,6 +1859,7 @@
                 hideModal(ui.customExerciseModal);
                 if (isAddingFromLibrary) {
                     openExerciseLibrary(libraryModalContext.group);
+                    isAddingFromLibrary = false;
                 }
             });
 
@@ -1838,7 +1877,6 @@
                 ui.customExerciseImgLoader.classList.remove('hidden');
 
                 try {
-                    // Generate Instructions & Rep Range
                     const textPrompt = `Generate a concise set of instructions and a recommended rep range for hypertrophy for the exercise: '${exerciseName}'. Respond in a valid JSON object with keys "instructions" (an array of strings) and "repRange" (a string).`;
                     const textApiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
                     const textResponse = await fetch(textApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: textPrompt }] }], generationConfig: { responseMimeType: "application/json" } }) });
@@ -1848,7 +1886,6 @@
                     ui.customExerciseInstructions.value = details.instructions.join('\n');
                     ui.customExerciseRepRange.value = details.repRange;
 
-                    // Generate Image
                     const imagePrompt = `Photorealistic image of a person demonstrating the proper form for the ${exerciseName} exercise at the peak contraction of the movement, on a plain white background.`;
                     const imageApiUrl = getApiUrl('imagen-3.0-generate-002', 'predict');
                     const imageResponse = await fetch(imageApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ instances: [{ prompt: imagePrompt }], parameters: { "sampleCount": 1 } }) });
@@ -1882,36 +1919,51 @@
                 }
             });
 
-
-            ui.customExerciseForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const imageUrl = document.getElementById('custom-img-url').value.trim();
-
-                const newExercise = {
-                    id: crypto.randomUUID(),
+            function handleSaveCustomExercise(isNewVariation = false) {
+                 const newExerciseData = {
+                    id: (editingExerciseId && !isNewVariation) ? editingExerciseId : crypto.randomUUID(),
                     isCustom: true,
                     name: ui.customExerciseNameInput.value.trim(),
-                    instructions: ui.customExerciseInstructions.value.split('\n'),
+                    instructions: ui.customExerciseInstructions.value.split('\n').filter(Boolean),
                     repRange: ui.customExerciseRepRange.value,
                     group: document.getElementById('custom-exercise-group').value,
                     type: document.getElementById('custom-exercise-type').value,
-                    videoPlaceholder: imageUrl || ui.customExerciseImg.src,
+                    videoPlaceholder: document.getElementById('custom-img-url').value.trim() || ui.customExerciseImg.src,
                     notes: '',
                     favorite: false,
                 };
-                if (!newExercise.name || !newExercise.group) {
-                    showCustomAlert("Missing Info", "Exercise name and muscle group are required.");
-                    return;
+                if (!newExerciseData.name || !newExerciseData.group) { showCustomAlert("Missing Info", "Exercise name and muscle group are required."); return; }
+
+                const isNameDuplicate = exerciseDB.some(ex => ex.name.toLowerCase() === newExerciseData.name.toLowerCase() && ex.id !== newExerciseData.id);
+                if (isNameDuplicate) { showCustomAlert("Duplicate Name", "An exercise with this name already exists. Please choose a different name."); return; }
+
+                if (editingExerciseId && !isNewVariation) {
+                    // Update existing
+                    const index = exerciseDB.findIndex(ex => ex.id === editingExerciseId);
+                    if (index > -1) exerciseDB[index] = { ...exerciseDB[index], ...newExerciseData };
+                } else {
+                    // Add new or variation
+                    exerciseDB.push(newExerciseData);
                 }
                 
-                exerciseDB.push(newExercise);
                 saveData();
-                
                 hideModal(ui.customExerciseModal);
-                showCustomAlert("Success", "Custom exercise saved!");
-                if(isAddingFromLibrary) {
+                showCustomAlert("Success", `Exercise "${newExerciseData.name}" has been saved!`);
+                
+                if (isAddingFromLibrary) {
                     openExerciseLibrary(libraryModalContext.group);
                     isAddingFromLibrary = false;
+                } else {
+                    updateUI();
+                }
+            }
+            
+            ui.customExerciseForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if(e.submitter && e.submitter.id === 'save-as-variation-btn') {
+                    handleSaveCustomExercise(true);
+                } else { // save changes or save new
+                    handleSaveCustomExercise(false);
                 }
             });
 
@@ -1958,7 +2010,36 @@
             ui.createNewExerciseFromLibraryBtn.addEventListener('click', () => {
                 isAddingFromLibrary = true;
                 hideModal(ui.exerciseLibraryModal);
-                ui.addCustomExerciseBtn.click();
+                openCustomExerciseModal();
+            });
+
+            document.getElementById('exercise-library-list').addEventListener('click', e => {
+                const editBtn = e.target.closest('.edit-exercise-library-btn');
+                const deleteBtn = e.target.closest('.delete-exercise-library-btn');
+
+                if (editBtn) {
+                    const exercise = exerciseDB.find(ex => ex.id === editBtn.dataset.id);
+                    if(exercise) {
+                        hideModal(ui.exerciseLibraryModal);
+                        openCustomExerciseModal(exercise);
+                    }
+                }
+                if (deleteBtn) {
+                    const exId = deleteBtn.dataset.id;
+                    const exName = exerciseDB.find(ex => ex.id === exId)?.name || 'this exercise';
+                    showConfirmModal('Delete Exercise?', `Are you sure you want to permanently delete "${exName}"? This cannot be undone.`, () => {
+                        exerciseDB = exerciseDB.filter(ex => ex.id !== exId);
+                        // Also remove from any plans
+                        if(workoutPlan.workouts) {
+                            workoutPlan.workouts.forEach(w => {
+                                w.exercises = w.exercises.filter(name => name !== exName);
+                            });
+                        }
+                        saveData();
+                        openExerciseLibrary(libraryModalContext.group);
+                        updateUI();
+                    });
+                }
             });
 
             function updateUnitToggleUI(unit) {
@@ -2002,7 +2083,7 @@
                         name: "Default PPL",
                         schedule: { "Monday": "Push", "Tuesday": "Pull", "Wednesday": "Legs", "Thursday": "Push", "Friday": "Pull", "Saturday": "Legs", "Sunday": "Rest" },
                         workouts: [
-                            { day: "Push", exercises: ["Flat Barbell Bench Press", "Incline Dumbbell Press", "Seated Dumbbell Press", "Dumbbell Lateral Raise", "Tricep Pushdown", "Dumbbell Overhead Tricep Extension"] },
+                            { day: "Push", exercises: ["Flat Barbell Bench Press", "Incline Dumbbell Press", "Seated Dumbbell Press", "Dumbbell Lateral Raise", "Tricep Pushdown"] },
                             { day: "Pull", exercises: ["Pull Ups", "Barbell Row", "Lat Pulldown", "Seated Cable Row", "Dumbbell Curl", "Hammer Curl"] },
                             { day: "Legs", exercises: ["Barbell Squat", "Leg Press", "Romanian Deadlift", "Leg Curl", "Standing Calf Raise", "Hanging Leg Raise"] }
                         ],

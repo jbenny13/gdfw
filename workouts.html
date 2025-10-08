@@ -247,7 +247,7 @@
             </a>
             <nav class="mt-4 sm:mt-0">
                 <ul class="flex items-center space-x-4 sm:space-x-6 text-base font-medium">
-                    <li><a href="index.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="index.html" class="nav-link">Home</a></li>
                     <li><a href="nutrition.html" class="nav-link">Nutrition</a></li>
                     <li><a href="workouts.html" class="nav-link active">Workouts</a></li>
                     <li><a href="goals.html" class="nav-link">Goals</a></li>
@@ -281,7 +281,7 @@
                     </div>
                      <div id="edit-mode-toolbar" class="hidden flex justify-between items-center mb-4 p-2 bg-input-bg rounded-lg">
                         <div class="flex items-center gap-2">
-                            <button id="edit-mode-favorite-btn" class="btn btn-secondary !p-2" title="Favorite Selected"><i data-lucide="star" class="w-4 h-4"></i></button>
+                            <button id="edit-mode-favorite-btn" class="btn btn-secondary !p-2" title="Toggle Favorite for Selected"><i data-lucide="star" class="w-4 h-4"></i></button>
                             <button id="edit-mode-delete-btn" class="btn btn-secondary !p-2 !text-red-400" title="Delete Selected"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
                         <button id="edit-mode-done-btn" class="btn btn-primary">Done</button>
@@ -382,16 +382,11 @@
     <!-- Modals -->
     <div id="ai-plan-generator-modal" class="modal-backdrop">
         <div class="modal-content !max-w-3xl">
-            <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">Plan Generator</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">AI Plan Generator</h2>
                 <button id="close-ai-plan-generator-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button>
             </div>
-             <div class="flex border-b border-border-color my-4">
-                <button id="ai-plan-tab-btn" class="flex-1 py-2 text-center font-semibold border-b-2 border-accent text-primary-text">AI Generator</button>
-                <button id="manual-plan-tab-btn" class="flex-1 py-2 text-center font-semibold border-b-2 border-transparent text-secondary-text">Manual Builder</button>
-            </div>
 
-            <!-- AI Generator Panel -->
             <div id="ai-plan-panel">
                 <form id="ai-plan-generator-form" class="space-y-4">
                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -399,15 +394,15 @@
                             <label for="ai-plan-goal" class="form-label">Primary Goal</label>
                             <select id="ai-plan-goal" class="form-select mt-1"><option value="muscle hypertrophy">Muscle Hypertrophy</option><option value="fat loss">Fat Loss</option><option value="body recomposition">Body Recomposition</option><option value="general fitness">General Fitness</option><option value="strength gain">Strength Gain</option><option value="custom">Custom</option></select>
                         </div>
-                        <div>
-                            <label for="ai-plan-split" class="form-label">Workout Split</label>
-                             <input type="text" id="ai-plan-split" list="common-splits" class="form-input mt-1" placeholder="e.g., Push/Pull/Legs (Default)">
-                             <datalist id="common-splits">
-                                <option value="Push/Pull/Legs"></option>
-                                <option value="Upper/Lower"></option>
-                                <option value="Full Body"></option>
-                                <option value="Bro Split"></option>
-                             </datalist>
+                        <div id="ai-plan-split-container">
+                            <label for="ai-plan-split-select" class="form-label">Workout Split</label>
+                            <select id="ai-plan-split-select" class="form-select mt-1">
+                                <option value="Push, Pull, Legs">Push, Pull, Legs</option>
+                                <option value="Upper, Lower">Upper, Lower</option>
+                                <option value="Full Body">Full Body</option>
+                                <option value="other">Other (Custom)</option>
+                            </select>
+                            <input type="text" id="ai-plan-split-custom" class="form-input mt-2 hidden" placeholder="e.g., Chest & Back, Arms, Legs">
                         </div>
                     </div>
                      <div id="ai-plan-goal-text-container" class="hidden">
@@ -415,18 +410,22 @@
                         <textarea id="ai-plan-goal-text" rows="2" class="form-input mt-1" placeholder="e.g., 'I want to build bigger arms and get a six-pack.'"></textarea>
                     </div>
 
-                    <details class="pt-2">
-                        <summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between"><span>Days & Durations</span><i data-lucide="chevron-down" class="w-4 h-4"></i></summary>
-                        <div class="space-y-4 pt-4 mt-4 border-t border-gray-800">
-                             <div>
-                                <label class="form-label">Workout Days</label>
-                                <div id="ai-plan-days-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 mt-2"></div>
+                    <details class="pt-2" open>
+                        <summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between"><span>Weekly Schedule & Duration</span><i data-lucide="chevron-down" class="w-4 h-4"></i></summary>
+                         <div class="pt-4 mt-4 border-t border-gray-800 space-y-4">
+                            <div id="ai-plan-schedule-builder">
+                                <!-- Schedule UI will be built here by JS -->
                             </div>
-                            <div id="ai-plan-durations-container" class="space-y-2"></div>
-                        </div>
+                            <div>
+                                <label for="ai-plan-duration" class="form-label">Default Duration (minutes)</label>
+                                <input type="number" id="ai-plan-duration" value="60" class="form-input mt-1">
+                                <button type="button" id="customize-duration-btn" class="text-sm text-blue-400 hover:underline mt-2">Customize per day</button>
+                                <div id="ai-plan-durations-container" class="space-y-2 mt-2 hidden"></div>
+                            </div>
+                         </div>
                     </details>
                     
-                    <details class="pt-2">
+                    <details class="pt-2" open>
                          <summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between"><span>Equipment & Focus</span><i data-lucide="chevron-down" class="w-4 h-4"></i></summary>
                          <div class="space-y-4 pt-4 mt-4 border-t border-gray-800">
                              <div>
@@ -435,7 +434,7 @@
                             </div>
                              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="form-label">Focus Muscle Groups (Optional)</label>
+                                    <label class="form-label">Focus Muscle Groups</label>
                                     <div id="ai-plan-focus-muscle-container" class="grid grid-cols-2 gap-x-4 gap-y-2 mt-2"></div>
                                 </div>
                                  <div>
@@ -446,11 +445,25 @@
                          </div>
                     </details>
 
+                     <details class="pt-2" open>
+                        <summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between">
+                            <span>Exercise Preferences</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </summary>
+                        <div id="ai-plan-exercise-prefs-container" class="grid grid-cols-2 md:grid-cols-3 gap-2 pt-4 mt-4 border-t border-gray-800">
+                            <!-- Exercise preference buttons will be built here -->
+                        </div>
+                    </details>
+
                     <details class="pt-2">
                         <summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between"><span>Advanced: Target Sets</span><i data-lucide="chevron-down" class="w-4 h-4"></i></summary>
                         <div class="pt-4 mt-4 border-t border-gray-800">
-                             <h3 class="form-label font-semibold text-primary-text mb-2">Weekly Sets Per Muscle Group (Optional)</h3>
-                             <div id="ai-plan-sets-container" class="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2"></div>
+                             <div class="mb-4">
+                                <label for="ai-plan-default-sets" class="form-label">Default Sets Per Muscle Group</label>
+                                <input type="number" id="ai-plan-default-sets" class="form-input mt-1" placeholder="Auto">
+                                <button type="button" id="customize-sets-btn" class="text-sm text-blue-400 hover:underline mt-2">Customize per muscle group</button>
+                             </div>
+                             <div id="ai-plan-sets-container" class="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 hidden"></div>
                         </div>
                     </details>
 
@@ -462,27 +475,13 @@
                     <div class="flex justify-end gap-4"><button id="cancel-new-plan-btn" class="btn btn-secondary">Cancel</button><button id="save-new-plan-btn" class="btn btn-primary">Save & Apply Plan</button></div>
                 </div>
             </div>
-             <!-- Manual Builder Panel -->
-            <div id="manual-plan-panel" class="hidden">
-                 <form id="manual-plan-form" class="space-y-4">
-                    <div>
-                        <label for="manual-plan-name" class="form-label">Plan Name</label>
-                        <input type="text" id="manual-plan-name" class="form-input mt-1" required placeholder="e.g., My Hypertrophy Plan">
-                    </div>
-                    <div id="manual-schedule-builder" class="space-y-4">
-                        <!-- Dynamically added schedule rows -->
-                    </div>
-                    <button type="button" id="add-manual-day-btn" class="btn btn-secondary w-full"><i data-lucide="plus"></i>Add Workout Day Type</button>
-                    <button type="submit" class="w-full btn btn-primary !mt-6">Save Manual Plan</button>
-                 </form>
-            </div>
         </div>
     </div>
     <div id="custom-exercise-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-6"><h2 id="custom-exercise-modal-title" class="text-2xl font-bold">Add Custom Exercise</h2><button id="close-custom-exercise-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div id="custom-exercise-initial-choice" class="flex gap-4"><button id="custom-exercise-ai-choice-btn" class="btn btn-primary w-full"><i data-lucide="sparkles"></i>Use AI Assistant</button><button id="custom-exercise-manual-choice-btn" class="btn btn-secondary w-full"><i data-lucide="edit-3"></i>Enter Manually</button></div><form id="custom-exercise-form" class="hidden space-y-4 mt-4"><div><label for="custom-exercise-name" class="form-label">Exercise Name *</label><div class="flex gap-2"><input type="text" id="custom-exercise-name" class="form-input" required placeholder="e.g., Kneeling Landmine Press"><button type="button" id="ai-generate-exercise-details-btn" class="btn btn-secondary !px-3 hidden"><i data-lucide="sparkles"></i></button></div></div><div id="custom-exercise-details-container" class="space-y-4 pt-4 border-t border-border-color"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-border-color"><div id="custom-exercise-img-loader" class="loader hidden"></div><img id="custom-exercise-img" src="" class="w-full h-full object-contain hidden"></div><div class="grid grid-cols-2 gap-2"><label for="custom-img-upload" class="btn btn-secondary !py-1 text-xs cursor-pointer">Upload Image<input type="file" id="custom-img-upload" class="hidden" accept="image/*"></label><input type="url" id="custom-img-url" class="form-input !py-1 text-xs" placeholder="Or paste image/video URL"></div><div><label for="custom-exercise-instructions" class="form-label">Instructions</label><textarea id="custom-exercise-instructions" rows="5" class="form-input mt-1"></textarea></div><div><label for="custom-exercise-rep-range" class="form-label">Rep Range</label><input type="text" id="custom-exercise-rep-range" class="form-input mt-1"></div><div class="grid grid-cols-2 gap-4"><div><label for="custom-exercise-group" class="form-label">Muscle Group</label><select id="custom-exercise-group" class="form-select mt-1"></select></div><div><label for="custom-exercise-type" class="form-label">Equipment</label><select id="custom-exercise-type" class="form-select mt-1"><option>Barbell</option><option>Dumbbell</option><option>Machine</option><option>Cable</option><option>Bodyweight</option><option>Other</option></select></div></div><button type="submit" id="save-custom-exercise-btn" class="w-full btn btn-primary">Save Custom Exercise</button></div></form></div></div>
     <div id="exercise-detail-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 id="exercise-detail-title" class="text-2xl font-bold">Exercise Details</h2><button id="close-exercise-detail-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-gray-800"><img id="exercise-detail-video" src="" alt="Exercise demonstration" class="w-full h-full object-contain"></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Instructions</h3><ul id="exercise-detail-instructions" class="list-disc list-inside space-y-1 text-gray-300"></ul></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Rep Range</h3><p id="exercise-detail-rep-range" class="text-gray-300"></p></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Personal Notes & Advice</h3><textarea id="exercise-detail-notes" rows="4" class="form-input mt-1" placeholder="Add your personal cues, weight progression goals, etc."></textarea><button id="save-exercise-notes-btn" class="mt-2 w-full btn btn-secondary">Save Notes</button></div><button id="log-from-detail-btn" class="w-full btn btn-primary mt-4">Log This Exercise</button></div></div></div>
     <div id="warmup-manage-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Manage Warm-ups</h2><button id="close-warmup-manage-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div><label for="warmup-day-select" class="form-label">Workout Day</label><select id="warmup-day-select" class="form-select mt-1"></select></div><div id="warmup-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div><hr class="border-gray-800"><form id="warmup-form" class="space-y-3"><h3 id="warmup-form-title" class="font-bold text-lg text-blue-400">Add New Warm-up</h3><div><label for="warmup-name" class="form-label">Name</label><input type="text" id="warmup-name" class="form-input mt-1" required></div><div><label for="warmup-instructions" class="form-label">Instructions (one per line)</label><textarea id="warmup-instructions" rows="4" class="form-input mt-1"></textarea></div><button type="submit" id="save-warmup-btn" class="w-full btn btn-primary">Add Warm-up</button></form></div></div></div>
     <div id="workout-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="modal-title" class="text-2xl font-bold">Log Exercise</h2><button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="workout-log-form"><div class="space-y-4"><div id="sets-container"></div><button type="button" id="add-set-btn" class="w-full btn btn-secondary">Add Set</button><button type="submit" id="save-workout-btn" class="w-full btn btn-primary mt-2">Save Workout</button></div></form></div></div>
-    <div id="exercise-library-modal" class="modal-backdrop"><div class="modal-content !max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Exercise Library</h2><button id="close-exercise-library-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="flex gap-2 mb-4"><input type="search" id="exercise-library-search" class="form-input" placeholder="Search exercises..."><select id="exercise-library-filter" class="form-select w-48"><option value="">All Groups</option></select></div><div id="exercise-library-list" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-2"></div><button id="add-selected-exercises-btn" class="btn btn-primary w-full mt-4">Add Selected to Plan</button></div></div>
+    <div id="exercise-library-modal" class="modal-backdrop"><div class="modal-content !max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold" id="exercise-library-title">Exercise Library</h2><button id="close-exercise-library-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="flex gap-2 mb-4"><input type="search" id="exercise-library-search" class="form-input" placeholder="Search exercises..."><select id="exercise-library-filter" class="form-select w-48"><option value="">All Groups</option></select></div><div id="exercise-library-list" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-2"></div><button id="add-selected-exercises-btn" class="btn btn-primary w-full mt-4">Add Selected to Plan</button></div></div>
     <div id="confirm-modal" class="modal-backdrop"><div class="modal-content"><h2 id="confirm-modal-title" class="text-xl font-bold mb-4">Are you sure?</h2><p id="confirm-modal-text" class="text-gray-300 mb-6">This action cannot be undone.</p><div class="flex justify-end gap-4"><button id="confirm-modal-cancel-btn" class="btn btn-secondary">Cancel</button><button id="confirm-modal-confirm-btn" class="btn btn-danger">Confirm</button></div></div></div>
     <div id="alert-modal" class="modal-backdrop"><div class="modal-content"><h2 id="alert-modal-title" class="text-xl font-bold mb-4">Alert</h2><p id="alert-modal-text" class="text-gray-300 mb-6"></p><div class="flex justify-end"><button id="alert-modal-ok-btn" class="btn btn-primary">OK</button></div></div></div>
     
@@ -501,6 +500,9 @@
             
             async function initializeFirebase() {
                 try {
+                    if (Object.keys(firebaseConfig).length === 0) {
+                        throw new Error("Firebase config is missing.");
+                    }
                     app = initializeApp(firebaseConfig);
                     db = getFirestore(app);
                     auth = getAuth(app);
@@ -539,6 +541,8 @@
             let viewDate = new Date();
             viewDate.setHours(0,0,0,0);
             let isLogging = false; 
+            let exercisePrefs = {}; // For AI plan generator
+            let libraryModalContext = { purpose: 'add', group: '' }; // 'add' or 'pref'
 
             // --- DATABASE DEFAULTS ---
              const defaultWarmups = {
@@ -587,6 +591,7 @@
                 confirmModalCancelBtn: document.getElementById('confirm-modal-cancel-btn'), confirmModalConfirmBtn: document.getElementById('confirm-modal-confirm-btn'),
                 alertModal: document.getElementById('alert-modal'), alertModalTitle: document.getElementById('alert-modal-title'), alertModalText: document.getElementById('alert-modal-text'), alertModalOkBtn: document.getElementById('alert-modal-ok-btn'),
                 exerciseLibraryModal: document.getElementById('exercise-library-modal'), closeExerciseLibraryModalBtn: document.getElementById('close-exercise-library-modal-btn'),
+                exerciseLibraryTitle: document.getElementById('exercise-library-title'),
                 addSelectedExercisesBtn: document.getElementById('add-selected-exercises-btn'),
                 progressExerciseSelect: document.getElementById('progress-exercise-select'), clearHistoryBtn: document.getElementById('clear-history-btn'), addExerciseToPlanBtn: document.getElementById('add-exercise-to-plan-btn'),
                 aiAdviceExerciseSelect: document.getElementById('ai-advice-exercise-select'), getAIAdviceBtn: document.getElementById('get-ai-advice-btn'), aiAdviceOutput: document.getElementById('ai-advice-output'),
@@ -598,7 +603,8 @@
                 warmupNameInput: document.getElementById('warmup-name'), warmupInstructionsInput: document.getElementById('warmup-instructions'), saveWarmupBtn: document.getElementById('save-warmup-btn'),
                 dayViewDateDisplayBtn: document.getElementById('day-view-date-display-btn'), dayViewStatus: document.getElementById('day-view-status'), dayViewDateDisplay: document.getElementById('day-view-date-display-btn'),
                 workoutPlanForDay: document.getElementById('workout-plan-for-day'), historyDayContent: document.getElementById('history-day-content'), 
-                planActionsBtn: document.getElementById('plan-actions-btn'), planActionsDropdown: document.getElementById('plan-actions-dropdown'), 
+                planActionsBtn: document.getElementById('plan-actions-btn'), planActionsDropdown: document.getElementById('plan-actions-dropdown'),
+                deletePlanBtn: document.getElementById('delete-plan-btn'), 
                 historyActionsBtn: document.getElementById('history-actions-btn'), historyActionsDropdown: document.getElementById('history-actions-dropdown'),
                 prevDayBtn: document.getElementById('prev-day-btn'), nextDayBtn: document.getElementById('next-day-btn'),
                 aiTabSpecific: document.getElementById('ai-tab-specific'), aiTabGeneral: document.getElementById('ai-tab-general'), aiPanelSpecific: document.getElementById('ai-panel-specific'), aiPanelGeneral: document.getElementById('ai-panel-general'),
@@ -607,13 +613,13 @@
                 // Plan Generator
                 aiPlanGeneratorModal: document.getElementById('ai-plan-generator-modal'), closeAiPlanGeneratorModalBtn: document.getElementById('close-ai-plan-generator-modal-btn'),
                 aiPlanGeneratorForm: document.getElementById('ai-plan-generator-form'), aiPlanGeneratorBtn: document.getElementById('ai-plan-generator-btn'),
-                aiPlanDaysContainer: document.getElementById('ai-plan-days-container'), aiPlanDurationsContainer: document.getElementById('ai-plan-durations-container'),
+                aiPlanScheduleBuilder: document.getElementById('ai-plan-schedule-builder'),
+                aiPlanDurationsContainer: document.getElementById('ai-plan-durations-container'),
                 aiPlanSetsContainer: document.getElementById('ai-plan-sets-container'), aiPlanOutput: document.getElementById('ai-plan-output'),
                 aiPlanExplanation: document.getElementById('ai-plan-explanation'), aiPlanJsonOutput: document.getElementById('ai-plan-json-output'),
                 cancelNewPlanBtn: document.getElementById('cancel-new-plan-btn'), saveNewPlanBtn: document.getElementById('save-new-plan-btn'),
-                aiPlanTabBtn: document.getElementById('ai-plan-tab-btn'), manualPlanTabBtn: document.getElementById('manual-plan-tab-btn'),
-                aiPlanPanel: document.getElementById('ai-plan-panel'), manualPlanPanel: document.getElementById('manual-plan-panel'),
-                manualPlanForm: document.getElementById('manual-plan-form'), addManualDayBtn: document.getElementById('add-manual-day-btn'), manualScheduleBuilder: document.getElementById('manual-schedule-builder'),
+                aiPlanPanel: document.getElementById('ai-plan-panel'),
+                aiPlanExercisePrefsContainer: document.getElementById('ai-plan-exercise-prefs-container'),
                 // Custom Exercise AI Modal
                 addCustomExerciseBtn: document.getElementById('add-custom-exercise-btn'),
                 customExerciseModal: document.getElementById('custom-exercise-modal'), closeCustomExerciseModalBtn: document.getElementById('close-custom-exercise-modal-btn'),
@@ -692,7 +698,7 @@
 
             // --- CORE & HELPER FUNCTIONS ---
             const getApiUrl = (model, action = 'generateContent') => {
-                 const apiKey = "AIzaSyDY48xF1byvU05kS9qKvN8iyrIR3hheP8w";
+                 const apiKey = "";
                 return `https://generativelanguage.googleapis.com/v1beta/models/${model}:${action}?key=${apiKey}`;
             };
             
@@ -900,32 +906,23 @@
             // --- EVENT LISTENERS ---
             ui.addExerciseToPlanBtn.addEventListener('click', () => {
                 const dayType = getWorkoutDayType(viewDate);
-                if(dayType === 'Rest') return showCustomAlert("Rest Day", "Cannot add exercises to a rest day.");
+                if (dayType === 'Rest') return showCustomAlert("Rest Day", "Cannot add exercises to a rest day.");
                 
-                const libraryList = document.getElementById('exercise-library-list');
-                const filterSelect = document.getElementById('exercise-library-filter');
-
-                filterSelect.innerHTML = '<option value="">All Groups</option>' + ALL_MUSCLE_GROUPS.map(g => `<option value="${g}">${g}</option>`).join('');
-
-                const renderLibrary = (filter = '', search = '') => {
-                    libraryList.innerHTML = exerciseDB
-                        .filter(ex => (filter ? ex.group === filter : true) && (search ? ex.name.toLowerCase().includes(search.toLowerCase()) : true))
-                        .sort((a,b) => a.name.localeCompare(b.name))
-                        .map(ex => `<label class="flex items-center gap-3 p-2 rounded-md hover:bg-input-bg"><input type="checkbox" value="${ex.name}" class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500"><div><p>${ex.name}</p><p class="text-xs text-secondary-text">${ex.group}</p></div></label>`).join('');
-                };
-                
-                renderLibrary();
-                document.getElementById('exercise-library-search').oninput = (e) => renderLibrary(filterSelect.value, e.target.value);
-                filterSelect.onchange = (e) => renderLibrary(e.target.value, document.getElementById('exercise-library-search').value);
-                
-                showModal(ui.exerciseLibraryModal);
+                libraryModalContext.purpose = 'add';
+                openExerciseLibrary(dayType);
             });
-            ui.closeExerciseLibraryModalBtn.addEventListener('click', () => hideModal(ui.exerciseLibraryModal));
-            ui.addSelectedExercisesBtn.addEventListener('click', async () => {
-                const dayType = getWorkoutDayType(viewDate);
-                const selected = Array.from(document.querySelectorAll('#exercise-library-list input:checked')).map(cb => cb.value);
 
-                if (selected.length > 0) {
+            ui.closeExerciseLibraryModalBtn.addEventListener('click', () => hideModal(ui.exerciseLibraryModal));
+            
+            ui.addSelectedExercisesBtn.addEventListener('click', async () => {
+                const selected = Array.from(document.querySelectorAll('#exercise-library-list input:checked')).map(cb => cb.value);
+                if (selected.length === 0) {
+                    hideModal(ui.exerciseLibraryModal);
+                    return;
+                }
+
+                if (libraryModalContext.purpose === 'add') {
+                    const dayType = getWorkoutDayType(viewDate);
                      if (!workoutPlan.workouts) workoutPlan.workouts = [];
                     const workoutIndex = workoutPlan.workouts.findIndex(w => w.day === dayType);
                     if (workoutIndex > -1) {
@@ -936,9 +933,15 @@
                         workoutPlan.workouts.push({ day: dayType, exercises: selected });
                     }
                     await saveDataToFirestore('workout_plan', { plan: workoutPlan });
+                } else if (libraryModalContext.purpose === 'pref') {
+                    const group = libraryModalContext.group;
+                    exercisePrefs[group] = selected;
+                    renderExercisePreferences(); // Re-render to update the count
                 }
+
                 hideModal(ui.exerciseLibraryModal);
             });
+
 
             ui.getAIAdviceBtn.addEventListener('click', getAIWorkoutAdvice);
             ui.closeModalBtn.addEventListener('click', () => { hideModal(ui.workoutModal); isLogging = false; });
@@ -1288,6 +1291,15 @@
                     ui.historyActionsDropdown.classList.add('hidden');
                 });
             }
+
+             ui.deletePlanBtn.addEventListener('click', () => {
+                showConfirmModal('Delete Plan?', 'This will delete your current workout plan and schedule. This action cannot be undone.', async () => {
+                    await saveDataToFirestore('workout_plan', { plan: { name: "No Plan", schedule: {}, workouts: [] } });
+                    showCustomAlert("Plan Deleted", "Your workout plan has been removed.");
+                });
+                ui.planActionsDropdown.classList.add('hidden');
+            });
+            
             if (ui.historyActionsBtn) {
                 ui.historyActionsBtn.addEventListener('click', (e) => { 
                     e.stopPropagation(); 
@@ -1311,70 +1323,159 @@
             ui.getAIGeneralAdviceBtn.addEventListener('click', getAIGeneralAdvice);
 
             // Plan Generator Listeners
-            ui.aiPlanTabBtn.addEventListener('click', () => {
-                ui.aiPlanTabBtn.classList.add('border-accent', 'text-primary-text');
-                ui.aiPlanTabBtn.classList.remove('border-transparent', 'text-secondary-text');
-                ui.manualPlanTabBtn.classList.remove('border-accent', 'text-primary-text');
-                ui.manualPlanTabBtn.classList.add('border-transparent', 'text-secondary-text');
-                ui.aiPlanPanel.classList.remove('hidden');
-                ui.manualPlanPanel.classList.add('hidden');
-            });
-            ui.manualPlanTabBtn.addEventListener('click', () => {
-                ui.manualPlanTabBtn.classList.add('border-accent', 'text-primary-text');
-                ui.manualPlanTabBtn.classList.remove('border-transparent', 'text-secondary-text');
-                ui.aiPlanTabBtn.classList.remove('border-accent', 'text-primary-text');
-                ui.aiPlanTabBtn.classList.add('border-transparent', 'text-secondary-text');
-                ui.manualPlanPanel.classList.remove('hidden');
-                ui.aiPlanPanel.classList.add('hidden');
-            });
-            
             ui.aiPlanGeneratorBtn.addEventListener('click', () => {
-                const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                ui.aiPlanDaysContainer.innerHTML = days.map(day => `<label class="flex items-center gap-2 p-2 bg-input-bg rounded-md"><input type="checkbox" name="workoutDay" value="${day}" class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500"><span class="text-sm">${day.substring(0,3)}</span></label>`).join('');
+                const splitSelect = document.getElementById('ai-plan-split-select');
+                
                 const equipment = ['Machines', 'Cables', 'Dumbbells', 'Barbells', 'Bodyweight', 'None'];
-                document.getElementById('ai-plan-equipment-container').innerHTML = equipment.map(e => `<label class="flex items-center gap-2"><input type="checkbox" name="equipment" value="${e}" class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500"><span class="text-sm">${e}</span></label>`).join('');
-                document.getElementById('ai-plan-focus-muscle-container').innerHTML = ALL_MUSCLE_GROUPS.map(g => `<label class="flex items-center gap-2"><input type="checkbox" name="focusMuscle" value="${g}" class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500"><span class="text-sm">${g}</span></label>`).join('');
+                document.getElementById('ai-plan-equipment-container').innerHTML = equipment.map(e => `<label class="flex items-center gap-2"><input type="checkbox" name="equipment" value="${e}" checked class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500"><span class="text-sm">${e}</span></label>`).join('');
+                
+                const focusMuscleContainer = document.getElementById('ai-plan-focus-muscle-container');
+                focusMuscleContainer.innerHTML = ALL_MUSCLE_GROUPS.map(g => `<label class="flex items-center gap-2"><input type="checkbox" name="focusMuscle" value="${g}" checked class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500"><span class="text-sm">${g}</span></label>`).join('');
+                
                 ui.aiPlanSetsContainer.innerHTML = ALL_MUSCLE_GROUPS.map(group => `<div class="flex items-center gap-2"><label for="sets-${group}" class="form-label text-sm flex-1">${group}</label><input type="number" id="sets-${group}" class="form-input !w-20 !py-1 text-center" placeholder="Auto"></div>`).join('');
+                
+                splitSelect.dispatchEvent(new Event('change')); // Trigger initial schedule build
+                focusMuscleContainer.dispatchEvent(new Event('change')); // Trigger initial prefs build
                 showModal(ui.aiPlanGeneratorModal);
             });
+
             ui.closeAiPlanGeneratorModalBtn.addEventListener('click', () => hideModal(ui.aiPlanGeneratorModal));
             
-            ui.aiPlanDaysContainer.addEventListener('change', () => {
-                const checkedDays = Array.from(document.querySelectorAll('input[name="workoutDay"]:checked')).map(cb => cb.value);
-                const sameTimeToggle = `
-                    <div class="flex items-center gap-2 mt-2">
-                        <input type="checkbox" id="same-duration-toggle" checked class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500">
-                        <label for="same-duration-toggle" class="text-sm">Use same duration for all</label>
-                    </div>
-                `;
-                const singleDurationInput = `
-                    <div id="single-duration-container">
-                        <label class="form-label">Workout Duration (minutes)</label>
-                        <input type="number" id="ai-plan-duration" value="60" class="form-input mt-1">
-                    </div>`;
+             const renderScheduleBuilder = (splitTypes) => {
+                const allTypes = ['Rest', ...splitTypes];
+                
+                const dayGrid = document.getElementById('ai-plan-schedule-builder');
+                dayGrid.className = "grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 pt-4 mt-4 border-t border-gray-800";
+                dayGrid.innerHTML = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => `
+                    <button type="button" class="text-center p-2 rounded-lg bg-input-bg day-schedule-btn" data-day="${day}day" data-current-index="0">
+                        <p class="font-semibold text-sm sm:text-base">${day}</p>
+                        <p class="text-xs text-blue-400" id="day-type-${day}">Rest</p>
+                    </button>
+                `).join('');
 
-                if (checkedDays.length > 0) {
-                    let durationHTML = `<h3 class="form-label font-semibold text-primary-text mb-2">Durations</h3>`;
-                    if (checkedDays.length > 1) {
-                       durationHTML += sameTimeToggle + singleDurationInput;
-                    } else {
-                        durationHTML += singleDurationInput;
+                dayGrid.addEventListener('click', e => {
+                    const btn = e.target.closest('.day-schedule-btn');
+                    if(btn) {
+                        let currentIndex = parseInt(btn.dataset.currentIndex) + 1;
+                        if (currentIndex >= allTypes.length) currentIndex = 0;
+                        btn.dataset.currentIndex = currentIndex;
+                        btn.querySelector('.text-xs').textContent = allTypes[currentIndex];
+                        renderDurations(); // Update durations when schedule changes
                     }
-                    durationHTML += `<div id="individual-durations-container" class="space-y-2 mt-2 hidden">${checkedDays.map(day => `<div class="flex items-center gap-2"><label class="w-24 text-sm">${day}</label><input type="number" data-day="${day}" class="form-input !py-1 day-duration-input" placeholder="60"></div>`).join('')}</div>`;
-                    ui.aiPlanDurationsContainer.innerHTML = durationHTML;
-                    
-                    const toggle = document.getElementById('same-duration-toggle');
-                    if(toggle){
-                        toggle.onchange = () => {
-                            document.getElementById('single-duration-container').classList.toggle('hidden', !toggle.checked);
-                            document.getElementById('individual-durations-container').classList.toggle('hidden', toggle.checked);
-                        };
-                    }
+                });
+                renderDurations();
+            };
 
+            const splitSelect = document.getElementById('ai-plan-split-select');
+            const customSplitInput = document.getElementById('ai-plan-split-custom');
+
+            const updateSplit = () => {
+                let splitTypes;
+                if (splitSelect.value === 'other') {
+                    customSplitInput.classList.remove('hidden');
+                    splitTypes = customSplitInput.value.split(',').map(s => s.trim()).filter(Boolean);
                 } else {
-                    ui.aiPlanDurationsContainer.innerHTML = '';
+                    customSplitInput.classList.add('hidden');
+                    splitTypes = splitSelect.value.split(',').map(s => s.trim()).filter(Boolean);
                 }
+                renderScheduleBuilder(splitTypes);
+            };
+
+            splitSelect.addEventListener('change', updateSplit);
+            customSplitInput.addEventListener('input', updateSplit);
+
+            const renderDurations = () => {
+                const container = ui.aiPlanDurationsContainer;
+                const scheduleButtons = document.querySelectorAll('.day-schedule-btn');
+                let hasWorkoutDay = false;
+                let durationHTML = '';
+
+                scheduleButtons.forEach(btn => {
+                    const day = btn.dataset.day.replace('day','');
+                    const dayType = btn.querySelector('.text-xs').textContent;
+                    if(dayType !== 'Rest') {
+                        hasWorkoutDay = true;
+                        durationHTML += `<div class="flex items-center justify-between gap-2"><label class="text-sm">${day}</label><input type="number" data-day="${day}" class="form-input !w-24 !py-1 day-duration-input" placeholder="${document.getElementById('ai-plan-duration').value || 60}"></div>`;
+                    }
+                });
+
+                if(hasWorkoutDay) {
+                    container.innerHTML = durationHTML;
+                } else {
+                    container.innerHTML = '';
+                    container.classList.add('hidden');
+                    document.getElementById('customize-duration-btn').textContent = 'Customize per day';
+                }
+            };
+            
+            document.getElementById('customize-duration-btn').addEventListener('click', (e) => {
+                const container = ui.aiPlanDurationsContainer;
+                container.classList.toggle('hidden');
+                e.target.textContent = container.classList.contains('hidden') ? 'Customize per day' : 'Use default duration';
+                renderDurations();
             });
+
+            document.getElementById('customize-sets-btn').addEventListener('click', (e) => {
+                const container = ui.aiPlanSetsContainer;
+                container.classList.toggle('hidden');
+                e.target.textContent = container.classList.contains('hidden') ? 'Customize per muscle group' : 'Use default sets';
+            });
+            
+            const openExerciseLibrary = (group) => {
+                libraryModalContext.purpose = 'pref';
+                libraryModalContext.group = group;
+
+                ui.exerciseLibraryTitle.textContent = `Select Exercises for ${group}`;
+                ui.addSelectedExercisesBtn.textContent = 'Confirm Selection';
+                
+                const libraryList = document.getElementById('exercise-library-list');
+                const filterSelect = document.getElementById('exercise-library-filter');
+                const searchInput = document.getElementById('exercise-library-search');
+
+                filterSelect.innerHTML = '<option value="">All Groups</option>' + ALL_MUSCLE_GROUPS.map(g => `<option value="${g}">${g}</option>`).join('');
+                filterSelect.value = group;
+                searchInput.value = '';
+                
+                const preSelected = exercisePrefs[group] || [];
+
+                const renderLibrary = (filter = '', search = '') => {
+                    libraryList.innerHTML = exerciseDB
+                        .filter(ex => (filter ? ex.group === filter : true) && (search ? ex.name.toLowerCase().includes(search.toLowerCase()) : true))
+                        .sort((a,b) => a.name.localeCompare(b.name))
+                        .map(ex => `<label class="flex items-center gap-3 p-2 rounded-md hover:bg-input-bg">
+                            <input type="checkbox" value="${ex.name}" ${preSelected.includes(ex.name) ? 'checked' : ''} class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500">
+                            <div><p>${ex.name}</p><p class="text-xs text-secondary-text">${ex.group}</p></div>
+                        </label>`).join('');
+                };
+                
+                renderLibrary(group);
+                searchInput.oninput = (e) => renderLibrary(filterSelect.value, e.target.value);
+                filterSelect.onchange = (e) => renderLibrary(e.target.value, searchInput.value);
+                
+                showModal(ui.exerciseLibraryModal);
+            };
+            
+            const renderExercisePreferences = () => {
+                const container = ui.aiPlanExercisePrefsContainer;
+                const checkedMuscles = Array.from(document.querySelectorAll('input[name="focusMuscle"]:checked')).map(cb => cb.value);
+                
+                if (checkedMuscles.length === 0) {
+                    container.innerHTML = '<p class="text-secondary-text text-sm">Select one or more focus muscle groups to set preferences.</p>';
+                    return;
+                }
+                
+                container.innerHTML = checkedMuscles.map(muscle => `
+                    <button type="button" class="btn btn-secondary w-full justify-between" data-group="${muscle}">
+                        <span>${muscle}</span>
+                        <span class="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full" id="pref-count-${muscle}">${(exercisePrefs[muscle] || []).length} selected</span>
+                    </button>
+                `).join('');
+
+                container.querySelectorAll('button').forEach(btn => {
+                    btn.addEventListener('click', () => openExerciseLibrary(btn.dataset.group));
+                });
+            };
+            document.getElementById('ai-plan-focus-muscle-container').addEventListener('change', renderExercisePreferences);
             
             const aiPlanGoalSelect = document.getElementById('ai-plan-goal');
             if(aiPlanGoalSelect){
@@ -1402,13 +1503,16 @@
                     statusDiv.textContent = 'Selecting the best exercises...';
 
                     const goal = document.getElementById('ai-plan-goal').value;
-                    const workoutDays = Array.from(document.querySelectorAll('input[name="workoutDay"]:checked')).map(cb => cb.value);
-                    const overallDuration = document.getElementById('ai-plan-duration')?.value || 60; 
-                    const durations = {};
-                    document.querySelectorAll('.day-duration-input').forEach(input => {
-                        if (input.value) durations[input.dataset.day] = input.value;
+                    
+                    const schedule = {};
+                    let scheduleIsCustomized = false;
+                    document.querySelectorAll('.day-schedule-btn').forEach(btn => {
+                        const dayName = btn.dataset.day.replace('day', 'day');
+                        const dayType = btn.querySelector('.text-xs').textContent;
+                        schedule[dayName] = dayType;
+                        if(parseInt(btn.dataset.currentIndex) !== 0) scheduleIsCustomized = true;
                     });
-                    const split = document.getElementById('ai-plan-split').value || 'Push/Pull/Legs';
+                    
                     const equipment = Array.from(document.querySelectorAll('input[name="equipment"]:checked')).map(cb => cb.value);
                     const focusMuscles = Array.from(document.querySelectorAll('input[name="focusMuscle"]:checked')).map(cb => cb.value);
                     const goalText = goal === 'custom' ? document.getElementById('ai-plan-goal-text').value : goal;
@@ -1416,28 +1520,36 @@
                     userSettings.unit = unit; 
                     await saveDataToFirestore('settings', userSettings);
                     
+                    const defaultSets = document.getElementById('ai-plan-default-sets').value;
                     const targetSets = {};
                     ALL_MUSCLE_GROUPS.forEach(group => {
                         const input = document.getElementById(`sets-${group}`);
-                        if (input.value) targetSets[group] = input.value;
+                        if (input && input.value) targetSets[group] = input.value;
                     });
+
+                    const defaultDuration = document.getElementById('ai-plan-duration').value;
+                    const durations = {};
+                    document.querySelectorAll('.day-duration-input').forEach(input => {
+                        if (input.value) durations[input.dataset.day] = input.value;
+                    });
+
 
                     let prompt = `Create a weekly workout plan based on these user inputs:
                     - Primary Goal: ${goalText}
-                    - Workout Days: ${workoutDays.join(', ') || 'Not specified'}
-                    - Workout Split: ${split}
-                    - Default Duration: ~${overallDuration} minutes per session.
+                    ${scheduleIsCustomized ? `- Weekly Schedule: ${JSON.stringify(schedule)}` : `- Workout Split: ${splitSelect.value === 'other' ? customSplitInput.value : splitSelect.value}`}
+                    - Default Duration: ${defaultDuration} minutes.
                     - Specific Durations: ${JSON.stringify(durations)}
                     - Equipment Available: ${equipment.join(', ') || 'Not specified'}
                     - Focus Muscles: ${focusMuscles.join(', ') || 'None'}
-                    - User's Goal Description: ${goalText || 'Not provided'}
-                    - Target Sets Per Muscle Group: ${JSON.stringify(targetSets)}
-                    - Available Exercises: ${exerciseDB.map(ex => ex.name).join(', ')}
+                    - Preferred Exercises: ${JSON.stringify(exercisePrefs)}
+                    - Default Sets Per Muscle: ${defaultSets || 'Auto'}
+                    - Specific Target Sets: ${JSON.stringify(targetSets)}
+                    - Full List of Available Exercises: ${exerciseDB.map(ex => ex.name).join(', ')}
 
                     Respond with a valid JSON object ONLY. The root object must have "name", "schedule", "workouts", and "reasoning" keys.
                     - "name": A creative name for the plan.
-                    - "schedule": An object mapping all 7 days of the week (Monday, Tuesday, etc.) to a workout type (e.g., "Push", "Pull", "Legs", or "Rest"). 
-                    - "workouts": An array of objects. Each object must have a "day" key (matching a workout type from the schedule) and an "exercises" key (an array of exercise names selected from the provided list).
+                    - "schedule": This MUST be the schedule object based on user input. If they did not customize, create a logical one based on their split.
+                    - "workouts": An array of objects. Each object must have a "day" key (matching a workout type from the schedule) and an "exercises" key (an array of exercise names selected from the provided list, respecting user preferences if provided).
                     - "reasoning": A brief paragraph (under 100 words) explaining the plan's structure.`;
                     
                     const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
@@ -1584,72 +1696,63 @@
                 showCustomAlert("Success", "Custom exercise saved!");
             });
 
-            // Manual Plan Builder Logic
-            ui.addManualDayBtn.addEventListener('click', () => {
-                const dayCount = ui.manualScheduleBuilder.children.length;
-                const div = document.createElement('div');
-                div.className = 'manual-day-row border-t border-border-color pt-4';
-                div.innerHTML = `
-                     <div class="flex justify-between items-center mb-2">
-                        <input type="text" class="form-input !w-1/2 day-type-name" placeholder="Workout Type (e.g., Push)">
-                        <button type="button" class="remove-manual-day-btn btn btn-secondary !p-2 !text-red-400"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
-                    </div>
-                    <div class="grid grid-cols-4 lg:grid-cols-7 gap-2">
-                        ${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => `<label class="flex items-center gap-1 p-1 bg-input-bg rounded-md text-xs"><input type="checkbox" name="manual-day-${dayCount}" value="${day}day" class="form-checkbox h-3 w-3 bg-input-bg border-border-color rounded-sm text-blue-500 focus:ring-blue-500">${day}</label>`).join('')}
-                    </div>
-                    <select multiple class="form-input mt-2 h-32 manual-exercise-select"></select>
-                `;
-                ui.manualScheduleBuilder.appendChild(div);
-                const select = div.querySelector('select');
-                select.innerHTML = exerciseDB.map(ex => `<option value="${ex.name}">${ex.name} (${ex.group})</option>`).join('');
-                lucide.createIcons();
+            ui.editPlanBtn.addEventListener('click', () => {
+                ui.workoutPlanForDay.classList.add('edit-mode');
+                ui.planViewHeader.classList.add('hidden');
+                ui.editModeToolbar.classList.remove('hidden');
+                ui.planActionsDropdown.classList.add('hidden');
             });
 
-            ui.manualScheduleBuilder.addEventListener('click', (e) => {
-                if(e.target.closest('.remove-manual-day-btn')) {
-                    e.target.closest('.manual-day-row').remove();
+            ui.editModeDoneBtn.addEventListener('click', () => {
+                ui.workoutPlanForDay.classList.remove('edit-mode');
+                ui.planViewHeader.classList.remove('hidden');
+                ui.editModeToolbar.classList.add('hidden');
+            });
+
+            ui.editModeDeleteBtn.addEventListener('click', async () => {
+                const dayType = getWorkoutDayType(viewDate);
+                const workoutIndex = workoutPlan.workouts?.findIndex(w => w.day === dayType);
+                if (workoutIndex > -1) {
+                    const selected = new Set(Array.from(ui.workoutPlanForDay.querySelectorAll('.edit-mode-controls input:checked')).map(cb => cb.value));
+                    if (selected.size === 0) return;
+                    
+                    workoutPlan.workouts[workoutIndex].exercises = workoutPlan.workouts[workoutIndex].exercises.filter(ex => !selected.has(ex));
+                    await saveDataToFirestore('workout_plan', { plan: workoutPlan });
                 }
             });
-            
-            ui.manualPlanForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const planName = document.getElementById('manual-plan-name').value.trim();
-                if(!planName) return showCustomAlert("Error", "Please enter a name for your plan.");
-                
-                const newPlan = {
-                    name: planName,
-                    schedule: {},
-                    workouts: [],
-                };
-                const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                weekDays.forEach(day => newPlan.schedule[day] = "Rest");
 
-                const dayRows = document.querySelectorAll('.manual-day-row');
-                let hasError = false;
-                
-                dayRows.forEach((row, index) => {
-                    const dayTypeName = row.querySelector('.day-type-name').value.trim();
-                    if(!dayTypeName) {
-                        showCustomAlert("Error", "Please name all your workout day types.");
-                        hasError = true;
-                        return;
+            ui.editModeFavoriteBtn.addEventListener('click', async () => {
+                const selected = Array.from(ui.workoutPlanForDay.querySelectorAll('.edit-mode-controls input:checked')).map(cb => cb.value);
+                if(selected.length === 0) return;
+
+                const updates = {};
+                selected.forEach(exName => {
+                    const exercise = exerciseDB.find(ex => ex.name === exName);
+                    if(exercise) {
+                        exercise.favorite = !exercise.favorite;
+                        if(exercise.id) {
+                            updates[`custom-${exercise.id}`] = exercise;
+                        } else {
+                            updates[`default-${exercise.name}`] = exercise;
+                        }
                     }
-                    
-                    const selectedDays = Array.from(row.querySelectorAll(`input[name="manual-day-${index}"]:checked`)).map(cb => cb.value.replace('day','sday'));
-                    selectedDays.forEach(day => {
-                        const fullDayName = weekDays.find(d => d.startsWith(day.substring(0,3)));
-                        if(fullDayName) newPlan.schedule[fullDayName] = dayTypeName;
-                    });
-                    
-                    const selectedExercises = Array.from(row.querySelector('.manual-exercise-select').selectedOptions).map(opt => opt.value);
-                    newPlan.workouts.push({ day: dayTypeName, exercises: selectedExercises });
+                });
+
+                const customUpdates = Object.values(updates).filter(ex => ex.id);
+                const defaultDB = exerciseDB.filter(ex => !ex.id);
+
+                const batch = writeBatch(db);
+                customUpdates.forEach(ex => {
+                    const docRef = doc(db, `/artifacts/${appId}/users/${userId}/custom_exercises/${ex.id}`);
+                    batch.set(docRef, ex, { merge: true });
                 });
                 
-                if(hasError) return;
+                if(Object.keys(updates).some(k => k.startsWith('default'))) {
+                    const docRef = doc(db, `/artifacts/${appId}/public/data/exercises/default`);
+                    batch.set(docRef, { exercises: defaultDB }, { merge: true });
+                }
 
-                await saveDataToFirestore('workout_plan', { plan: newPlan });
-                hideModal(ui.aiPlanGeneratorModal);
-                showCustomAlert("Success", `Plan "${planName}" has been saved!`);
+                await batch.commit();
             });
 
 

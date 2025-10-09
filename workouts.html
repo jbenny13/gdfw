@@ -60,8 +60,15 @@
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 0.75rem;
-            padding: 2rem;
+            padding: 1.5rem; /* Adjusted for mobile */
         }
+        
+        @media (min-width: 640px) {
+            .content-card {
+                padding: 2rem;
+            }
+        }
+
 
         .form-input, .form-select {
             background-color: var(--input-bg);
@@ -164,9 +171,9 @@
         .modal-content {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            padding: 1.5rem; /* Reduced padding for mobile */
+            padding: 1.5rem;
             border-radius: 0.75rem;
-            width: 95%; /* Increased width for mobile */
+            width: 95%;
             max-width: 550px;
             max-height: 90vh;
             overflow-y: auto;
@@ -237,10 +244,11 @@
         details[open] > summary .lucide-chevron-down {
             transform: rotate(180deg);
         }
+        
         .submenu {
             display: none;
         }
-        .group:hover .submenu, .group.open .submenu {
+        .group.open > .submenu {
             display: block;
         }
 
@@ -248,15 +256,15 @@
 </head>
 <body class="antialiased">
 
-    <div class="container mx-auto max-w-7xl px-4 py-8">
+    <div class="container mx-auto max-w-7xl px-2 sm:px-4 py-8">
 
-        <header class="flex flex-col sm:flex-row items-center justify-between mb-16 pb-4 border-b border-gray-900">
+        <header class="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-16 pb-4 border-b border-gray-900">
             <a href="index.html" class="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
                 <h1 class="text-2xl font-bold">FitTrack AI</h1>
             </a>
             <nav class="mt-4 sm:mt-0">
-                <ul class="flex items-center space-x-4 sm:space-x-6 text-base font-medium">
+                <ul class="flex items-center space-x-2 sm:space-x-6 text-sm sm:text-base font-medium">
                     <li><a href="index.html" class="nav-link">Home</a></li>
                     <li><a href="nutrition.html" class="nav-link">Nutrition</a></li>
                     <li><a href="workouts.html" class="nav-link active">Workouts</a></li>
@@ -268,29 +276,29 @@
         </header>
 
         <main>
-             <div class="flex flex-col sm:flex-row justify-between items-center mb-8">
+             <div class="flex flex-col sm:flex-row justify-between items-center mb-8 px-2">
                 <div>
-                    <h2 id="plan-main-title" class="text-3xl font-bold">Your Workout Plan</h2>
-                    <p id="plan-subtitle" class="text-gray-400 mt-2">Your personalized workout schedule.</p>
+                    <h2 id="plan-main-title" class="text-2xl sm:text-3xl font-bold">Your Workout Plan</h2>
+                    <p id="plan-subtitle" class="text-gray-400 mt-1 sm:mt-2">Your personalized workout schedule.</p>
                 </div>
-                <button id="ai-plan-generator-btn" class="btn btn-primary mt-4 sm:mt-0">
+                <button id="ai-plan-generator-btn" class="btn btn-primary mt-4 sm:mt-0 w-full sm:w-auto">
                     <i data-lucide="wand"></i>
-                    Plan Generator
+                    <span>Plan Generator</span>
                 </button>
             </div>
             
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                <div class="lg:col-span-2 content-card">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-8">
+                <div class="lg:col-span-4 content-card">
                     <div id="plan-view-header" class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                          <div class="flex-1">
-                             <button id="day-view-date-display-btn" class="text-left hover:bg-input-bg px-4 py-2 rounded-lg transition-colors">
-                                <span id="day-view-title-span" class="text-2xl font-semibold block"></span>
-                                <span id="day-view-date-span" class="text-base text-secondary-text"></span>
+                             <button id="day-view-date-display-btn" class="text-left hover:bg-input-bg px-4 py-2 rounded-lg transition-colors w-full">
+                                <span id="day-view-title-span" class="text-xl sm:text-2xl font-semibold block"></span>
+                                <span id="day-view-date-span" class="text-sm sm:text-base text-secondary-text"></span>
                             </button>
                         </div>
                         <div class="flex items-center justify-center gap-2">
                             <button id="prev-day-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-                            <div class="flex flex-wrap items-center justify-center sm:justify-between gap-2">
+                            <div class="flex flex-col items-center justify-center sm:justify-between gap-2">
                                 <span id="day-view-status" class="text-sm font-bold text-secondary-text w-full sm:w-auto text-center"></span>
                                 <div id="workout-status-controls" class="flex gap-2 text-sm">
                                     <button class="status-btn btn !p-2 !py-1" data-status="full">Full</button>
@@ -313,36 +321,25 @@
                             <div>
                                 <div class="flex justify-between items-center mb-2 border-b border-border-color pb-1">
                                     <h5 class="font-semibold text-lg">Plan</h5>
-                                    <div class="relative">
-                                        <button id="plan-actions-btn" class="btn btn-secondary !p-1.5"><i data-lucide="settings-2" class="w-4 h-4"></i></button>
-                                        <div id="plan-actions-dropdown" class="absolute right-0 mt-2 w-56 border border-border-color rounded-md shadow-lg hidden actions-dropdown">
-                                            <div class="relative group" data-menu-item>
-                                                <div class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center justify-between rounded-t-md cursor-pointer">
-                                                    <span><i data-lucide="clipboard-list" class="w-4 h-4 inline-block mr-2"></i>Plan Settings</span><i data-lucide="chevron-right" class="w-4 h-4"></i>
-                                                </div>
-                                                <div class="absolute left-full -top-px ml-1 w-56 border border-border-color rounded-md shadow-lg submenu bg-card-bg opa">
-                                                    <button id="edit-plan-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-t-md"><i data-lucide="edit" class="w-4 h-4"></i> Edit Plan</button>
-                                                    <button id="delete-plan-btn" class="w-full text-left px-4 py-2 text-sm btn-danger hover:bg-input-bg flex items-center gap-2 rounded-b-md"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete Plan</button>
-                                                </div>
-                                            </div>
-                                            <div class="relative group" data-menu-item>
-                                                <div class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center justify-between cursor-pointer">
-                                                    <span><i data-lucide="dumbbell" class="w-4 h-4 inline-block mr-2"></i>Exercise Settings</span><i data-lucide="chevron-right" class="w-4 h-4"></i>
-                                                </div>
-                                                <div class="absolute left-full -top-px ml-1 w-56 border border-border-color rounded-md shadow-lg submenu bg-card-bg opa">
-                                                    <button id="add-exercise-to-plan-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-t-md"><i data-lucide="list-plus" class="w-4 h-4"></i> Add Exercise to Plan</button>
-                                                    <button id="manage-library-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-b-md"><i data-lucide="library" class="w-4 h-4"></i> Manage Library</button>
-                                                </div>
-                                            </div>
-                                            <div class="relative group" data-menu-item>
-                                                <div class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center justify-between rounded-b-md cursor-pointer">
-                                                     <span><i data-lucide="flame" class="w-4 h-4 inline-block mr-2"></i>Warm-up Settings</span><i data-lucide="chevron-right" class="w-4 h-4"></i>
-                                                </div>
-                                                <div class="absolute left-full -top-px ml-1 w-56 border border-border-color rounded-md shadow-lg submenu bg-card-bg opa">
-                                                     <button id="manage-warmups-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-md"><i data-lucide="flame" class="w-4 h-4"></i> Manage Warm-ups</button>
-                                                </div>
+                                    <div class="flex items-center gap-2">
+                                        <!-- Plan Button -->
+                                        <div class="relative group" data-menu-group>
+                                            <button class="btn btn-secondary !p-1.5" title="Plan Settings"><i data-lucide="clipboard-list" class="w-4 h-4 pointer-events-none"></i></button>
+                                            <div class="absolute right-0 mt-2 w-48 border border-border-color rounded-md shadow-lg submenu actions-dropdown">
+                                                <button id="edit-plan-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-t-md"><i data-lucide="edit" class="w-4 h-4"></i> Edit Plan</button>
+                                                <button id="delete-plan-btn" class="w-full text-left px-4 py-2 text-sm btn-danger hover:bg-input-bg flex items-center gap-2 rounded-b-md"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete Plan</button>
                                             </div>
                                         </div>
+                                        <!-- Exercise Button -->
+                                        <div class="relative group" data-menu-group>
+                                            <button class="btn btn-secondary !p-1.5" title="Exercise Settings"><i data-lucide="dumbbell" class="w-4 h-4 pointer-events-none"></i></button>
+                                            <div class="absolute right-0 mt-2 w-56 border border-border-color rounded-md shadow-lg submenu actions-dropdown">
+                                                <button id="add-exercise-to-plan-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-t-md"><i data-lucide="list-plus" class="w-4 h-4"></i> Add to Today's Plan</button>
+                                                <button id="manage-library-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-b-md"><i data-lucide="library" class="w-4 h-4"></i> Manage Library</button>
+                                            </div>
+                                        </div>
+                                        <!-- Warm-up Button -->
+                                        <button id="manage-warmups-btn" class="btn btn-secondary !p-1.5" title="Warm-up Settings"><i data-lucide="flame" class="w-4 h-4"></i></button>
                                     </div>
                                 </div>
                                 <div id="workout-plan-for-day" class="space-y-4 max-h-96 overflow-y-auto custom-scrollbar pr-2"></div>
@@ -360,9 +357,9 @@
                     </div>
                 </div>
 
-                <div class="content-card lg:col-span-2">
+                <div class="content-card lg:col-span-4 lg:col-start-1">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-                        <h3 class="text-2xl font-semibold">Progression Chart</h3>
+                        <h3 class="text-xl sm:text-2xl font-semibold">Progression Chart</h3>
                         <select id="progress-exercise-select" class="w-full sm:w-auto form-select"></select>
                     </div>
                     <div class="w-full h-80 flex items-center justify-center">
@@ -370,7 +367,7 @@
                     </div>
                 </div>
                  <div class="content-card lg:col-span-4">
-                    <h3 class="text-2xl font-semibold mb-4 text-center">AI Coach</h3>
+                    <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-center">AI Coach</h3>
                     
                     <div class="flex border-b border-border-color mb-4">
                         <button id="ai-tab-specific" class="flex-1 py-2 text-center font-semibold border-b-2 border-accent text-primary-text">Specific Advice</button>
@@ -379,11 +376,11 @@
 
                     <div id="ai-panel-specific">
                         <p class="text-gray-400 text-sm mb-3 text-center">Select an exercise to get science-based advice on when to add weight or reps.</p>
-                        <div class="flex gap-2">
+                        <div class="flex flex-col sm:flex-row gap-2">
                             <select id="ai-advice-exercise-select" class="w-full form-select">
                                 <option value="">Select an exercise...</option>
                             </select>
-                            <button id="get-ai-advice-btn" class="btn btn-secondary">
+                            <button id="get-ai-advice-btn" class="btn btn-secondary w-full sm:w-auto">
                                 <span class="btn-text">Get Advice</span>
                                 <div class="loader hidden ml-2"></div>
                             </button>
@@ -392,8 +389,8 @@
                     </div>
 
                     <div id="ai-panel-general" class="hidden">
-                        <p class="text-gray-400 text-sm mb-3 text-center">Ask the AI anything about your workout data. It will use your recent history to give a personalized answer.</p>
-                        <textarea id="ai-general-prompt" class="form-input" rows="3" placeholder="e.g., 'Am I doing enough volume for my back?' or 'Suggest a different bicep exercise.'"></textarea>
+                        <p class="text-gray-400 text-sm mb-3 text-center">Ask the AI anything about your workout data.</p>
+                        <textarea id="ai-general-prompt" class="form-input" rows="3" placeholder="e.g., 'Am I doing enough volume for my back?'"></textarea>
                         <button id="get-ai-general-advice-btn" class="btn btn-secondary w-full mt-2">
                             <span class="btn-text">Ask AI</span>
                             <div class="loader hidden ml-2"></div>
@@ -405,112 +402,13 @@
         </main>
     </div>
 
-    <div id="ai-plan-generator-modal" class="modal-backdrop">
-        <div class="modal-content !max-w-3xl">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">AI Plan Generator</h2>
-                <button id="close-ai-plan-generator-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button>
-            </div>
-
-            <div id="ai-plan-panel">
-                <form id="ai-plan-generator-form" class="space-y-4">
-                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="ai-plan-goal" class="form-label">Primary Goal</label>
-                            <select id="ai-plan-goal" class="form-select mt-1"><option value="muscle hypertrophy">Muscle Hypertrophy</option><option value="fat loss">Fat Loss</option><option value="body recomposition">Body Recomposition</option><option value="general fitness">General Fitness</option><option value="strength gain">Strength Gain</option><option value="custom">Custom</option></select>
-                        </div>
-                        <div id="ai-plan-split-container">
-                            <label for="ai-plan-split-select" class="form-label">Workout Split</label>
-                            <select id="ai-plan-split-select" class="form-select mt-1">
-                                <option value="Push, Pull, Legs">Push, Pull, Legs</option>
-                                <option value="Upper, Lower">Upper, Lower</option>
-                                <option value="Full Body">Full Body</option>
-                                <option value="custom">Custom</option>
-                            </select>
-                            <input type="text" id="ai-plan-split-custom" class="form-input mt-2 hidden" placeholder="e.g., Chest & Back, Arms, Legs">
-                        </div>
-                    </div>
-                     <div id="ai-plan-goal-text-container" class="hidden">
-                        <label for="ai-plan-goal-text" class="form-label">Describe Your Goal</label>
-                        <textarea id="ai-plan-goal-text" rows="2" class="form-input mt-1" placeholder="e.g., 'I want to build bigger arms and get a six-pack.'"></textarea>
-                    </div>
-
-                    <details class="pt-2" open>
-                        <summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between"><span>Weekly Schedule & Duration</span><i data-lucide="chevron-down" class="w-4 h-4"></i></summary>
-                         <div class="pt-4 mt-4 border-t border-gray-800 space-y-4">
-                            <div id="ai-plan-schedule-builder">
-                                </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="ai-plan-duration" class="form-label">Default Duration (minutes)</label>
-                                    <input type="number" id="ai-plan-duration" value="60" class="form-input mt-1">
-                                    <button type="button" id="customize-duration-btn" class="text-sm text-blue-400 hover:underline mt-2">Customize per day</button>
-                                    <div id="ai-plan-durations-container" class="space-y-2 mt-2 hidden"></div>
-                                </div>
-                                <div>
-                                    <label for="ai-plan-rest" class="form-label">Rest Between Sets (minutes)</label>
-                                    <input type="number" id="ai-plan-rest" value="2" step="0.5" min="0" class="form-input mt-1">
-                                </div>
-                            </div>
-                         </div>
-                    </details>
-                    
-                    <details class="pt-2" open>
-                         <summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between"><span>Equipment & Focus</span><i data-lucide="chevron-down" class="w-4 h-4"></i></summary>
-                         <div class="space-y-4 pt-4 mt-4 border-t border-gray-800">
-                             <div>
-                                <label class="form-label">Equipment Available</label>
-                                <div id="ai-plan-equipment-container" class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 mt-2"></div>
-                            </div>
-                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="form-label">Focus Muscle Groups</label>
-                                    <div id="ai-plan-focus-muscle-container" class="grid grid-cols-2 gap-x-4 gap-y-2 mt-2"></div>
-                                </div>
-                                 <div>
-                                    <label for="ai-plan-unit" class="form-label">Weight Unit</label>
-                                    <select id="ai-plan-unit" class="form-select mt-1"><option value="kg">Kilograms (kg)</option><option value="lbs">Pounds (lbs)</option></select>
-                                </div>
-                            </div>
-                         </div>
-                    </details>
-
-                     <details class="pt-2" open>
-                        <summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between">
-                            <span>Exercise Preferences</span>
-                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                        </summary>
-                        <div id="ai-plan-exercise-prefs-container" class="grid grid-cols-2 md:grid-cols-3 gap-2 pt-4 mt-4 border-t border-gray-800">
-                            </div>
-                    </details>
-
-                    <details class="pt-2">
-                        <summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between"><span>Advanced: Target Sets</span><i data-lucide="chevron-down" class="w-4 h-4"></i></summary>
-                        <div class="pt-4 mt-4 border-t border-gray-800">
-                             <div class="mb-4">
-                                <label for="ai-plan-default-sets" class="form-label">Default Sets Per Muscle Group</label>
-                                <input type="number" id="ai-plan-default-sets" class="form-input mt-1" placeholder="Auto">
-                                <button type="button" id="customize-sets-btn" class="text-sm text-blue-400 hover:underline mt-2">Customize per muscle group</button>
-                             </div>
-                             <div id="ai-plan-sets-container" class="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 hidden"></div>
-                        </div>
-                    </details>
-
-                    <button type="submit" class="w-full btn btn-primary !mt-6"><span class="btn-text">Generate My Plan</span><div class="loader hidden"></div></button>
-                </form>
-                <div id="ai-plan-output" class="mt-6 hidden">
-                    <div id="ai-plan-explanation" class="text-sm p-3 bg-black/30 rounded-lg mb-4"></div>
-                    <pre id="ai-plan-json-output" class="hidden"></pre>
-                    <div class="flex justify-end gap-4"><button id="cancel-new-plan-btn" class="btn btn-secondary">Cancel</button><button id="save-new-plan-btn" class="btn btn-primary">Save & Apply Plan</button></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="custom-exercise-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-6"><h2 id="custom-exercise-modal-title" class="text-2xl font-bold">Add Custom Exercise</h2><button id="close-custom-exercise-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div id="custom-exercise-initial-choice" class="flex gap-4"><button id="custom-exercise-ai-choice-btn" class="btn btn-primary w-full"><i data-lucide="sparkles"></i>Use AI Assistant</button><button id="custom-exercise-manual-choice-btn" class="btn btn-secondary w-full"><i data-lucide="edit-3"></i>Enter Manually</button></div><form id="custom-exercise-form" class="hidden space-y-4 mt-4"><div><label for="custom-exercise-name" class="form-label">Exercise Name *</label><div class="flex gap-2"><input type="text" id="custom-exercise-name" class="form-input" required placeholder="e.g., Kneeling Landmine Press"><button type="button" id="ai-generate-exercise-details-btn" class="btn btn-secondary !px-3 hidden"><i data-lucide="sparkles"></i></button></div></div><div id="custom-exercise-details-container" class="space-y-4 pt-4 border-t border-border-color"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-border-color"><div id="custom-exercise-img-loader" class="loader hidden"></div><img id="custom-exercise-img" src="" class="w-full h-full object-contain hidden"></div><div class="grid grid-cols-2 gap-2"><label for="custom-img-upload" class="btn btn-secondary !py-1 text-xs cursor-pointer">Upload Image<input type="file" id="custom-img-upload" class="hidden" accept="image/*"></label><input type="url" id="custom-img-url" class="form-input !py-1 text-xs" placeholder="Or paste image/video URL"></div><div><label for="custom-exercise-instructions" class="form-label">Instructions</label><textarea id="custom-exercise-instructions" rows="5" class="form-input mt-1"></textarea></div><div><label for="custom-exercise-rep-range" class="form-label">Rep Range</label><input type="text" id="custom-exercise-rep-range" class="form-input mt-1"></div><div class="grid grid-cols-2 gap-4"><div><label for="custom-exercise-group" class="form-label">Muscle Group</label><select id="custom-exercise-group" class="form-select mt-1"></select></div><div><label for="custom-exercise-type" class="form-label">Equipment</label><select id="custom-exercise-type" class="form-select mt-1"><option>Barbell</option><option>Dumbbell</option><option>Machine</option><option>Cable</option><option>Bodyweight</option><option>Other</option></select></div></div><div id="custom-exercise-action-buttons" class="flex flex-col sm:flex-row gap-2 pt-2"></div></div></form></div></div>
-    <div id="exercise-detail-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 id="exercise-detail-title" class="text-2xl font-bold">Exercise Details</h2><button id="close-exercise-detail-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-gray-800"><img id="exercise-detail-video" src="" alt="Exercise demonstration" class="w-full h-full object-contain"></div><div class="custom-scrollbar overflow-y-auto max-h-48 pr-2"><h3 class="font-bold text-lg text-blue-400 mb-2">Instructions</h3><textarea id="exercise-detail-instructions" rows="6" class="form-input mt-1 w-full bg-input-bg"></textarea><button id="save-instructions-btn" class="mt-2 w-full btn btn-secondary">Save Instructions</button></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Rep Range</h3><p id="exercise-detail-rep-range" class="text-gray-300"></p></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Personal Notes & Advice</h3><textarea id="exercise-detail-notes" rows="4" class="form-input mt-1" placeholder="Add your personal cues, weight progression goals, etc."></textarea><button id="save-exercise-notes-btn" class="mt-2 w-full btn btn-secondary">Save Notes</button></div><button id="log-from-detail-btn" class="w-full btn btn-primary mt-4">Log This Exercise</button></div></div></div>
-    <div id="warmup-manage-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Manage Warm-ups</h2><button id="close-warmup-manage-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div><label for="warmup-day-select" class="form-label">Workout Day</label><select id="warmup-day-select" class="form-select mt-1"></select></div><div id="warmup-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div><hr class="border-gray-800"><form id="warmup-form" class="space-y-3"><h3 id="warmup-form-title" class="font-bold text-lg text-blue-400">Add New Warm-up</h3><div><label for="warmup-name" class="form-label">Name</label><input type="text" id="warmup-name" class="form-input mt-1" required></div><div><label for="warmup-instructions" class="form-label">Instructions (one per line)</label><textarea id="warmup-instructions" rows="4" class="form-input mt-1"></textarea></div><button type="submit" id="save-warmup-btn" class="w-full btn btn-primary">Add Warm-up</button></form></div></div></div>
-    <div id="workout-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="modal-title" class="text-2xl font-bold">Log Exercise</h2><div class="flex items-center gap-1 border border-border-color rounded-lg p-1"><button type="button" id="unit-toggle-kg" class="btn !py-1 !px-3 text-sm unit-toggle-btn">kg</button><button type="button" id="unit-toggle-lbs" class="btn !py-1 !px-3 text-sm unit-toggle-btn">lbs</button></div><button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="workout-log-form"><div class="space-y-4"><div id="sets-container"></div><button type="button" id="add-set-btn" class="w-full btn btn-secondary">Add Set</button><button type="submit" id="save-workout-btn" class="w-full btn btn-primary mt-2">Save Workout</button></div></form></div></div>
-    <div id="exercise-library-modal" class="modal-backdrop"><div class="modal-content !max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold" id="exercise-library-title">Exercise Library</h2><button id="close-exercise-library-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="flex gap-2 mb-4"><input type="search" id="exercise-library-search" class="form-input" placeholder="Search exercises..."><select id="exercise-library-filter" class="form-select w-48"><option value="">All Groups</option></select><button id="create-new-exercise-from-library-btn" class="btn btn-secondary !px-3" title="Create New Exercise"><i data-lucide="plus"></i></button></div><div id="exercise-library-list" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-2"></div><button id="add-selected-exercises-btn" class="btn btn-primary w-full mt-4">Add Selected</button></div></div>
+    <!-- Modals here... -->
+    <div id="ai-plan-generator-modal" class="modal-backdrop"><div class="modal-content !max-w-3xl"><div class="flex justify-between items-center mb-4"><h2 class="text-xl sm:text-2xl font-bold">AI Plan Generator</h2><button id="close-ai-plan-generator-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div id="ai-plan-panel"><form id="ai-plan-generator-form" class="space-y-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label for="ai-plan-goal" class="form-label">Primary Goal</label><select id="ai-plan-goal" class="form-select mt-1"><option value="muscle hypertrophy">Muscle Hypertrophy</option><option value="fat loss">Fat Loss</option><option value="body recomposition">Body Recomposition</option><option value="general fitness">General Fitness</option><option value="strength gain">Strength Gain</option><option value="custom">Custom</option></select></div><div id="ai-plan-split-container"><label for="ai-plan-split-select" class="form-label">Workout Split</label><select id="ai-plan-split-select" class="form-select mt-1"><option value="Push, Pull, Legs">Push, Pull, Legs</option><option value="Upper, Lower">Upper, Lower</option><option value="Full Body">Full Body</option><option value="custom">Custom</option></select><input type="text" id="ai-plan-split-custom" class="form-input mt-2 hidden" placeholder="e.g., Chest & Back, Arms, Legs"></div></div><div id="ai-plan-goal-text-container" class="hidden"><label for="ai-plan-goal-text" class="form-label">Describe Your Goal</label><textarea id="ai-plan-goal-text" rows="2" class="form-input mt-1" placeholder="e.g., 'I want to build bigger arms and get a six-pack.'"></textarea></div><details class="pt-2" open><summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between"><span>Weekly Schedule & Duration</span><i data-lucide="chevron-down" class="w-4 h-4"></i></summary><div class="pt-4 mt-4 border-t border-gray-800 space-y-4"><div id="ai-plan-schedule-builder"></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label for="ai-plan-duration" class="form-label">Default Duration (minutes)</label><input type="number" id="ai-plan-duration" value="60" class="form-input mt-1"><button type="button" id="customize-duration-btn" class="text-sm text-blue-400 hover:underline mt-2">Customize per day</button><div id="ai-plan-durations-container" class="space-y-2 mt-2 hidden"></div></div><div><label for="ai-plan-rest" class="form-label">Rest Between Sets (minutes)</label><input type="number" id="ai-plan-rest" value="2" step="0.5" min="0" class="form-input mt-1"></div></div></div></details><details class="pt-2" open><summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between"><span>Equipment & Focus</span><i data-lucide="chevron-down" class="w-4 h-4"></i></summary><div class="space-y-4 pt-4 mt-4 border-t border-gray-800"><div><label class="form-label">Equipment Available</label><div id="ai-plan-equipment-container" class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 mt-2"></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="form-label">Focus Muscle Groups</label><div id="ai-plan-focus-muscle-container" class="grid grid-cols-2 gap-x-4 gap-y-2 mt-2"></div></div><div><label for="ai-plan-unit" class="form-label">Weight Unit</label><select id="ai-plan-unit" class="form-select mt-1"><option value="kg">Kilograms (kg)</option><option value="lbs">Pounds (lbs)</option></select></div></div></div></details><details class="pt-2" open><summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between"><span>Exercise Preferences</span><i data-lucide="chevron-down" class="w-4 h-4"></i></summary><div id="ai-plan-exercise-prefs-container" class="grid grid-cols-2 md:grid-cols-3 gap-2 pt-4 mt-4 border-t border-gray-800"></div></details><details class="pt-2"><summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between"><span>Advanced: Target Sets</span><i data-lucide="chevron-down" class="w-4 h-4"></i></summary><div class="pt-4 mt-4 border-t border-gray-800"><div class="mb-4"><label for="ai-plan-default-sets" class="form-label">Default Sets Per Muscle Group</label><input type="number" id="ai-plan-default-sets" class="form-input mt-1" placeholder="Auto"><button type="button" id="customize-sets-btn" class="text-sm text-blue-400 hover:underline mt-2">Customize per muscle group</button></div><div id="ai-plan-sets-container" class="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 hidden"></div></div></details><button type="submit" class="w-full btn btn-primary !mt-6"><span class="btn-text">Generate My Plan</span><div class="loader hidden"></div></button></form><div id="ai-plan-output" class="mt-6 hidden"><div id="ai-plan-explanation" class="text-sm p-3 bg-black/30 rounded-lg mb-4"></div><pre id="ai-plan-json-output" class="hidden"></pre><div class="flex justify-end gap-4"><button id="cancel-new-plan-btn" class="btn btn-secondary">Cancel</button><button id="save-new-plan-btn" class="btn btn-primary">Save & Apply Plan</button></div></div></div></div></div>
+    <div id="custom-exercise-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-6"><h2 id="custom-exercise-modal-title" class="text-xl sm:text-2xl font-bold">Add Custom Exercise</h2><button id="close-custom-exercise-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div id="custom-exercise-initial-choice" class="flex gap-4"><button id="custom-exercise-ai-choice-btn" class="btn btn-primary w-full"><i data-lucide="sparkles"></i>Use AI</button><button id="custom-exercise-manual-choice-btn" class="btn btn-secondary w-full"><i data-lucide="edit-3"></i>Manual</button></div><form id="custom-exercise-form" class="hidden space-y-4 mt-4"><div><label for="custom-exercise-name" class="form-label">Exercise Name *</label><div class="flex gap-2"><input type="text" id="custom-exercise-name" class="form-input" required placeholder="e.g., Kneeling Landmine Press"><button type="button" id="ai-generate-exercise-details-btn" class="btn btn-secondary !px-3 hidden"><i data-lucide="sparkles"></i></button></div></div><div id="custom-exercise-details-container" class="space-y-4 pt-4 border-t border-border-color"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-border-color"><div id="custom-exercise-img-loader" class="loader hidden"></div><img id="custom-exercise-img" src="" class="w-full h-full object-contain hidden"></div><div class="grid grid-cols-2 gap-2"><label for="custom-img-upload" class="btn btn-secondary !py-1 text-xs cursor-pointer">Upload Image<input type="file" id="custom-img-upload" class="hidden" accept="image/*"></label><input type="url" id="custom-img-url" class="form-input !py-1 text-xs" placeholder="Or paste image/video URL"></div><div><label for="custom-exercise-instructions" class="form-label">Instructions</label><textarea id="custom-exercise-instructions" rows="5" class="form-input mt-1"></textarea></div><div><label for="custom-exercise-rep-range" class="form-label">Rep Range</label><input type="text" id="custom-exercise-rep-range" class="form-input mt-1"></div><div class="grid grid-cols-2 gap-4"><div><label for="custom-exercise-group" class="form-label">Muscle Group</label><select id="custom-exercise-group" class="form-select mt-1"></select></div><div><label for="custom-exercise-type" class="form-label">Equipment</label><select id="custom-exercise-type" class="form-select mt-1"><option>Barbell</option><option>Dumbbell</option><option>Machine</option><option>Cable</option><option>Bodyweight</option><option>Other</option></select></div></div><div id="custom-exercise-action-buttons" class="flex flex-col sm:flex-row gap-2 pt-2"></div></div></form></div></div>
+    <div id="exercise-detail-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 id="exercise-detail-title" class="text-xl sm:text-2xl font-bold">Exercise Details</h2><button id="close-exercise-detail-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-gray-800"><img id="exercise-detail-video" src="" alt="Exercise demonstration" class="w-full h-full object-contain"></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Instructions</h3><textarea id="exercise-detail-instructions" class="form-input mt-1 w-full bg-input-bg text-sm" readonly></textarea><button id="save-instructions-btn" class="mt-2 w-full btn btn-secondary">Edit Instructions</button></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Rep Range</h3><p id="exercise-detail-rep-range" class="text-gray-300"></p></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Personal Notes & Advice</h3><textarea id="exercise-detail-notes" rows="4" class="form-input mt-1" placeholder="Add your personal cues, weight progression goals, etc."></textarea><button id="save-exercise-notes-btn" class="mt-2 w-full btn btn-secondary">Save Notes</button></div><button id="log-from-detail-btn" class="w-full btn btn-primary mt-4">Log This Exercise</button></div></div></div>
+    <div id="warmup-manage-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 class="text-xl sm:text-2xl font-bold">Manage Warm-ups</h2><button id="close-warmup-manage-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div><label for="warmup-day-select" class="form-label">Workout Day</label><select id="warmup-day-select" class="form-select mt-1"></select></div><div id="warmup-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div><hr class="border-gray-800"><form id="warmup-form" class="space-y-3"><h3 id="warmup-form-title" class="font-bold text-lg text-blue-400">Add New Warm-up</h3><div><label for="warmup-name" class="form-label">Name</label><input type="text" id="warmup-name" class="form-input mt-1" required></div><div><label for="warmup-instructions" class="form-label">Instructions (one per line)</label><textarea id="warmup-instructions" rows="4" class="form-input mt-1"></textarea></div><button type="submit" id="save-warmup-btn" class="w-full btn btn-primary">Add Warm-up</button></form></div></div></div>
+    <div id="workout-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="modal-title" class="text-xl sm:text-2xl font-bold">Log Exercise</h2><div class="flex items-center gap-1 border border-border-color rounded-lg p-1"><button type="button" id="unit-toggle-kg" class="btn !py-1 !px-3 text-sm unit-toggle-btn">kg</button><button type="button" id="unit-toggle-lbs" class="btn !py-1 !px-3 text-sm unit-toggle-btn">lbs</button></div><button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="workout-log-form"><div class="space-y-4"><div id="sets-container"></div><button type="button" id="add-set-btn" class="w-full btn btn-secondary">Add Set</button><button type="submit" id="save-workout-btn" class="w-full btn btn-primary mt-2">Save Workout</button></div></form></div></div>
+    <div id="exercise-library-modal" class="modal-backdrop"><div class="modal-content !max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-xl sm:text-2xl font-bold" id="exercise-library-title">Exercise Library</h2><button id="close-exercise-library-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="flex gap-2 mb-4"><input type="search" id="exercise-library-search" class="form-input" placeholder="Search exercises..."><select id="exercise-library-filter" class="form-select w-48"><option value="">All Groups</option></select><button id="create-new-exercise-from-library-btn" class="btn btn-secondary !px-3" title="Create New Exercise"><i data-lucide="plus"></i></button></div><div id="exercise-library-list" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-2"></div><button id="add-selected-exercises-btn" class="btn btn-primary w-full mt-4">Add Selected</button></div></div>
     <div id="confirm-modal" class="modal-backdrop"><div class="modal-content"><h2 id="confirm-modal-title" class="text-xl font-bold mb-4">Are you sure?</h2><p id="confirm-modal-text" class="text-gray-300 mb-6">This action cannot be undone.</p><div class="flex justify-end gap-4"><button id="confirm-modal-cancel-btn" class="btn btn-secondary">Cancel</button><button id="confirm-modal-confirm-btn" class="btn btn-danger">Confirm</button></div></div></div>
     <div id="alert-modal" class="modal-backdrop"><div class="modal-content"><h2 id="alert-modal-title" class="text-xl font-bold mb-4">Alert</h2><p id="alert-modal-text" class="text-gray-300 mb-6"></p><div class="flex justify-end"><button id="alert-modal-ok-btn" class="btn btn-primary">OK</button></div></div></div>
     
@@ -541,24 +439,50 @@
             // --- DATABASE DEFAULTS ---
             const exercisesJsonContent = `
 [
-    { "id": "uuid-bench-flat", "name": "Flat Barbell Bench Press", "group": "Chest", "type": "Barbell", "instructions": ["Lie flat on the bench with your feet on the floor.", "Grip the bar slightly wider than shoulder-width.", "Lower the bar to your mid-chest, keeping your elbows tucked at about a 45-degree angle.", "Press the bar back up to the starting position."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "id": "uuid-bench-incline", "name": "Incline Barbell Bench Press", "group": "Chest", "type": "Barbell", "instructions": ["Set a bench to a 30-45 degree incline.", "Lie on the bench and grip the bar slightly wider than shoulder-width.", "Unrack the bar and lower it to your upper chest.", "Press the bar back up until your arms are fully extended."], "repRange": "8-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "id": "uuid-pushup", "name": "Push Up", "group": "Chest", "type": "Bodyweight", "instructions": ["Start in a high plank position with hands under your shoulders.", "Lower your body until your chest nearly touches the floor.", "Push back up to the starting position, keeping your body in a straight line."], "repRange": "As many as possible", "notes": "", "favorite": false, "isCompound": true },
-    { "id": "uuid-overhead-press", "name": "Overhead Press", "group": "Shoulders", "type": "Barbell", "instructions": ["Stand with the bar on your front shoulders, hands just outside shoulder-width.", "Press the bar straight overhead until your arms are fully extended.", "Lower the bar back to your shoulders with control."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "id": "uuid-lat-raise-db", "name": "Dumbbell Lateral Raise", "group": "Shoulders", "type": "Dumbbell", "instructions": ["Stand holding dumbbells at your sides with palms facing in.", "With a slight bend in your elbows, raise the weights out to your sides until they reach shoulder height.", "Lower with control."], "repRange": "12-20 reps", "notes": "", "favorite": false },
-    { "id": "uuid-pullup", "name": "Pull Ups", "group": "Back", "type": "Bodyweight", "instructions": ["Hang from a pull-up bar with an overhand grip, slightly wider than your shoulders.", "Pull your chest up to the bar, leading with your chest and squeezing your back.", "Lower yourself down with control."], "repRange": "As many as possible", "notes": "", "favorite": false, "isCompound": true },
-    { "id": "uuid-row-bb", "name": "Barbell Row", "group": "Back", "type": "Barbell", "instructions": ["Stand with your feet shoulder-width apart, holding a barbell with an overhand grip.", "Hinge at your hips until your torso is nearly parallel to the floor.", "Pull the bar towards your lower chest/upper abdomen, squeezing your back muscles.", "Lower the bar with control."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "id": "uuid-lat-pulldown", "name": "Lat Pulldown", "group": "Back", "type": "Machine", "instructions": ["Sit at the machine and grab the bar with a wide overhand grip.", "Pull the bar down to your upper chest, keeping your torso upright.", "Squeeze your lats at the bottom.", "Slowly return the bar to the starting position."], "repRange": "8-15 reps", "notes": "", "favorite": false },
-    { "id": "uuid-curl-db", "name": "Dumbbell Curl", "group": "Biceps", "type": "Dumbbell", "instructions": ["Stand holding a dumbbell in each hand at your sides, palms facing forward.", "Curl the weights up towards your shoulders, keeping your elbows stationary.", "Squeeze your biceps at the top.", "Lower with control."], "repRange": "8-15 reps", "notes": "", "favorite": false },
-    { "id": "uuid-squat-bb", "name": "Barbell Squat", "group": "Quads", "type": "Barbell", "instructions": ["Place a barbell on your upper back.", "Stand with your feet shoulder-width apart, toes slightly out.", "Lower your hips down and back as if sitting in a chair, keeping your chest up.", "Descend until your thighs are at least parallel to the floor.", "Drive back up through your heels."], "repRange": "6-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "id": "uuid-leg-press", "name": "Leg Press", "group": "Quads", "type": "Machine", "instructions": ["Sit in the leg press machine and place your feet on the platform shoulder-width apart.", "Push the platform away from you by extending your knees.", "Lower the platform with control, do not let your lower back round off the pad."], "repRange": "10-20 reps", "notes": "", "favorite": false },
-    { "id": "uuid-rdl-bb", "name": "Romanian Deadlift", "group": "Hamstrings", "type": "Barbell", "instructions": ["Hold a barbell in front of your thighs.", "Hinge at your hips, pushing them back while keeping your back straight and a slight bend in your knees.", "Lower the bar until you feel a deep stretch in your hamstrings.", "Return to the start by squeezing your glutes."], "repRange": "8-12 reps", "notes": "", "favorite": false, "isCompound": true },
-    { "id": "uuid-leg-curl", "name": "Leg Curl", "group": "Hamstrings", "type": "Machine", "instructions": ["Lie face down on a leg curl machine (or sit in a seated version).", "Curl the weight up by bending your knees and squeezing your hamstrings.", "Lower with control."], "repRange": "10-20 reps", "notes": "", "favorite": false },
-    { "id": "uuid-calf-raise", "name": "Standing Calf Raise", "group": "Calves", "type": "Machine", "instructions": ["Stand on a calf raise machine or a step with a weight.", "Press up onto the balls of your feet as high as possible.", "Hold the peak contraction, then slowly lower your heels below the level of the step."], "repRange": "10-20 reps", "notes": "", "favorite": false },
-    { "id": "uuid-leg-raise", "name": "Hanging Leg Raise", "group": "Abs", "type": "Bodyweight", "instructions": ["Hang from a pull-up bar.", "Raise your legs up as high as you can, keeping them straight or with a slight bend.", "Lower with control."], "repRange": "10-20 reps", "notes": "", "favorite": false },
-    { "id": "uuid-hammer-curl", "name": "Hammer Curl", "group": "Biceps", "type": "Dumbbell", "instructions": ["Stand holding a dumbbell in each hand with a neutral (hammer) grip.", "Curl the weights up towards your shoulders, keeping your palms facing each other.", "Squeeze at the top and lower with control."], "repRange": "8-15 reps", "notes": "", "favorite": false }
-]
-`;
+    {"id":"uuid-bench-flat-bb","name":"Flat Barbell Bench Press","group":"Chest","type":"Barbell","instructions":["Lie flat on the bench with your feet firmly on the floor.","Grip the bar slightly wider than shoulder-width, palms forward.","Unrack the bar and hold it directly over your chest with arms extended.","Lower the bar in a controlled manner to your mid-chest.","Press the bar back up to the starting position without locking your elbows."],"repRange":"6-10 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-bench-incline-bb","name":"Incline Barbell Bench Press","group":"Chest","type":"Barbell","instructions":["Set a bench to a 30-45 degree incline.","Lie on the bench and grip the bar slightly wider than shoulder-width.","Unrack the bar and lower it to your upper chest.","Press the bar back up until your arms are almost fully extended."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-bench-decline-bb","name":"Decline Barbell Bench Press","group":"Chest","type":"Barbell","instructions":["Secure your legs at the end of a decline bench.","Lie back and grip the bar with a medium-width grip.","Unrack the bar and lower it to your lower chest, keeping elbows tucked.","Press the bar back to the starting position."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-bench-flat-db","name":"Flat Dumbbell Press","group":"Chest","type":"Dumbbell","instructions":["Lie on a flat bench with a dumbbell in each hand resting on your thighs.","Use your thighs to help kick the dumbbells up to shoulder height.","Press the dumbbells up until your arms are fully extended, palms facing forward.","Lower the dumbbells slowly to the sides of your chest."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-bench-incline-db","name":"Incline Dumbbell Press","group":"Chest","type":"Dumbbell","instructions":["Set a bench to a 30-45 degree incline.","Sit and place dumbbells on your thighs.","Kick the weights up to your shoulders and lie back.","Press the dumbbells up and slightly together over your chest.","Lower them slowly with control, getting a good stretch."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-fly-db","name":"Dumbbell Flyes","group":"Chest","type":"Dumbbell","instructions":["Lie on a flat bench with a dumbbell in each hand, palms facing each other.","Press the weights above your chest.","With a slight bend in your elbows, lower the weights out to your sides in a wide arc.","Bring the weights back to the starting position using your chest muscles in a 'hugging' motion."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-fly-cable","name":"Cable Crossover","group":"Chest","type":"Cable","instructions":["Set pulleys to a high position.","Grab the handles and step forward to create tension, with a slight forward lean.","With a slight bend in your elbows, pull the handles down and across your body until they meet in front of your lower chest.","Squeeze your chest at the peak contraction and slowly return."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-pushup","name":"Push Up","group":"Chest","type":"Bodyweight","instructions":["Start in a high plank position with hands slightly wider than your shoulders.","Lower your body until your chest nearly touches the floor, keeping your body in a straight line from head to heels.","Push back up to the starting position."],"repRange":"As many as possible","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-dips-chest","name":"Dips (Chest Focus)","group":"Chest","type":"Bodyweight","instructions":["Use parallel bars.","Lean your torso forward as you lower your body by bending your elbows.","Go down until you feel a good stretch in your chest, then press back up.","A forward lean emphasizes the chest over the triceps."],"repRange":"8-15 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-pec-deck","name":"Pec Deck Machine","group":"Chest","type":"Machine","instructions":["Sit on the machine with your back flat against the pad.","Place your forearms on the padded levers or grab the handles.","Bring the levers together in a hugging motion, squeezing your chest.","Return slowly to the start with control."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-pullup","name":"Pull Ups","group":"Back","type":"Bodyweight","instructions":["Hang from a pull-up bar with an overhand grip, slightly wider than your shoulders.","Pull your chest up to the bar, leading with your chest and squeezing your back muscles.","Lower yourself down with control until your arms are nearly straight."],"repRange":"As many as possible","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-chinup","name":"Chin Ups","group":"Back","type":"Bodyweight","instructions":["Hang from a pull-up bar with an underhand (palms facing you) grip, shoulder-width apart.","Pull your chest up to the bar, focusing on using your lats and biceps.","Lower yourself down with control."],"repRange":"As many as possible","notes":"Engages more biceps than a standard pull-up.","favorite":false,"isCompound":true},
+    {"id":"uuid-lat-pulldown","name":"Lat Pulldown","group":"Back","type":"Machine","instructions":["Sit at the machine and secure your knees under the pads.","Grab the bar with a wide overhand grip.","Pull the bar down to your upper chest, keeping your torso upright and squeezing your lats.","Slowly return the bar to the starting position."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-row-bb","name":"Barbell Row","group":"Back","type":"Barbell","instructions":["Stand with feet shoulder-width apart, holding a barbell with an overhand grip.","Hinge at your hips until your torso is nearly parallel to the floor, back straight.","Pull the bar towards your lower chest/upper abdomen, squeezing your back muscles.","Lower the bar with control."],"repRange":"6-10 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-row-db","name":"Single Arm Dumbbell Row","group":"Back","type":"Dumbbell","instructions":["Place one knee and one hand on a flat bench, keeping your back parallel to the floor.","Hold a dumbbell in the other hand with your arm extended.","Pull the dumbbell up to the side of your chest, squeezing your back and keeping your elbow close to your body.","Lower the dumbbell with control."],"repRange":"8-12 reps per arm","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-row-cable","name":"Seated Cable Row","group":"Back","type":"Cable","instructions":["Sit at the cable row machine with your feet on the platform.","Grab the handle (V-bar or straight bar) and pull it towards your abdomen, keeping your back straight.","Squeeze your shoulder blades together at the peak.","Slowly extend your arms back to the start."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-deadlift","name":"Conventional Deadlift","group":"Back","type":"Barbell","instructions":["Stand with mid-foot under the barbell.","Hinge at your hips and bend your knees to grip the bar just outside your shins.","Keep your back straight, chest up, and pull the weight up by driving through your legs.","Stand up tall, pulling the bar up your legs. Reverse the motion to lower."],"repRange":"4-6 reps","notes":"Full-body compound lift, primarily targeting the posterior chain.","favorite":false,"isCompound":true},
+    {"id":"uuid-face-pull","name":"Face Pull","group":"Shoulders","type":"Cable","instructions":["Set a cable pulley at head height with a rope attachment.","Grab the rope with an overhand grip and step back.","Pull the rope towards your face, separating your hands as you pull.","Focus on squeezing your rear delts and upper back.","Your elbows should be high and out to the sides."],"repRange":"12-20 reps","notes":"Excellent for rear delts and shoulder health.","favorite":false,"isCompound":false},
+    {"id":"uuid-overhead-press-bb","name":"Barbell Overhead Press","group":"Shoulders","type":"Barbell","instructions":["Stand with the bar on your front shoulders, hands just outside shoulder-width.","Keep your core tight and glutes squeezed.","Press the bar straight overhead until your arms are fully extended.","Lower the bar back to your shoulders with control."],"repRange":"6-10 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-overhead-press-db","name":"Seated Dumbbell Press","group":"Shoulders","type":"Dumbbell","instructions":["Sit on a bench with back support, holding dumbbells at shoulder height, palms forward.","Press the dumbbells overhead until your arms are fully extended.","Lower the dumbbells back to the starting position with control."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-lat-raise-db","name":"Dumbbell Lateral Raise","group":"Shoulders","type":"Dumbbell","instructions":["Stand holding dumbbells at your sides with palms facing in.","With a slight bend in your elbows, raise the weights out to your sides until they reach shoulder height.","Imagine pouring a jug of water at the top to correctly orient your hands.","Lower with control."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-front-raise-db","name":"Dumbbell Front Raise","group":"Shoulders","type":"Dumbbell","instructions":["Stand holding dumbbells in front of your thighs with palms facing you.","Raise one dumbbell straight up to shoulder height, keeping your arm mostly straight.","Lower with control and alternate arms."],"repRange":"10-15 reps per arm","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-squat-bb","name":"Barbell Back Squat","group":"Quads","type":"Barbell","instructions":["Place a barbell on your upper back/traps.","Stand with your feet shoulder-width apart, toes slightly out.","Lower your hips down and back as if sitting in a chair, keeping your chest up and back straight.","Descend until your thighs are at least parallel to the floor.","Drive back up through your heels."],"repRange":"6-10 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-leg-press","name":"Leg Press","group":"Quads","type":"Machine","instructions":["Sit in the leg press machine and place your feet on the platform shoulder-width apart.","Push the platform away from you by extending your knees, without locking them out.","Lower the platform with control, do not let your lower back round off the pad."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-lunge-db","name":"Dumbbell Lunges","group":"Quads","type":"Dumbbell","instructions":["Stand holding a dumbbell in each hand.","Step forward with one leg and lower your hips until both knees are bent at a 90-degree angle.","Push off your front foot to return to the starting position. Alternate legs."],"repRange":"10-12 reps per leg","notes":"Also targets glutes and hamstrings.","favorite":false,"isCompound":false},
+    {"id":"uuid-leg-extension","name":"Leg Extension","group":"Quads","type":"Machine","instructions":["Sit on the machine with your legs under the pad, knees aligned with the machine's pivot point.","Extend your legs to lift the weight, squeezing your quads at the top for a moment.","Lower slowly with control."],"repRange":"12-20 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-rdl-bb","name":"Romanian Deadlift","group":"Hamstrings","type":"Barbell","instructions":["Hold a barbell in front of your thighs, feet hip-width apart.","Hinge at your hips, pushing them back while keeping your back straight and a slight bend in your knees.","Lower the bar along your shins until you feel a deep stretch in your hamstrings.","Return to the start by squeezing your glutes and driving your hips forward."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-leg-curl-lying","name":"Lying Leg Curl","group":"Hamstrings","type":"Machine","instructions":["Lie face down on a leg curl machine with the pad on the back of your ankles.","Curl the weight up by bending your knees and squeezing your hamstrings.","Hold the contraction at the top, then lower with control."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-hip-thrust-bb","name":"Barbell Hip Thrust","group":"Glutes","type":"Barbell","instructions":["Sit on the floor with your upper back against a bench and a barbell across your hips (use a pad for comfort).","Drive your hips up towards the ceiling, squeezing your glutes hard at the top until your body is parallel to the floor.","Lower with control without touching the ground and repeat."],"repRange":"8-15 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-calf-raise-standing","name":"Standing Calf Raise","group":"Calves","type":"Machine","instructions":["Stand on a calf raise machine or a step with a weight.","Press up onto the balls of your feet as high as possible.","Hold the peak contraction, then slowly lower your heels below the level of the step to get a full stretch."],"repRange":"10-20 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-calf-raise-seated","name":"Seated Calf Raise","group":"Calves","type":"Machine","instructions":["Sit on the machine with your knees under the pad.","Place the balls of your feet on the platform.","Raise your heels as high as possible, squeezing your soleus muscle.","Lower your heels slowly to feel a stretch."],"repRange":"15-25 reps","notes":"Targets the soleus muscle more than standing raises.","favorite":false,"isCompound":false},
+    {"id":"uuid-curl-bb","name":"Barbell Curl","group":"Biceps","type":"Barbell","instructions":["Stand holding a barbell with an underhand grip, hands shoulder-width apart.","Keep your elbows close to your torso and curl the weight up towards your shoulders.","Squeeze your biceps at the top of the movement.","Lower the barbell with control until arms are nearly straight."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-curl-db-incline","name":"Incline Dumbbell Curl","group":"Biceps","type":"Dumbbell","instructions":["Sit on an incline bench, holding a dumbbell in each hand with arms hanging straight down.","Curl the weights up towards your shoulders, keeping your upper arms stationary.","Supinate your wrists (turn palms up) as you curl.","Lower with control."],"repRange":"8-12 reps","notes":"Provides a great stretch on the bicep long head.","favorite":false,"isCompound":false},
+    {"id":"uuid-preacher-curl","name":"Preacher Curl","group":"Biceps","type":"Machine","instructions":["Sit at a preacher curl machine and adjust the seat height.","Place the back of your upper arms on the pad and grab the handles.","Curl the weight up towards your shoulders, focusing on isolating the bicep.","Slowly lower the weight until your arms are almost fully extended."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-tricep-pushdown","name":"Tricep Pushdown (Rope)","group":"Triceps","type":"Cable","instructions":["Attach a rope to a high pulley.","Grab the rope with both hands and push down until your arms are fully extended.","Keep your elbows pinned to your sides and separate the rope handles at the bottom.","Slowly let the attachment return to the starting position."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-skull-crusher","name":"Skull Crushers","group":"Triceps","type":"Barbell","instructions":["Lie on a flat bench holding an EZ bar or barbell above your chest with a close grip.","Lower the bar towards your forehead by bending only at the elbows.","Extend your arms to press the weight back to the start, focusing on the triceps contraction."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-overhead-ext-db","name":"Overhead Tricep Extension","group":"Triceps","type":"Dumbbell","instructions":["Sit on a bench and hold one dumbbell with both hands over your head.","Lower the dumbbell behind your head by bending your elbows.","Extend your arms to lift the dumbbell back to the starting position.","Keep your upper arms stationary throughout."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-leg-raise-hanging","name":"Hanging Leg Raise","group":"Abs","type":"Bodyweight","instructions":["Hang from a pull-up bar.","Raise your legs up as high as you can, keeping them straight or with a slight bend for an easier variation.","Lower with control, avoiding swinging."],"repRange":"10-20 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-cable-crunch","name":"Cable Crunch","group":"Abs","type":"Cable","instructions":["Kneel in front of a high pulley with a rope attachment.","Grab the rope and pull it down so your hands are on either side of your head.","Crunch your torso downwards, bringing your elbows towards your knees, rounding your back.","Return to the starting position slowly."],"repRange":"12-20 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-plank","name":"Plank","group":"Abs","type":"Bodyweight","instructions":["Hold a push-up position, but rest on your forearms instead of your hands.","Keep your back straight, and core and glutes tight.","Hold this position for the desired time."],"repRange":"30-90 seconds","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-hammer-curl","name":"Hammer Curl","group":"Biceps","type":"Dumbbell","instructions":["Stand holding a dumbbell in each hand with a neutral (hammer) grip.","Curl the weights up towards your shoulders, keeping your palms facing each other.","Squeeze at the top and lower with control."],"repRange":"8-15 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-wrist-curl","name":"Wrist Curl","group":"Forearms","type":"Dumbbell","instructions":["Sit on a bench and rest your forearms on your thighs, with your wrists hanging off your knees.","Hold a light dumbbell in each hand with your palms facing up.","Curl your wrists upwards as far as possible.","Lower the dumbbells with control."],"repRange":"15-25 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-reverse-wrist-curl","name":"Reverse Wrist Curl","group":"Forearms","type":"Dumbbell","instructions":["Sit on a bench and rest your forearms on your thighs, with your wrists hanging off your knees.","Hold a light dumbbell in each hand with your palms facing down.","Extend your wrists upwards as far as possible.","Lower the dumbbells with control."],"repRange":"15-25 reps","notes":"","favorite":false,"isCompound":false}
+]`;
             const defaultWarmups = {
                 "Push": [{ name: "Arm Circles", instructions: ["Stand with feet shoulder-width apart.", "Extend your arms to the sides.", "Make small circles, gradually increasing to large circles.", "Perform for 30 seconds forward, then 30 seconds backward."], repRange: "1 minute total", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Warm-up" }],
                 "Pull": [{ name: "Cat-Cow", instructions: ["Start on your hands and knees.", "Inhale as you drop your belly towards the mat (Cow).", "Exhale as you round your spine upwards (Cat).", "Repeat for 10-15 repetitions."], repRange: "10-15 reps", videoPlaceholder: "https://placehold.co/400x225/111111/FFFFFF?text=Warm-up" }],
@@ -589,7 +513,6 @@
                 warmupNameInput: document.getElementById('warmup-name'), warmupInstructionsInput: document.getElementById('warmup-instructions'), saveWarmupBtn: document.getElementById('save-warmup-btn'),
                 dayViewDateDisplayBtn: document.getElementById('day-view-date-display-btn'), dayViewStatus: document.getElementById('day-view-status'), dayViewDateDisplay: document.getElementById('day-view-date-display-btn'),
                 workoutPlanForDay: document.getElementById('workout-plan-for-day'), historyDayContent: document.getElementById('history-day-content'), 
-                planActionsBtn: document.getElementById('plan-actions-btn'), planActionsDropdown: document.getElementById('plan-actions-dropdown'),
                 deletePlanBtn: document.getElementById('delete-plan-btn'), 
                 historyActionsBtn: document.getElementById('history-actions-btn'), 
                 prevDayBtn: document.getElementById('prev-day-btn'), nextDayBtn: document.getElementById('next-day-btn'),
@@ -646,22 +569,22 @@
                 localStorage.setItem('fitTrackAI_userSettings', JSON.stringify(userSettings));
             }
 
-            function loadAllData() {
+            async function loadAllData() {
                 const localExerciseDB = localStorage.getItem('fitTrackAI_exerciseDB');
 
                 if (localExerciseDB) {
                     exerciseDB = JSON.parse(localExerciseDB);
                 } else {
                     try {
-                        exerciseDB = JSON.parse(exercisesJsonContent);
-                    } catch (error) {
-                        console.error('Failed to parse embedded exercises.json:', error);
-                        exerciseDB = defaultExerciseDB; // Fallback to empty
+                       exerciseDB = JSON.parse(exercisesJsonContent);
+                       localStorage.setItem('fitTrackAI_exerciseDB', JSON.stringify(exerciseDB));
+                    } catch (e) {
+                       console.error('Failed to parse embedded exercises.json:', e);
+                       exerciseDB = defaultExerciseDB;
                     }
                 }
-                 // Ensure all exercises have a unique ID
-                exerciseDB.forEach(ex => { if (!ex.id) ex.id = crypto.randomUUID(); });
 
+                exerciseDB.forEach(ex => { if (!ex.id) ex.id = crypto.randomUUID(); });
                 ALL_MUSCLE_GROUPS = [...new Set(exerciseDB.map(ex => ex.group))].sort();
 
                 workoutPlan = JSON.parse(localStorage.getItem('fitTrackAI_workoutPlan')) || {};
@@ -673,7 +596,7 @@
 
             // --- CORE & HELPER FUNCTIONS ---
             const getApiUrl = (model, action = 'generateContent') => {
-                const apiKey = "AIzaSyDY48xF1byvU05kS9qKvN8iyrIR3hheP8w"; // API key is handled by the execution environment.
+                const apiKey = "";
                 return `https://generativelanguage.googleapis.com/v1beta/models/${model}:${action}?key=${apiKey}`;
             };
             
@@ -751,7 +674,6 @@
                 ui.dayViewDateDisplay.querySelector('#day-view-title-span').textContent = date.toLocaleDateString(undefined, { weekday: 'long' }) + (isToday ? ' (Today)' : '');
                 ui.dayViewDateDisplay.querySelector('#day-view-date-span').textContent = date.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
                 
-                // Allow viewing future days, but buttons will be disabled.
                 ui.nextDayBtn.disabled = false; 
                 
                 lucide.createIcons();
@@ -869,7 +791,7 @@
                 const dateKey = dateToKey(date);
                 const logsForDay = workoutHistory
                     .filter(log => log.date === dateKey)
-                    .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort by creation time, recent first
+                    .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
 
                 if (logsForDay.length === 0) {
                     ui.historyDayContent.innerHTML = `<p class="text-secondary-text">No workouts logged.</p>`;
@@ -886,7 +808,6 @@
                 lucide.createIcons();
             }
             
-            // --- REST TIMER FUNCTIONS ---
             function startRestTimer(timerDisplayElement) {
                 if (timerDisplayElement.dataset.timerId) {
                     clearInterval(parseInt(timerDisplayElement.dataset.timerId));
@@ -964,7 +885,6 @@
                     updateUI();
                 } else if (libraryModalContext.purpose === 'pref') {
                     const group = libraryModalContext.group;
-                    // If all are selected (default), store an empty array to mean "no preference"
                     const allInGroup = exerciseDB.filter(ex => ex.group === group).length;
                     if(selected.length === allInGroup) {
                          delete exercisePrefs[group];
@@ -1185,6 +1105,10 @@
                 ui.exerciseDetailVideo.src = item.videoPlaceholder || "https://placehold.co/400x225/111111/FFFFFF?text=No+Image";
                 const instructions = Array.isArray(item.instructions) ? item.instructions : (item.instructions || "").split('\n');
                 ui.exerciseDetailInstructions.value = instructions.join('\n');
+                 // Auto-adjust textarea height
+                ui.exerciseDetailInstructions.style.height = 'auto';
+                ui.exerciseDetailInstructions.style.height = (ui.exerciseDetailInstructions.scrollHeight) + 'px';
+
                 ui.exerciseDetailRepRange.textContent = item.repRange ? `Aim for ${item.repRange}.` : 'No specific rep range.';
                 ui.exerciseDetailNotes.value = item.notes || '';
                 ui.logFromDetailBtn.style.display = itemType === 'warmup' ? 'none' : 'block';
@@ -1293,7 +1217,7 @@
                 if (exIndex > -1) { 
                     exerciseDB[exIndex].instructions = ui.exerciseDetailInstructions.value.split('\n').filter(line => line.trim() !== '');
                     saveData();
-                    const btn = ui.saveInstructionsBtn; btn.textContent = 'Saved!'; setTimeout(() => { btn.textContent = 'Save Instructions'; }, 2000); 
+                    const btn = ui.saveInstructionsBtn; btn.textContent = 'Saved!'; setTimeout(() => { btn.textContent = 'Edit Instructions'; }, 2000); 
                 }
             });
 
@@ -1427,13 +1351,7 @@
                 saveData();
                 updateUI();
             })});
-            if (ui.planActionsBtn) {
-                ui.planActionsBtn.addEventListener('click', (e) => { 
-                    e.stopPropagation(); 
-                    ui.planActionsDropdown.classList.toggle('hidden'); 
-                });
-            }
-
+            
              ui.deletePlanBtn.addEventListener('click', () => {
                 showConfirmModal('Delete Plan?', 'This will delete your current workout plan and schedule. This action cannot be undone.', () => {
                     workoutPlan = { name: "No Plan", schedule: {}, workouts: [] };
@@ -1441,26 +1359,29 @@
                     updateUI();
                     showCustomAlert("Plan Deleted", "Your workout plan has been removed.");
                 });
-                ui.planActionsDropdown.classList.add('hidden');
             });
             
 
-            document.addEventListener('click', (e) => { 
-                if (ui.planActionsBtn && !ui.planActionsBtn.contains(e.target) && !ui.planActionsDropdown.contains(e.target)) { 
-                    ui.planActionsDropdown.classList.add('hidden'); 
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('[data-menu-group]')) {
+                    document.querySelectorAll('.group.open').forEach(group => {
+                        group.classList.remove('open');
+                    });
                 }
-                const allMenuItems = document.querySelectorAll('[data-menu-item]');
-                allMenuItems.forEach(item => item.classList.remove('open'));
             });
-            
-            ui.planActionsDropdown.addEventListener('click', e => {
-                const menuItem = e.target.closest('[data-menu-item]');
-                if(menuItem) {
+
+            document.querySelectorAll('[data-menu-group] > button').forEach(button => {
+                button.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const wasOpen = menuItem.classList.contains('open');
-                    document.querySelectorAll('[data-menu-item]').forEach(item => item.classList.remove('open'));
-                    if(!wasOpen) menuItem.classList.add('open');
-                }
+                    const parentGroup = button.parentElement;
+                    const wasOpen = parentGroup.classList.contains('open');
+                    document.querySelectorAll('.group.open').forEach(group => {
+                        if (group !== parentGroup) {
+                            group.classList.remove('open');
+                        }
+                    });
+                    parentGroup.classList.toggle('open');
+                });
             });
 
 
@@ -1827,13 +1748,11 @@
                     } else {
                         ui.customExerciseImg.classList.add('hidden');
                     }
-                     // Configure buttons for editing
                     ui.customExerciseActionButtons.innerHTML = `
                         <button type="submit" id="save-custom-exercise-changes-btn" class="btn btn-primary w-full">Save Changes</button>
                         <button type="button" id="save-as-variation-btn" class="btn btn-secondary w-full">Save as New Variation</button>
                     `;
                 } else {
-                    // Configure for creating a new exercise
                     ui.customExerciseActionButtons.innerHTML = '<button type="submit" id="save-new-custom-exercise-btn" class="w-full btn btn-primary">Save Custom Exercise</button>';
                 }
 
@@ -1886,7 +1805,7 @@
                     ui.customExerciseInstructions.value = details.instructions.join('\n');
                     ui.customExerciseRepRange.value = details.repRange;
 
-                    const imagePrompt = `Photorealistic image of a person demonstrating the proper form for the ${exerciseName} exercise at the peak contraction of the movement, on a plain white background.`;
+                    const imagePrompt = `Photorealistic image, clean white background. A person demonstrating the exercise '${exerciseName}'. Based on an analysis of instructional videos, the image should be from an angle that clearly shows proper form. Show the moment of peak muscle contraction.`;
                     const imageApiUrl = getApiUrl('imagen-3.0-generate-002', 'predict');
                     const imageResponse = await fetch(imageApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ instances: [{ prompt: imagePrompt }], parameters: { "sampleCount": 1 } }) });
                     if(!imageResponse.ok) throw new Error(`Image Gen Error: ${imageResponse.status}`);
@@ -1938,11 +1857,9 @@
                 if (isNameDuplicate) { showCustomAlert("Duplicate Name", "An exercise with this name already exists. Please choose a different name."); return; }
 
                 if (editingExerciseId && !isNewVariation) {
-                    // Update existing
                     const index = exerciseDB.findIndex(ex => ex.id === editingExerciseId);
                     if (index > -1) exerciseDB[index] = { ...exerciseDB[index], ...newExerciseData };
                 } else {
-                    // Add new or variation
                     exerciseDB.push(newExerciseData);
                 }
                 
@@ -1962,7 +1879,7 @@
                 e.preventDefault();
                 if(e.submitter && e.submitter.id === 'save-as-variation-btn') {
                     handleSaveCustomExercise(true);
-                } else { // save changes or save new
+                } else {
                     handleSaveCustomExercise(false);
                 }
             });
@@ -1971,7 +1888,6 @@
                 ui.workoutPlanForDay.classList.add('edit-mode');
                 ui.planViewHeader.classList.add('hidden');
                 ui.editModeToolbar.classList.remove('hidden');
-                ui.planActionsDropdown.classList.add('hidden');
             });
 
             ui.editModeDoneBtn.addEventListener('click', () => {
@@ -2029,7 +1945,6 @@
                     const exName = exerciseDB.find(ex => ex.id === exId)?.name || 'this exercise';
                     showConfirmModal('Delete Exercise?', `Are you sure you want to permanently delete "${exName}"? This cannot be undone.`, () => {
                         exerciseDB = exerciseDB.filter(ex => ex.id !== exId);
-                        // Also remove from any plans
                         if(workoutPlan.workouts) {
                             workoutPlan.workouts.forEach(w => {
                                 w.exercises = w.exercises.filter(name => name !== exName);
@@ -2071,21 +1986,19 @@
             ui.unitToggleKg.addEventListener('click', () => convertModalWeights('kg'));
             ui.unitToggleLbs.addEventListener('click', () => convertModalWeights('lbs'));
 
-            // Unload protection
             window.addEventListener('beforeunload', (e) => { if (isLogging) { e.preventDefault(); e.returnValue = ''; } });
 
             // --- INITIALIZATION ---
-            function initializeApp() {
-                loadAllData();
-                 // If no plan exists, create a default PPL
-                if (!workoutPlan || !workoutPlan.schedule || Object.keys(workoutPlan.schedule).length === 0) {
+            async function initializeApp() {
+                await loadAllData();
+                 if (!workoutPlan || !workoutPlan.schedule || Object.keys(workoutPlan.schedule).length === 0) {
                     workoutPlan = {
                         name: "Default PPL",
                         schedule: { "Monday": "Push", "Tuesday": "Pull", "Wednesday": "Legs", "Thursday": "Push", "Friday": "Pull", "Saturday": "Legs", "Sunday": "Rest" },
                         workouts: [
-                            { day: "Push", exercises: ["Flat Barbell Bench Press", "Incline Dumbbell Press", "Seated Dumbbell Press", "Dumbbell Lateral Raise", "Tricep Pushdown"] },
+                            { day: "Push", exercises: ["Flat Barbell Bench Press", "Incline Dumbbell Press", "Seated Dumbbell Press", "Dumbbell Lateral Raise", "Tricep Pushdown (Rope)"] },
                             { day: "Pull", exercises: ["Pull Ups", "Barbell Row", "Lat Pulldown", "Seated Cable Row", "Dumbbell Curl", "Hammer Curl"] },
-                            { day: "Legs", exercises: ["Barbell Squat", "Leg Press", "Romanian Deadlift", "Leg Curl", "Standing Calf Raise", "Hanging Leg Raise"] }
+                            { day: "Legs", exercises: ["Barbell Back Squat", "Leg Press", "Romanian Deadlift", "Lying Leg Curl", "Standing Calf Raise", "Hanging Leg Raise"] }
                         ],
                         restTime: 2
                     };

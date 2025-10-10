@@ -64,18 +64,47 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(255, 255, 255, 0.05), 0 4px 6px -2px rgba(255, 255, 255, 0.05);
         }
+        
+        .mobile-menu {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+        }
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #666; }
     </style>
 </head>
 <body class="antialiased">
 
+    <!-- Mobile Menu -->
+    <div id="mobile-menu-overlay" class="hidden fixed inset-0 bg-black/50 z-30 md:hidden"></div>
+    <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 h-full w-64 bg-card-bg z-40 p-6 md:hidden">
+        <a href="index.html" class="flex items-center gap-3 mb-8">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
+            <h1 class="text-xl font-bold">FitTrack AI</h1>
+        </a>
+        <ul class="space-y-4">
+             <li><a href="index.html" class="block py-2 text-lg text-primary-text">Home</a></li>
+             <li><a href="nutrition.html" class="block py-2 text-lg text-secondary-text hover:text-primary-text">Nutrition</a></li>
+             <li><a href="workouts.html" class="block py-2 text-lg text-secondary-text hover:text-primary-text">Workouts</a></li>
+             <li><a href="goals.html" class="block py-2 text-lg text-secondary-text hover:text-primary-text">Goals</a></li>
+             <li><a href="sleep.html" class="block py-2 text-lg text-secondary-text hover:text-primary-text">Sleep</a></li>
+             <li><a href="settings.html" class="block py-2 text-lg text-secondary-text hover:text-primary-text">Settings</a></li>
+        </ul>
+    </div>
+
     <div class="container mx-auto max-w-7xl px-4 py-8">
 
-        <header class="flex flex-col sm:flex-row items-center justify-between mb-16 pb-4 border-b border-gray-900">
+        <header class="flex items-center justify-between mb-16 pb-4 border-b border-gray-900">
             <a href="index.html" class="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
                 <h1 class="text-2xl font-bold">FitTrack AI</h1>
             </a>
-            <nav class="mt-4 sm:mt-0">
+            <nav class="hidden md:block">
                 <ul class="flex items-center space-x-4 sm:space-x-6 text-base font-medium">
                     <li><a href="index.html" class="nav-link active">Home</a></li>
                     <li><a href="nutrition.html" class="nav-link">Nutrition</a></li>
@@ -85,6 +114,11 @@
                     <li><a href="settings.html" class="nav-link">Settings</a></li>
                 </ul>
             </nav>
+            <div class="md:hidden">
+                <button id="hamburger-btn" class="p-2">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
         </header>
 
         <main class="space-y-8">
@@ -107,13 +141,21 @@
                             <div class="flex justify-between items-baseline"><span class="text-gray-400">Fat:</span> <span class="font-semibold"><span id="summary-current-fat">0</span> / <span id="summary-goal-fat">60</span> g</span></div>
                         </div>
                     </div>
+                    <div class="mt-4 pt-4 border-t border-border-color">
+                         <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-medium text-gray-400 flex items-center gap-2"><i data-lucide="glass-water" class="w-4 h-4 text-blue-400"></i>Hydration</span>
+                            <span class="text-sm font-semibold"><span id="summary-current-hydration">0</span> / <span id="summary-goal-hydration">2.5</span> L</span>
+                        </div>
+                        <div class="w-full bg-input-bg rounded-full h-2">
+                            <div id="hydration-progress" class="bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
                 </a>
 
                 <a href="workouts.html" class="content-card clickable-card">
                     <h3 class="text-2xl font-bold mb-4">Today's Workout</h3>
                     <div id="workout-summary" class="text-center text-secondary-text">
-                        <p>No workout data available.</p>
-                        <span class="text-accent hover:text-accent-hover mt-4 inline-block">Log a workout</span>
+                        <!-- Detailed workout summary will be injected here -->
                     </div>
                 </a>
 
@@ -138,6 +180,22 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
+            
+            // --- Mobile Menu ---
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+            hamburgerBtn.addEventListener('click', () => {
+                mobileMenu.classList.add('open');
+                mobileMenuOverlay.classList.remove('hidden');
+            });
+
+            mobileMenuOverlay.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+                mobileMenuOverlay.classList.add('hidden');
+            });
+
 
             // --- STATE MANAGEMENT ---
             let appData = {};
@@ -210,17 +268,12 @@
             }
 
              function getWorkoutDayType(date) {
-                const schedule = [ 
-                    { day: "Monday", type: "Push" }, 
-                    { day: "Tuesday", type: "Pull" }, 
-                    { day: "Wednesday", type: "Legs" }, 
-                    { day: "Thursday", type: "Push" }, 
-                    { day: "Friday", type: "Pull" }, 
-                    { day: "Saturday", type: "Legs" }, 
-                    { day: "Sunday", type: "Rest" }
-                ];
-                const dayIndex = date.getDay(); 
-                return schedule[(dayIndex + 6) % 7];
+                const schedule = (appData.workoutPlan && appData.workoutPlan.schedule) ? appData.workoutPlan.schedule : {
+                    "Monday": "Push", "Tuesday": "Pull", "Wednesday": "Legs", 
+                    "Thursday": "Push", "Friday": "Pull", "Saturday": "Legs", "Sunday": "Rest"
+                };
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+                return { day: dayName, type: schedule[dayName] || "Rest" };
             }
 
             function calculateDuration(startTime, endTime, dateStr) {
@@ -232,7 +285,7 @@
                 const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
                 const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
                 
-                if (durationMs < 0 || durationHours > 24) return { durationHours: 0, durationMinutes: 0 }; // Handle errors
+                if (durationMs < 0 || isNaN(durationHours)) return { durationHours: 0, durationMinutes: 0 }; // Handle errors
                 return { durationHours, durationMinutes };
             }
 
@@ -242,24 +295,25 @@
                 const todayKey = dateToKey(new Date());
 
                 // Default goals
-                const defaultGoals = { calories: 2000, protein: 150, carbs: 225, fat: 60 };
+                const defaultGoals = { calories: 2000, protein: 150, carbs: 225, fat: 60, hydrationGoalTicks: 10 };
                 
                 // Load all necessary keys
                 appData.allDailyLogs = JSON.parse(localStorage.getItem('fitTrackAI_allDailyLogs')) || {};
+                appData.hydrationLog = JSON.parse(localStorage.getItem('fitTrackAI_hydrationLog')) || {};
                 appData.userProfile = JSON.parse(localStorage.getItem('fitTrackAI_userProfile')) || { sleepHistory: [], weightHistory: [] };
                 appData.workoutHistory = JSON.parse(localStorage.getItem('fitTrackAI_workoutHistory')) || [];
                 appData.workoutStatusHistory = JSON.parse(localStorage.getItem('fitTrackAI_workoutStatus')) || {};
-                appData.goals = JSON.parse(localStorage.getItem('fitTrackAI_goals')) || defaultGoals;
-                appData.exerciseDB = JSON.parse(localStorage.getItem('fitTrackAI_exerciseDB')) || [];
+                appData.goals = { ...defaultGoals, ...(JSON.parse(localStorage.getItem('fitTrackAI_goals'))) };
+                appData.workoutPlan = JSON.parse(localStorage.getItem('fitTrackAI_workoutPlan')) || {};
 
-                // Get today's log and goal
+                // Get today's log
                 appData.todayLog = appData.allDailyLogs[todayKey] || [];
-                appData.goals = { ...defaultGoals, ...appData.goals };
             }
 
             // --- RENDERING FUNCTIONS ---
             
             function renderNutritionSummary() {
+                const todayKey = dateToKey(new Date());
                 const totals = appData.todayLog.reduce((acc, item) => ({
                     calories: acc.calories + (item.calories || 0), protein: acc.protein + (item.protein || 0),
                     carbs: acc.carbs + (item.carbs || 0), fat: acc.fat + (item.fat || 0)
@@ -277,31 +331,78 @@
                 const macroSum = totals.protein + totals.carbs + totals.fat;
                 macroChart.data.datasets[0].data = macroSum > 0 ? [totals.protein, totals.carbs, totals.fat] : [1, 1, 1];
                 macroChart.update();
+
+                // Hydration
+                const currentHydrationTicks = appData.hydrationLog[todayKey] || 0;
+                const goalHydrationTicks = appData.goals.hydrationGoalTicks || 10;
+                const currentLiters = (currentHydrationTicks * 0.25).toFixed(2);
+                const goalLiters = (goalHydrationTicks * 0.25).toFixed(2);
+                
+                document.getElementById('summary-current-hydration').textContent = currentLiters;
+                document.getElementById('summary-goal-hydration').textContent = goalLiters;
+
+                const hydrationPercent = goalLiters > 0 ? Math.min(100, (currentLiters / goalLiters) * 100) : 0;
+                document.getElementById('hydration-progress').style.width = `${hydrationPercent}%`;
             }
 
             function renderWorkoutSummary() {
                 const today = new Date();
-                today.setHours(0,0,0,0);
+                today.setHours(0, 0, 0, 0);
                 const todayKey = dateToKey(today);
 
                 const dayInfo = getWorkoutDayType(today);
                 const loggedExercises = appData.workoutHistory.filter(log => dateToKey(new Date(log.date)) === todayKey);
+                const loggedExerciseNames = new Set(loggedExercises.map(log => log.name));
                 const status = appData.workoutStatusHistory[todayKey];
                 
-                let summaryHtml = '';
-                
+                const workoutSummaryDiv = document.getElementById('workout-summary');
+                workoutSummaryDiv.innerHTML = ''; // Clear previous content
+
                 if (dayInfo.type === 'Rest') {
-                    summaryHtml = `<p class="text-3xl font-bold text-green-400 mb-2">Rest Day</p><p class="text-lg font-semibold text-primary-text">Recovery is key!</p><span class="text-accent hover:text-accent-hover mt-4 inline-block">View full plan</span>`;
-                } else if (loggedExercises.length > 0) {
-                     const firstExercise = loggedExercises[0].name;
-                     const exerciseCount = loggedExercises.length;
-                     const statusText = status === 'full' ? 'Complete' : (status === 'partial' ? 'Partial' : 'Logged');
-                     summaryHtml = `<p class="text-3xl font-bold text-blue-400 mb-2">${dayInfo.type} (${statusText})</p><p class="text-lg font-semibold text-primary-text">Logged ${exerciseCount} exercises. Started with ${firstExercise}.</p><span class="text-accent hover:text-accent-hover mt-4 inline-block">View full log</span>`;
-                } else {
-                    summaryHtml = `<p class="text-lg font-semibold text-primary-text">${dayInfo.type} Scheduled</p><p>Time to hit the gym!</p><span class="text-accent hover:text-accent-hover mt-4 inline-block">Start your workout</span>`;
+                    workoutSummaryDiv.innerHTML = `
+                        <i data-lucide="bed-double" class="w-12 h-12 text-green-400 mx-auto mb-2"></i>
+                        <p class="text-xl font-bold text-green-400">Rest Day</p>
+                        <p class="text-secondary-text">Recovery is key!</p>
+                    `;
+                    lucide.createIcons();
+                    return;
                 }
                 
-                document.getElementById('workout-summary').innerHTML = summaryHtml;
+                const workoutForDay = appData.workoutPlan?.workouts?.find(w => w.day === dayInfo.type);
+                const plannedExercises = workoutForDay?.exercises || [];
+
+                let titleText = `${dayInfo.type} Scheduled`;
+                let titleColor = "text-primary-text";
+                
+                if (loggedExercises.length > 0) {
+                    const isComplete = plannedExercises.length > 0 && plannedExercises.every(ex => loggedExerciseNames.has(ex));
+                    const statusText = isComplete ? 'Complete' : (status === 'partial' ? 'Partial' : 'In Progress');
+                    titleText = `${dayInfo.type} (${statusText})`;
+                    titleColor = "text-blue-400";
+                }
+
+                let exerciseListHtml = '';
+                if (plannedExercises.length > 0) {
+                    exerciseListHtml = `<ul class="space-y-2 text-left mt-4 max-h-48 overflow-y-auto pr-2 custom-scrollbar">` +
+                        plannedExercises.map(exName => {
+                            const isLogged = loggedExerciseNames.has(exName);
+                            return `<li class="flex items-center justify-between text-sm p-2 rounded-md ${isLogged ? 'bg-green-500/10' : 'bg-input-bg/50'}">
+                                <span>${exName}</span>
+                                ${isLogged 
+                                    ? '<i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>'
+                                    : '<i data-lucide="circle-dashed" class="w-5 h-5 text-secondary-text"></i>'
+                                }
+                            </li>`;
+                        }).join('') + `</ul>`;
+                } else {
+                    exerciseListHtml = `<p class="text-secondary-text mt-4">No exercises planned for today. Go to the workouts page to generate a plan!</p>`;
+                }
+
+                workoutSummaryDiv.innerHTML = `
+                    <p class="text-xl font-bold ${titleColor} mb-2">${titleText}</p>
+                    ${exerciseListHtml}
+                `;
+                lucide.createIcons();
             }
 
             function renderSleepSummary() {
@@ -350,12 +451,12 @@
                 weeklyProgressChart.data.datasets[0].data = calorieData;
                 weeklyProgressChart.data.datasets[1].data = weightData;
                 
-                const validCalories = calorieData.filter(d => d !== null);
-                const validWeights = weightData.filter(d => d !== null);
+                const validCalories = calorieData.filter(d => d !== null && d > 0);
+                const validWeights = weightData.filter(d => d !== null && d > 0);
 
                 // Ensure the Y-axes scale correctly if there is data
-                weeklyProgressChart.options.scales.y.min = validCalories.length > 0 ? Math.min(...validCalories) * 0.9 : 0;
-                weeklyProgressChart.options.scales.y1.min = validWeights.length > 0 ? Math.min(...validWeights) * 0.95 : 60; // Start slightly below lowest weight
+                weeklyProgressChart.options.scales.y.min = validCalories.length > 1 ? Math.min(...validCalories) * 0.9 : 0;
+                weeklyProgressChart.options.scales.y1.min = validWeights.length > 1 ? Math.min(...validWeights) * 0.95 : (validWeights[0] ? validWeights[0] - 5 : 60);
                 
                 weeklyProgressChart.update();
             }
@@ -366,6 +467,7 @@
                 renderWorkoutSummary();
                 renderSleepSummary();
                 renderWeeklyProgressChart();
+                lucide.createIcons();
             }
 
             // --- INITIALIZATION ---

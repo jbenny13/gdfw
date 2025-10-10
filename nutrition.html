@@ -10,6 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Added for barcode scanning -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         :root {
             --background: #000000;
@@ -56,8 +58,14 @@
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 0.75rem;
-            padding: 2rem;
+            padding: 1.5rem;
         }
+        @media (min-width: 640px) {
+            .content-card {
+                padding: 2rem;
+            }
+        }
+
 
         .form-input {
             background-color: var(--input-bg);
@@ -190,6 +198,14 @@
         input[type=number] {
           -moz-appearance: textfield;
         }
+
+        .mobile-menu {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(-100%);
+        }
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -197,12 +213,13 @@
     <div class="container mx-auto max-w-7xl px-4 py-8">
 
         <!-- Header -->
-        <header class="flex flex-col sm:flex-row items-center justify-between mb-16 pb-4 border-b border-gray-900">
+        <header class="flex items-center justify-between mb-8 sm:mb-16 pb-4 border-b border-gray-900">
             <a href="index.html" class="flex items-center gap-3">
                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
                 <h1 class="text-2xl font-bold">FitTrack AI</h1>
             </a>
-            <nav class="mt-4 sm:mt-0">
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex">
                 <ul class="flex items-center space-x-4 sm:space-x-6 text-base font-medium">
                     <li><a href="index.html" class="nav-link">Home</a></li>
                     <li><a href="nutrition.html" class="nav-link active">Nutrition</a></li>
@@ -212,7 +229,31 @@
                     <li><a href="settings.html" class="nav-link">Settings</a></li>
                 </ul>
             </nav>
+            <!-- Mobile Nav Button -->
+            <div class="md:hidden">
+                <button id="hamburger-btn" class="p-2">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
         </header>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="mobile-menu fixed top-0 left-0 h-full w-64 bg-card-bg z-40 p-6 md:hidden">
+            <a href="index.html" class="flex items-center gap-3 mb-8">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
+                <h1 class="text-xl font-bold">FitTrack AI</h1>
+            </a>
+            <ul class="space-y-4">
+                 <li><a href="index.html" class="block py-2 text-lg text-secondary-text hover:text-primary-text">Home</a></li>
+                 <li><a href="nutrition.html" class="block py-2 text-lg text-primary-text">Nutrition</a></li>
+                 <li><a href="workouts.html" class="block py-2 text-lg text-secondary-text hover:text-primary-text">Workouts</a></li>
+                 <li><a href="goals.html" class="block py-2 text-lg text-secondary-text hover:text-primary-text">Goals</a></li>
+                 <li><a href="sleep.html" class="block py-2 text-lg text-secondary-text hover:text-primary-text">Sleep</a></li>
+                 <li><a href="settings.html" class="block py-2 text-lg text-secondary-text hover:text-primary-text">Settings</a></li>
+            </ul>
+        </div>
+        <div id="mobile-menu-overlay" class="hidden fixed inset-0 bg-black/50 z-30 md:hidden"></div>
+
 
         <!-- Main Content -->
         <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -228,8 +269,8 @@
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label for="food-servings-input" class="form-label">Servings *</label>
-                                    <input type="number" id="food-servings-input" value="1" min="0" class="form-input mt-1">
+                                    <label for="food-grams-input" class="form-label">Total Grams *</label>
+                                    <input type="number" id="food-grams-input" placeholder="e.g., 150" min="0" class="form-input mt-1">
                                 </div>
                                 <div>
                                     <label for="food-brand-input" class="form-label">Brand (Optional)</label>
@@ -239,57 +280,47 @@
 
                             <details class="pt-2">
                                 <summary class="cursor-pointer text-sm text-gray-400 hover:text-white flex items-center justify-between">
-                                    <span>Manual Macro Entry</span>
+                                    <span>Enter Macros for Total Grams</span>
                                     <i data-lucide="chevron-down" class="w-4 h-4"></i>
                                 </summary>
                                 <div class="space-y-4 pt-4 mt-4 border-t border-gray-800">
-                                    <div class="grid grid-cols-2 gap-4">
+                                     <div class="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label for="food-grams-input" class="form-label">Grams per Serving</label>
-                                            <input type="number" id="food-grams-input" placeholder="0" min="0" class="form-input mt-1">
-                                        </div>
-                                         <div>
                                             <label for="food-calories-input" class="form-label">Calories (kcal)</label>
                                             <input type="number" step="0.01" id="food-calories-input" min="0" placeholder="0" class="form-input mt-1 macro-input">
                                         </div>
-                                    </div>
-                                     <div class="grid grid-cols-2 gap-4">
                                         <div>
                                             <label for="food-protein-input" class="form-label">Protein (g)</label>
                                             <input type="number" step="0.01" id="food-protein-input" min="0" placeholder="0" class="form-input mt-1 macro-input">
                                         </div>
+                                    </div>
+                                     <div class="grid grid-cols-2 gap-4">
                                         <div>
                                             <label for="food-carbs-input" class="form-label">Carbs (g)</label>
                                             <input type="number" step="0.01" id="food-carbs-input" min="0" placeholder="0" class="form-input mt-1 macro-input">
                                         </div>
-                                    </div>
-                                     <div class="grid grid-cols-2 gap-4">
                                         <div>
                                             <label for="food-fat-input" class="form-label">Fat (g)</label>
                                             <input type="number" step="0.01" id="food-fat-input" min="0" placeholder="0" class="form-input mt-1 macro-input">
                                         </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
                                         <div>
                                             <label for="food-sugar-input" class="form-label">Sugar (g)</label>
                                             <input type="number" step="0.01" id="food-sugar-input" min="0" placeholder="0" class="form-input mt-1 macro-input">
                                         </div>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
+                                         <div>
                                             <label for="food-sodium-input" class="form-label">Sodium (mg)</label>
                                             <input type="number" step="0.01" id="food-sodium-input" min="0" placeholder="0" class="form-input mt-1 macro-input">
                                         </div>
-                                         <div>
-                                            <label for="food-potassium-input" class="form-label">Potassium (mg)</label>
-                                            <input type="number" step="0.01" id="food-potassium-input" min="0" placeholder="0" class="form-input mt-1 macro-input">
-                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="food-potassium-input" class="form-label">Potassium (mg)</label>
+                                        <input type="number" step="0.01" id="food-potassium-input" min="0" placeholder="0" class="form-input mt-1 macro-input">
                                     </div>
                                 </div>
                             </details>
                             
-                            <div class="bg-black/30 p-3 rounded-lg mt-4">
-                                <p class="text-sm text-gray-400">Total Macros for <span id="total-servings-display">1</span> Serving(s):</p>
-                                <p id="total-macros-display" class="font-semibold mt-1">0kcal | 0p | 0c | 0f | 0s | 0na | 0k</p>
-                            </div>
                             <button id="ai-get-macros-btn" type="button" class="btn btn-secondary w-full !mt-6">
                                 <i data-lucide="sparkles" class="w-4 h-4"></i>
                                 <span class="btn-text">Get Macros with AI</span>
@@ -302,7 +333,7 @@
                                     <div class="loader hidden"></div>
                                 </button>
                                 <button id="create-recipe-btn" type="button" class="btn btn-secondary !p-3" title="Create Recipe"><i data-lucide="notebook-tabs"></i></button>
-                                <button id="scan-food-btn" type="button" class="btn btn-secondary !p-3" title="Scan Food Image"><i data-lucide="camera"></i></button>
+                                <button id="scan-food-btn" type="button" class="btn btn-secondary !p-3" title="Scan Food with AI Camera"><i data-lucide="camera"></i></button>
                                 <button id="scan-barcode-btn" type="button" class="btn btn-secondary !p-3" title="Scan Barcode"><i data-lucide="barcode"></i></button>
                             </div>
                             <div id="add-food-error" class="text-red-400 text-sm mt-2 h-4"></div>
@@ -310,7 +341,7 @@
                     </div>
                 </div>
 
-                <!-- Right Column (Updated with Carousel/Date Navigation) -->
+                <!-- Right Column -->
                 <div class="space-y-8">
                     <div class="content-card">
                          <!-- Date Navigation -->
@@ -343,13 +374,13 @@
                     <!-- Daily Log Content & AI Report Output -->
                     <div class="content-card">
                         <h3 class="text-2xl font-bold mb-4">Food Log</h3>
-                        <div id="daily-log-content" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"><p class="text-gray-500">No food logged yet.</p></div>              <!-- AI Report Button -->
+                        <div id="daily-log-content" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"><p class="text-gray-500">No food logged yet.</p></div>
                          <button id="ai-daily-report-btn" class="btn btn-primary w-full mt-6">
                             <i data-lucide="clipboard-list" class="w-4 h-4"></i>
                             <span class="btn-text">Get Daily Log AI Report</span>
                             <div class="loader hidden"></div>
                         </button>
-                        <div id="ai-report-output" class="mt-4 p-3 bg-black/30 rounded-md text-sm hidden">
+                        <div id="ai-report-output" class="mt-4 p-3 bg-black/30 rounded-lg text-sm hidden">
                             <h4 class="font-bold text-lg mb-2 text-yellow-400 flex items-center gap-2">
                                 <i data-lucide="sparkles" class="w-5 h-5"></i>
                                 <span>AI Nutrition Report</span>
@@ -362,12 +393,17 @@
                     <div class="content-card">
                         <div class="flex justify-between items-center mb-4">
                            <h3 class="text-2xl font-bold">Hydration</h3>
-                           <button id="add-hydration-tick-btn" class="btn btn-secondary !p-2" title="Increase daily goal">
-                               <i data-lucide="plus"></i>
-                           </button>
+                           <div class="flex items-center gap-2">
+                               <button id="remove-hydration-tick-btn" class="btn btn-secondary !p-2" title="Decrease daily goal">
+                                   <i data-lucide="minus"></i>
+                               </button>
+                               <button id="add-hydration-tick-btn" class="btn btn-secondary !p-2" title="Increase daily goal">
+                                   <i data-lucide="plus"></i>
+                               </button>
+                           </div>
                         </div>
                         <p class="text-sm text-secondary-text mb-4">Goal: <span id="hydration-goal-text">2.50</span>L. Each glass is 250ml.</p>
-                        <div id="hydration-tracker" class="flex flex-wrap items-center justify-start gap-1 sm:gap-2 cursor-pointer">
+                        <div id="hydration-tracker" class="flex flex-wrap items-center justify-start gap-1 sm:gap-2">
                             <!-- Ticks will be dynamically generated by JS -->
                         </div>
                         <p id="hydration-total" class="text-center text-lg font-semibold mt-4">0 / 2.50 L</p>
@@ -384,31 +420,46 @@
                     </div>
                 </div>
 
-                <!-- AI Suggestions moved to the bottom -->
+                <!-- AI Sections moved to the bottom -->
                 <div class="content-card lg:col-span-2">
-                    <h3 class="text-2xl font-bold mb-4">AI Meal Suggestions</h3>
-                    <p class="text-gray-400 mb-4 text-sm">Enter ingredients you have, and the AI will suggest a quick, healthy meal.</p>
-                     <div>
-                        <label for="ai-ingredients" class="form-label">Your Ingredients</label>
-                        <textarea id="ai-ingredients" rows="3" class="form-input mt-1" placeholder="e.g., chicken breast, rice, broccoli, olive oil"></textarea>
-                    </div>
-                    <button id="ai-suggestion-btn" class="btn btn-secondary w-full mt-4">
-                        <span class="btn-text">Generate Ideas</span>
-                        <div class="loader hidden"></div>
-                    </button>
-                    <div id="ai-suggestions-output" class="mt-4 space-y-3"></div>
+                    <h3 class="text-2xl font-bold mb-4">AI Coach</h3>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                         <div>
+                            <h4 class="font-semibold text-lg mb-2">Meal Suggester</h4>
+                            <p class="text-gray-400 mb-4 text-sm">Enter ingredients you have, and the AI will suggest a quick, healthy meal.</p>
+                             <div>
+                                <label for="ai-ingredients" class="form-label">Your Ingredients</label>
+                                <textarea id="ai-ingredients" rows="3" class="form-input mt-1" placeholder="e.g., chicken breast, rice, broccoli, olive oil"></textarea>
+                            </div>
+                            <button id="ai-suggestion-btn" class="btn btn-secondary w-full mt-4">
+                                <span class="btn-text">Generate Ideas</span>
+                                <div class="loader hidden"></div>
+                            </button>
+                            <div id="ai-suggestions-output" class="mt-4 space-y-3"></div>
+                         </div>
+                         <div>
+                            <h4 class="font-semibold text-lg mb-2">Nutritionist Chat</h4>
+                            <p class="text-gray-400 mb-4 text-sm">Ask for specific advice about your diet, or have a general chat about nutrition.</p>
+                            <div class="bg-black/30 p-4 rounded-lg text-center">
+                                <i data-lucide="message-circle" class="w-12 h-12 text-blue-400 mx-auto mb-4"></i>
+                                <button id="open-nutritionist-chat-btn" class="btn btn-primary w-full">Chat with AI Nutritionist</button>
+                            </div>
+                         </div>
+                     </div>
                 </div>
         </main>
     </div>
 
     <!-- Modals -->
-    <div id="food-scanner-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">Scan Food with AI</h2><button id="close-food-scanner-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-gray-800"><img id="image-preview" src="" class="hidden w-full h-full object-contain"><p id="image-placeholder" class="text-gray-400">Upload or take a photo</p></div><div class="grid grid-cols-2 gap-4"><label for="upload-photo-input" class="btn btn-secondary cursor-pointer"><i data-lucide="upload"></i>Upload</label><input type="file" id="upload-photo-input" class="hidden" accept="image/*"><label for="take-picture-input" class="btn btn-secondary cursor-pointer"><i data-lucide="camera"></i>Take Photo</label><input type="file" id="take-picture-input" class="hidden" accept="image/*" capture="environment"></div><div><label for="scanner-food-name" class="form-label">Food Name</label><input type="text" id="scanner-food-name" placeholder="e.g., 'bowl of oatmeal with berries'" class="form-input mt-1" required></div><div><label for="scanner-brand-input" class="form-label">Brand (Optional)</label><input type="text" id="scanner-brand-input" placeholder="e.g., Quaker" class="form-input mt-1"></div><details class="pt-2"><summary class="cursor-pointer text-sm text-gray-400 hover:text-white">Manual Macro Override</summary><div class="space-y-4 mt-4 border-t border-gray-800 pt-4"><div class="grid grid-cols-2 gap-4"><div><label for="scanner-food-grams" class="form-label">Grams (g)</label><input type="number" id="scanner-food-grams" min="0" placeholder="e.g., 250" class="form-input mt-1"></div><div><label class="form-label">Calories</label><input type="number" id="scanner-calories" min="0" class="form-input mt-1"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Protein (g)</label><input type="number" id="scanner-protein" min="0" class="form-input mt-1"></div><div><label class="form-label">Carbs (g)</label><input type="number" id="scanner-carbs" min="0" class="form-input mt-1"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Fat (g)</label><input type="number" id="scanner-fat" min="0" class="form-input mt-1"></div><div><label class="form-label">Sugar (g)</label><input type="number" id="scanner-sugar" min="0" class="form-input mt-1"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Sodium (mg)</label><input type="number" id="scanner-sodium" min="0" class="form-input mt-1"></div><div><label class="form-label">Potassium (mg)</label><input type="number" id="scanner-potassium" min="0" class="form-input mt-1"></div></div></div></details><button id="ai-get-macros-from-image-btn" class="btn btn-primary w-full"><span class="btn-text">Get Macros & Log</span><div class="loader hidden"></div></button><p id="food-scanner-status" class="text-center text-sm text-gray-400 mt-2 h-5"></p></div></div></div>
-    <div id="barcode-scanner-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">Scan Barcode</h2><button id="close-barcode-scanner-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div class="grid grid-cols-2 gap-4"><label for="barcode-photo-input" class="btn btn-secondary cursor-pointer"><i data-lucide="camera"></i> Take Photo</label><input type="file" id="barcode-photo-input" class="hidden" accept="image/*" capture="environment"><button id="find-barcode-btn" class="btn btn-primary">Find by Number</button></div><div><label for="barcode-input" class="form-label">Or enter barcode number manually</label><input type="text" id="barcode-input" placeholder="e.g., 5060294101234" class="form-input mt-1"></div><div id="barcode-results" class="mt-4 p-4 bg-black/30 rounded-lg min-h-[100px]"><p class="text-secondary-text text-center">Use your camera or enter a number to find a food item.</p></div></div></div></div>
+    <div id="food-scanner-modal" class="modal-backdrop" style="z-index: 60;"><div class="modal-content"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">Scan Food with AI</h2><button id="close-food-scanner-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-gray-800"><img id="image-preview" src="" class="hidden w-full h-full object-contain"><p id="image-placeholder" class="text-gray-400">Upload or take a photo</p></div><div class="grid grid-cols-2 gap-4"><label for="upload-photo-input" class="btn btn-secondary cursor-pointer"><i data-lucide="upload"></i>Upload</label><input type="file" id="upload-photo-input" class="hidden" accept="image/*"><label for="take-picture-input" class="btn btn-secondary cursor-pointer"><i data-lucide="camera"></i>Take Photo</label><input type="file" id="take-picture-input" class="hidden" accept="image/*" capture="environment"></div><div><label for="scanner-food-name" class="form-label">Food Name</label><input type="text" id="scanner-food-name" placeholder="e.g., 'bowl of oatmeal with berries'" class="form-input mt-1" required></div><div><label for="scanner-brand-input" class="form-label">Brand (Optional)</label><input type="text" id="scanner-brand-input" placeholder="e.g., Quaker" class="form-input mt-1"></div><details class="pt-2"><summary class="cursor-pointer text-sm text-gray-400 hover:text-white">Manual Macro Override</summary><div class="space-y-4 mt-4 border-t border-gray-800 pt-4"><div class="grid grid-cols-2 gap-4"><div><label for="scanner-food-grams" class="form-label">Grams (g)</label><input type="number" id="scanner-food-grams" min="0" placeholder="e.g., 250" class="form-input mt-1"></div><div><label class="form-label">Calories</label><input type="number" id="scanner-calories" min="0" class="form-input mt-1"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Protein (g)</label><input type="number" id="scanner-protein" min="0" class="form-input mt-1"></div><div><label class="form-label">Carbs (g)</label><input type="number" id="scanner-carbs" min="0" class="form-input mt-1"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Fat (g)</label><input type="number" id="scanner-fat" min="0" class="form-input mt-1"></div><div><label class="form-label">Sugar (g)</label><input type="number" id="scanner-sugar" min="0" class="form-input mt-1"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Sodium (mg)</label><input type="number" id="scanner-sodium" min="0" class="form-input mt-1"></div><div><label class="form-label">Potassium (mg)</label><input type="number" id="scanner-potassium" min="0" class="form-input mt-1"></div></div></div></details><button id="ai-get-macros-from-image-btn" class="btn btn-primary w-full"><span class="btn-text">Get Macros & Log</span><div class="loader hidden"></div></button><p id="food-scanner-status" class="text-center text-sm text-gray-400 mt-2 h-5"></p></div></div></div>
+    <div id="barcode-scanner-modal" class="modal-backdrop" style="z-index: 60;"><div class="modal-content"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">Scan Barcode</h2><button id="close-barcode-scanner-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div id="barcode-reader" class="w-full aspect-square bg-black rounded-lg border border-border-color hidden"></div><div id="barcode-initial-options" class="flex flex-col gap-4"><button id="start-camera-scan-btn" class="btn btn-primary w-full"><i data-lucide="camera"></i>Start Live Scan</button><label for="barcode-upload-input" class="btn btn-secondary cursor-pointer w-full"><i data-lucide="upload"></i>Upload Barcode Image</label><input type="file" id="barcode-upload-input" class="hidden" accept="image/*"></div><p id="barcode-scanner-status" class="text-center text-sm text-secondary-text h-5"></p><div id="barcode-results" class="mt-4 p-4 bg-black/30 rounded-lg min-h-[100px] hidden"></div></div></div></div>
     <div id="confirm-modal" class="modal-backdrop"><div class="modal-content"><h2 id="confirm-modal-title" class="text-xl font-bold mb-4">Are you sure?</h2><p id="confirm-modal-text" class="text-gray-300 mb-6">This action cannot be undone.</p><div class="flex justify-end gap-4"><button id="confirm-modal-cancel-btn" class="btn btn-secondary">Cancel</button><button id="confirm-modal-confirm-btn" class="btn btn-danger">Confirm</button></div></div></div>
     <div id="alert-modal" class="modal-backdrop"><div class="modal-content"><h2 id="alert-modal-title" class="text-xl font-bold mb-4">Alert</h2><p id="alert-modal-text" class="text-gray-300 mb-6"></p><div class="flex justify-end"><button id="alert-modal-ok-btn" class="btn btn-primary">OK</button></div></div></div>
-    <div id="compound-food-modal" class="modal-backdrop"><div class="modal-content !max-w-3xl"><div class="flex justify-between items-center mb-6"><h2 id="compound-food-modal-title" class="text-2xl font-bold">Create a Recipe</h2><button id="close-compound-food-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="compound-food-form" class="space-y-6"><div><label for="recipe-name-input" class="form-label">Recipe Name</label><input type="text" id="recipe-name-input" class="form-input mt-1" required placeholder="e.g., Turkey Sandwich"></div><div class="border-t border-b border-gray-800 py-4"><h3 class="text-lg font-semibold mb-3">Ingredients</h3><div id="ingredient-list-container" class="space-y-4 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary w-full mt-4"><i data-lucide="plus"></i>Add Ingredient</button></div><div><h3 class="text-lg font-semibold mb-3">Total Macros</h3><div id="recipe-totals" class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center"><div><p class="text-sm text-gray-400">Calories</p><p id="recipe-total-calories" class="font-bold text-xl">0</p></div><div><p class="text-sm text-gray-400">Protein</p><p class="font-bold text-xl"><span id="recipe-total-protein">0</span>g</p></div><div><p class="text-sm text-gray-400">Carbs</p><p class="font-bold text-xl"><span id="recipe-total-carbs">0</span>g</p></div><div><p class="text-sm text-gray-400">Fat</p><p class="font-bold text-xl"><span id="recipe-total-fat">0</span>g</p></div></div><p class="text-center text-sm text-gray-400 mt-2">Total Weight: <span id="recipe-total-grams" class="font-bold">0</span>g</p></div><button type="submit" id="save-recipe-btn" class="btn btn-primary w-full">Save & Log Recipe</button></form></div></div>
+    <div id="compound-food-modal" class="modal-backdrop"><div class="modal-content !max-w-3xl"><div class="flex justify-between items-center mb-6"><h2 id="compound-food-modal-title" class="text-2xl font-bold">Create a Recipe</h2><button id="close-compound-food-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="compound-food-form" class="space-y-6"><div><label for="recipe-name-input" class="form-label">Recipe Name</label><input type="text" id="recipe-name-input" class="form-input mt-1" required placeholder="e.g., Turkey Sandwich"></div><div class="border-t border-b border-gray-800 py-4"><h3 class="text-lg font-semibold mb-3">Ingredients</h3><div id="ingredient-list-container" class="space-y-4 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div><button type="button" id="add-ingredient-btn" class="btn btn-secondary w-full mt-4"><i data-lucide="plus"></i>Add Ingredient</button></div><div><h3 class="text-lg font-semibold mb-3">Total Macros</h3><div id="recipe-totals" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 text-center"><div><p class="text-sm text-gray-400">Calories</p><p id="recipe-total-calories" class="font-bold text-xl">0</p></div><div><p class="text-sm text-gray-400">Protein</p><p class="font-bold text-xl"><span id="recipe-total-protein">0</span>g</p></div><div><p class="text-sm text-gray-400">Carbs</p><p class="font-bold text-xl"><span id="recipe-total-carbs">0</span>g</p></div><div><p class="text-sm text-gray-400">Fat</p><p class="font-bold text-xl"><span id="recipe-total-fat">0</span>g</p></div><div><p class="text-sm text-gray-400">Sugar</p><p class="font-bold text-xl"><span id="recipe-total-sugar">0</span>g</p></div><div><p class="text-sm text-gray-400">Sodium</p><p class="font-bold text-xl"><span id="recipe-total-sodium">0</span>mg</p></div><div><p class="text-sm text-gray-400">Potassium</p><p class="font-bold text-xl"><span id="recipe-total-potassium">0</span>mg</p></div></div><p class="text-center text-sm text-gray-400 mt-2">Total Weight: <span id="recipe-total-grams" class="font-bold">0</span>g</p></div><button type="submit" id="save-recipe-btn" class="btn btn-primary w-full">Save & Log Recipe</button></form></div></div>
     <div id="prompt-modal" class="modal-backdrop"><div class="modal-content"><h2 id="prompt-modal-title" class="text-xl font-bold mb-4">Input Required</h2><p id="prompt-modal-text" class="text-gray-300 mb-4"></p><input type="number" id="prompt-modal-input" min="0" class="form-input mb-6"><div class="flex justify-end gap-4"><button id="prompt-modal-cancel-btn" class="btn btn-secondary">Cancel</button><button id="prompt-modal-ok-btn" class="btn btn-primary">OK</button></div></div></div>
     <div id="edit-favorite-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">Edit Favorite Food</h2><button id="close-edit-favorite-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="edit-favorite-form" class="space-y-4"><p class="text-sm text-gray-400">All values should be per 100g.</p><div><label for="edit-fav-food-name" class="form-label">Food Name</label><input type="text" id="edit-fav-food-name" class="form-input mt-1" required></div><div class="grid grid-cols-2 gap-4"><div><label for="edit-fav-food-calories" class="form-label">Calories (kcal)</label><input type="number" step="0.01" min="0" id="edit-fav-food-calories" class="form-input mt-1" required></div><div><label for="edit-fav-food-protein" class="form-label">Protein (g)</label><input type="number" step="0.01" min="0" id="edit-fav-food-protein" class="form-input mt-1" required></div></div><div class="grid grid-cols-2 gap-4"><div><label for="edit-fav-food-carbs" class="form-label">Carbs (g)</label><input type="number" step="0.01" min="0" id="edit-fav-food-carbs" class="form-input mt-1" required></div><div><label for="edit-fav-food-fat" class="form-label">Fat (g)</label><input type="number" step="0.01" min="0" id="edit-fav-food-fat" class="form-input mt-1" required></div></div><button type="submit" class="btn btn-primary w-full">Update Favorite</button></form></div></div>
+    <!-- AI Nutritionist Chat Modal -->
+    <div id="ai-nutritionist-modal" class="modal-backdrop"><div class="modal-content !max-w-2xl flex flex-col"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">AI Nutritionist Chat</h2><button id="close-ai-nutritionist-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div id="ai-chat-history" class="flex-grow space-y-4 overflow-y-auto custom-scrollbar pr-2 mb-4 min-h-[300px]"></div><div class="flex gap-2"><input type="text" id="ai-chat-input" class="form-input" placeholder="Ask a nutrition question..."><button id="ai-chat-send-btn" class="btn btn-primary"><i data-lucide="send"></i></button></div></div></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -428,14 +479,10 @@
             let scanningIngredientRow = null; 
             let viewDate = new Date();
             viewDate.setHours(0, 0, 0, 0);
+            let html5QrCode;
+            let aiBaseMacros = null;
+            let chatHistory = [];
 
-            // --- BARCODE DATABASE ---
-            const BARCODE_DB = {
-                '5060294101234': { name: 'Grenade Protein Bar - White Choc Salted Peanut', servings: 1, grams: 60, calories: 242, protein: 20, carbs: 20, fat: 11, sugar: 1.5, sodium: 180, potassium: 0 },
-                '5449000000996': { name: 'Coca-Cola Original', servings: 1, grams: 330, calories: 139, protein: 0, carbs: 35, fat: 0, sugar: 35, sodium: 0, potassium: 0 },
-                '0737628064502': { name: 'Quaker Rolled Oats', servings: 1, grams: 40, calories: 151, protein: 5.2, carbs: 26, fat: 3, sugar: 0.4, sodium: 0, potassium: 140 },
-                '5000159492864': { name: 'Cadbury Dairy Milk', servings: 1, grams: 45, calories: 237, protein: 3.4, carbs: 26, fat: 14, sugar: 26, sodium: 110, potassium: 0 },
-            };
 
             // --- CORE & HELPER FUNCTIONS ---
             function dateToKey(date) { return date.toISOString().split('T')[0]; }
@@ -475,11 +522,11 @@
 
             // --- UI ELEMENT DEFINITIONS ---
             const ui = {
-                foodNameInput: document.getElementById('food-name-input'), foodBrandInput: document.getElementById('food-brand-input'), foodServingsInput: document.getElementById('food-servings-input'), foodGramsInput: document.getElementById('food-grams-input'), logMealForm: document.getElementById('log-meal-form'), addFoodBtn: document.getElementById('add-food-btn'), addFoodError: document.getElementById('add-food-error'), dailyLogContentDiv: document.getElementById('daily-log-content'), aiSuggestionBtn: document.getElementById('ai-suggestion-btn'), aiSuggestionsOutput: document.getElementById('ai-suggestions-output'), aiGetMacrosBtn: document.getElementById('ai-get-macros-btn'), scanFoodBtn: document.getElementById('scan-food-btn'), foodScannerModal: document.getElementById('food-scanner-modal'), closeFoodScannerModalBtn: document.getElementById('close-food-scanner-modal-btn'), uploadPhotoInput: document.getElementById('upload-photo-input'), takePictureInput: document.getElementById('take-picture-input'), imagePreview: document.getElementById('image-preview'), imagePlaceholder: document.getElementById('image-placeholder'), aiGetMacrosFromImageBtn: document.getElementById('ai-get-macros-from-image-btn'), foodScannerStatus: document.getElementById('food-scanner-status'), confirmModal: document.getElementById('confirm-modal'), confirmModalTitle: document.getElementById('confirm-modal-title'), confirmModalText: document.getElementById('confirm-modal-text'), confirmModalCancelBtn: document.getElementById('confirm-modal-cancel-btn'), confirmModalConfirmBtn: document.getElementById('confirm-modal-confirm-btn'), alertModal: document.getElementById('alert-modal'), alertModalTitle: document.getElementById('alert-modal-title'), alertModalText: document.getElementById('alert-modal-text'), alertModalOkBtn: document.getElementById('alert-modal-ok-btn'), createRecipeBtn: document.getElementById('create-recipe-btn'), compoundFoodModal: document.getElementById('compound-food-modal'), closeCompoundFoodModalBtn: document.getElementById('close-compound-food-modal-btn'), compoundFoodForm: document.getElementById('compound-food-form'), recipeNameInput: document.getElementById('recipe-name-input'), ingredientListContainer: document.getElementById('ingredient-list-container'), addIngredientBtn: document.getElementById('add-ingredient-btn'), saveRecipeBtn: document.getElementById('save-recipe-btn'), favoriteFoodsListDiv: document.getElementById('favorite-foods-list'), savedRecipesListDiv: document.getElementById('saved-recipes-list'), promptModal: document.getElementById('prompt-modal'), promptModalTitle: document.getElementById('prompt-modal-title'), promptModalText: document.getElementById('prompt-modal-text'), promptModalInput: document.getElementById('prompt-modal-input'), promptModalCancelBtn: document.getElementById('prompt-modal-cancel-btn'), promptModalOkBtn: document.getElementById('prompt-modal-ok-btn'), editFavoriteModal: document.getElementById('edit-favorite-modal'), closeEditFavoriteModalBtn: document.getElementById('close-edit-favorite-modal-btn'), editFavoriteForm: document.getElementById('edit-favorite-form'), totalServingsDisplay: document.getElementById('total-servings-display'), totalMacrosDisplay: document.getElementById('total-macros-display'), macroInputs: document.querySelectorAll('.macro-input'), prevDayBtn: document.getElementById('prev-day-btn'), nextDayBtn: document.getElementById('next-day-btn'), dayViewTitleSpan: document.getElementById('day-view-title-span'), dayViewDateSpan: document.getElementById('day-view-date-span'), aiDailyReportBtn: document.getElementById('ai-daily-report-btn'), aiReportOutputDiv: document.getElementById('ai-report-output'), aiReportText: document.getElementById('ai-report-text'), 
-                // New Hydration UI
-                hydrationTracker: document.getElementById('hydration-tracker'), hydrationTotal: document.getElementById('hydration-total'), addHydrationTickBtn: document.getElementById('add-hydration-tick-btn'),
-                // New Barcode UI
-                scanBarcodeBtn: document.getElementById('scan-barcode-btn'), barcodeScannerModal: document.getElementById('barcode-scanner-modal'), closeBarcodeScannerModalBtn: document.getElementById('close-barcode-scanner-modal-btn'), barcodeInput: document.getElementById('barcode-input'), findBarcodeBtn: document.getElementById('find-barcode-btn'), barcodeResults: document.getElementById('barcode-results'), barcodePhotoInput: document.getElementById('barcode-photo-input'),
+                foodNameInput: document.getElementById('food-name-input'), foodBrandInput: document.getElementById('food-brand-input'), foodGramsInput: document.getElementById('food-grams-input'), logMealForm: document.getElementById('log-meal-form'), addFoodBtn: document.getElementById('add-food-btn'), addFoodError: document.getElementById('add-food-error'), dailyLogContentDiv: document.getElementById('daily-log-content'), aiSuggestionBtn: document.getElementById('ai-suggestion-btn'), aiSuggestionsOutput: document.getElementById('ai-suggestions-output'), aiGetMacrosBtn: document.getElementById('ai-get-macros-btn'), scanFoodBtn: document.getElementById('scan-food-btn'), foodScannerModal: document.getElementById('food-scanner-modal'), closeFoodScannerModalBtn: document.getElementById('close-food-scanner-modal-btn'), uploadPhotoInput: document.getElementById('upload-photo-input'), takePictureInput: document.getElementById('take-picture-input'), imagePreview: document.getElementById('image-preview'), imagePlaceholder: document.getElementById('image-placeholder'), aiGetMacrosFromImageBtn: document.getElementById('ai-get-macros-from-image-btn'), foodScannerStatus: document.getElementById('food-scanner-status'), confirmModal: document.getElementById('confirm-modal'), confirmModalTitle: document.getElementById('confirm-modal-title'), confirmModalText: document.getElementById('confirm-modal-text'), confirmModalCancelBtn: document.getElementById('confirm-modal-cancel-btn'), confirmModalConfirmBtn: document.getElementById('confirm-modal-confirm-btn'), alertModal: document.getElementById('alert-modal'), alertModalTitle: document.getElementById('alert-modal-title'), alertModalText: document.getElementById('alert-modal-text'), alertModalOkBtn: document.getElementById('alert-modal-ok-btn'), createRecipeBtn: document.getElementById('create-recipe-btn'), compoundFoodModal: document.getElementById('compound-food-modal'), closeCompoundFoodModalBtn: document.getElementById('close-compound-food-modal-btn'), compoundFoodForm: document.getElementById('compound-food-form'), recipeNameInput: document.getElementById('recipe-name-input'), ingredientListContainer: document.getElementById('ingredient-list-container'), addIngredientBtn: document.getElementById('add-ingredient-btn'), saveRecipeBtn: document.getElementById('save-recipe-btn'), favoriteFoodsListDiv: document.getElementById('favorite-foods-list'), savedRecipesListDiv: document.getElementById('saved-recipes-list'), promptModal: document.getElementById('prompt-modal'), promptModalTitle: document.getElementById('prompt-modal-title'), promptModalText: document.getElementById('prompt-modal-text'), promptModalInput: document.getElementById('prompt-modal-input'), promptModalCancelBtn: document.getElementById('prompt-modal-cancel-btn'), promptModalOkBtn: document.getElementById('prompt-modal-ok-btn'), editFavoriteModal: document.getElementById('edit-favorite-modal'), closeEditFavoriteModalBtn: document.getElementById('close-edit-favorite-modal-btn'), editFavoriteForm: document.getElementById('edit-favorite-form'), prevDayBtn: document.getElementById('prev-day-btn'), nextDayBtn: document.getElementById('next-day-btn'), dayViewTitleSpan: document.getElementById('day-view-title-span'), dayViewDateSpan: document.getElementById('day-view-date-span'), aiDailyReportBtn: document.getElementById('ai-daily-report-btn'), aiReportOutputDiv: document.getElementById('ai-report-output'), aiReportText: document.getElementById('ai-report-text'), 
+                hydrationTracker: document.getElementById('hydration-tracker'), hydrationTotal: document.getElementById('hydration-total'), addHydrationTickBtn: document.getElementById('add-hydration-tick-btn'), removeHydrationTickBtn: document.getElementById('remove-hydration-tick-btn'),
+                scanBarcodeBtn: document.getElementById('scan-barcode-btn'), barcodeScannerModal: document.getElementById('barcode-scanner-modal'), closeBarcodeScannerModalBtn: document.getElementById('close-barcode-scanner-modal-btn'), barcodeReader: document.getElementById('barcode-reader'), barcodeScannerStatus: document.getElementById('barcode-scanner-status'), barcodeResults: document.getElementById('barcode-results'),
+                hamburgerBtn: document.getElementById('hamburger-btn'), mobileMenu: document.getElementById('mobile-menu'), mobileMenuOverlay: document.getElementById('mobile-menu-overlay'),
+                openNutritionistChatBtn: document.getElementById('open-nutritionist-chat-btn'), aiNutritionistModal: document.getElementById('ai-nutritionist-modal'), closeAiNutritionistModalBtn: document.getElementById('close-ai-nutritionist-modal-btn'), aiChatHistory: document.getElementById('ai-chat-history'), aiChatInput: document.getElementById('ai-chat-input'), aiChatSendBtn: document.getElementById('ai-chat-send-btn'),
             };
 
             // --- CHART.JS SETUP ---
@@ -547,7 +594,7 @@
                     const tickSize = totalTicks > 12 ? 'w-6 h-6 sm:w-8 sm:h-8' : 'w-8 h-8 sm:w-10 sm:h-10';
                     const iconSize = totalTicks > 12 ? 'w-4 h-4 sm:w-5 sm:h-5' : 'w-5 h-5 sm:w-6 sm:h-6';
 
-                    tick.className = `hydration-tick ${tickSize} rounded-full flex items-center justify-center transition-colors ${isFilled ? 'bg-blue-500' : 'bg-input-bg'}`;
+                    tick.className = `hydration-tick ${tickSize} rounded-full flex items-center justify-center transition-colors cursor-pointer ${isFilled ? 'bg-blue-500' : 'bg-input-bg'}`;
                     tick.dataset.index = i;
                     tick.innerHTML = `<i data-lucide="glass-water" class="${iconSize} pointer-events-none ${isFilled ? 'text-white' : 'text-secondary-text'}"></i>`;
                     tracker.appendChild(tick);
@@ -567,29 +614,16 @@
                 lucide.createIcons();
             }
 
-            function updateTotalMacrosDisplay() {
-                const servings = parseFloat(ui.foodServingsInput.value) || 1;
-                const calories = (parseFloat(document.getElementById('food-calories-input').value) || 0) * servings;
-                const protein = (parseFloat(document.getElementById('food-protein-input').value) || 0) * servings;
-                const carbs = (parseFloat(document.getElementById('food-carbs-input').value) || 0) * servings;
-                const fat = (parseFloat(document.getElementById('food-fat-input').value) || 0) * servings;
-                const sugar = (parseFloat(document.getElementById('food-sugar-input').value) || 0) * servings;
-                const sodium = (parseFloat(document.getElementById('food-sodium-input').value) || 0) * servings;
-                const potassium = (parseFloat(document.getElementById('food-potassium-input').value) || 0) * servings;
-
-                ui.totalServingsDisplay.textContent = servings;
-                ui.totalMacrosDisplay.textContent = `${calories.toFixed(0)}kcal | ${protein.toFixed(1)}p | ${carbs.toFixed(1)}c | ${fat.toFixed(1)}f | ${sugar.toFixed(1)}s | ${sodium.toFixed(0)}na | ${potassium.toFixed(0)}k`;
-            }
-            
             function addIngredientRow(ingredient = null) {
                 const div = document.createElement('div');
-                div.className = 'ingredient-row space-y-2 border-t border-gray-700 pt-3 mt-3';
+                div.className = 'ingredient-row space-y-3 border border-border-color p-4 rounded-lg';
                 div.innerHTML = `
                     <div class="grid grid-cols-12 gap-2 items-center">
                         <input type="text" list="favorite-foods-datalist" placeholder="Ingredient Name" class="form-input col-span-12 sm:col-span-6 ingredient-name" value="${ingredient ? ingredient.name : ''}">
                         <input type="number" placeholder="grams" min="0" class="form-input col-span-6 sm:col-span-3 ingredient-grams" value="${ingredient ? ingredient.grams : ''}">
-                        <div class="col-span-6 sm:col-span-3 flex justify-end gap-2">
-                            <button type="button" class="recipe-ai-btn btn btn-secondary !p-2" title="Get Macros with AI"><i data-lucide="sparkles" class="w-4 h-4 pointer-events-none"></i></button>
+                        <div class="col-span-6 sm:col-span-3 flex justify-end gap-1">
+                            <button type="button" class="recipe-ai-btn btn btn-secondary !p-2" title="Scan with AI"><i data-lucide="camera" class="w-4 h-4 pointer-events-none"></i></button>
+                            <button type="button" class="recipe-barcode-btn btn btn-secondary !p-2" title="Scan Barcode"><i data-lucide="barcode" class="w-4 h-4 pointer-events-none"></i></button>
                             <button type="button" class="remove-ingredient-btn btn btn-secondary !p-2" title="Remove Ingredient"><i data-lucide="x" class="w-4 h-4 pointer-events-none"></i></button>
                         </div>
                     </div>
@@ -610,7 +644,7 @@
             }
 
             function updateRecipeTotals() {
-                let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0, totalGrams = 0;
+                let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0, totalGrams = 0, totalSugar = 0, totalSodium = 0, totalPotassium = 0;
                 document.querySelectorAll('.ingredient-row').forEach(row => {
                     const grams = parseFloat(row.querySelector('.ingredient-grams').value) || 0;
                     if (grams > 0) {
@@ -619,12 +653,18 @@
                         totalProtein += parseFloat(row.querySelector('.ingredient-protein').value) || 0;
                         totalCarbs += parseFloat(row.querySelector('.ingredient-carbs').value) || 0;
                         totalFat += parseFloat(row.querySelector('.ingredient-fat').value) || 0;
+                        totalSugar += parseFloat(row.querySelector('.ingredient-sugar').value) || 0;
+                        totalSodium += parseFloat(row.querySelector('.ingredient-sodium').value) || 0;
+                        totalPotassium += parseFloat(row.querySelector('.ingredient-potassium').value) || 0;
                     }
                 });
                 document.getElementById('recipe-total-calories').textContent = totalCalories.toFixed(0);
                 document.getElementById('recipe-total-protein').textContent = totalProtein.toFixed(1);
                 document.getElementById('recipe-total-carbs').textContent = totalCarbs.toFixed(1);
                 document.getElementById('recipe-total-fat').textContent = totalFat.toFixed(1);
+                document.getElementById('recipe-total-sugar').textContent = totalSugar.toFixed(1);
+                document.getElementById('recipe-total-sodium').textContent = totalSodium.toFixed(0);
+                document.getElementById('recipe-total-potassium').textContent = totalPotassium.toFixed(0);
                 document.getElementById('recipe-total-grams').textContent = totalGrams.toFixed(1);
             }
             
@@ -685,31 +725,32 @@
                 if (!loggedItem) return;
                 if (savedRecipes.some(r => r.name.toLowerCase() === loggedItem.name.toLowerCase())) { showCustomAlert("Action Not Allowed", "Recipes are automatically saved and cannot be favorited separately."); return; }
                 const favIndex = favoriteFoods.findIndex(fav => fav.name.toLowerCase() === loggedItem.name.toLowerCase());
-                if (favIndex > -1) { favoriteFoods.splice(favIndex, 1); } else { const servings = loggedItem.servings || 1; const totalGrams = loggedItem.grams || 0; if (totalGrams <= 0) { showCustomAlert("Cannot Favorite", "Cannot favorite an item with 0 grams to calculate base macros."); return; } const ratio = 100 / (totalGrams / servings); favoriteFoods.push({ name: loggedItem.name, calories: (loggedItem.calories / servings) * ratio, protein: (loggedItem.protein / servings) * ratio, carbs: (loggedItem.carbs / servings) * ratio, fat: (loggedItem.fat / servings) * ratio, }); }
+                if (favIndex > -1) { favoriteFoods.splice(favIndex, 1); } else { const totalGrams = loggedItem.grams || 0; if (totalGrams <= 0) { showCustomAlert("Cannot Favorite", "Cannot favorite an item with 0 grams to calculate base macros."); return; } const ratio = 100 / totalGrams; favoriteFoods.push({ name: loggedItem.name, calories: loggedItem.calories * ratio, protein: loggedItem.protein * ratio, carbs: loggedItem.carbs * ratio, fat: loggedItem.fat * ratio, }); }
                 saveData(); fullRender();
             }
 
             // --- EVENT LISTENERS ---
             ui.addFoodBtn.addEventListener('click', async () => {
-                ui.addFoodError.textContent = ''; const foodName = ui.foodNameInput.value.trim(); const servings = parseFloat(ui.foodServingsInput.value);
-                if (!foodName || isNaN(servings) || servings <= 0) { ui.addFoodError.textContent = "Please enter a valid food name and servings amount."; return; }
+                ui.addFoodError.textContent = ''; const foodName = ui.foodNameInput.value.trim();
+                const grams = parseFloat(ui.foodGramsInput.value);
+                if (!foodName || isNaN(grams) || grams <= 0) { ui.addFoodError.textContent = "Please enter a valid food name and total grams."; return; }
                 let hasError = false; const macros = {};
-                ['grams', 'calories', 'protein', 'carbs', 'fat', 'sugar', 'sodium', 'potassium'].forEach(m => { const input = document.getElementById(`food-${m}-input`); const val = parseFloat(input.value); if (!isNaN(val) && val < 0) { ui.addFoodError.textContent = "Macro values cannot be negative."; input.classList.add('!border-red-500'); hasError = true; } else { input.classList.remove('!border-red-500'); macros[m] = val || 0; } });
+                ['calories', 'protein', 'carbs', 'fat', 'sugar', 'sodium', 'potassium'].forEach(m => { const input = document.getElementById(`food-${m}-input`); const val = parseFloat(input.value); if (!isNaN(val) && val < 0) { ui.addFoodError.textContent = "Macro values cannot be negative."; input.classList.add('!border-red-500'); hasError = true; } else { input.classList.remove('!border-red-500'); macros[m] = val || 0; } });
                 if (hasError) return;
                 const dateKey = dateToKey(viewDate); if (!allDailyLogs[dateKey]) allDailyLogs[dateKey] = [];
                 let currentDayLog = allDailyLogs[dateKey];
-                const foodItem = { name: foodName, servings: servings, grams: parseFloat((macros.grams * servings).toFixed(2)), calories: parseFloat((macros.calories * servings).toFixed(2)), protein: parseFloat((macros.protein * servings).toFixed(2)), carbs: parseFloat((macros.carbs * servings).toFixed(2)), fat: parseFloat((macros.fat * servings).toFixed(2)), sugar: parseFloat((macros.sugar * servings).toFixed(2)), sodium: parseFloat((macros.sodium * servings).toFixed(2)), potassium: parseFloat((macros.potassium * servings).toFixed(2)), };
+                const foodItem = { name: foodName, grams, calories: macros.calories, protein: macros.protein, carbs: macros.carbs, fat: macros.fat, sugar: macros.sugar, sodium: macros.sodium, potassium: macros.potassium };
                 if (foodItem.calories === 0 && editingFoodLogIndex === null) { ui.addFoodError.textContent = 'Please enter macros or use "Get Macros with AI".'; return; }
                 if (editingFoodLogIndex !== null) { currentDayLog[editingFoodLogIndex] = foodItem; editingFoodLogIndex = null; ui.addFoodBtn.querySelector('.btn-text').textContent = 'Add Food';
                 } else { currentDayLog.push(foodItem); }
-                ui.logMealForm.reset(); ui.foodServingsInput.value = 1; updateTotalMacrosDisplay(); saveData(); updateDayView(viewDate);
+                ui.logMealForm.reset(); saveData(); updateDayView(viewDate);
             });
             
             ui.dailyLogContentDiv.addEventListener('click', (e) => {
                 const removeBtn = e.target.closest('.remove-item-btn'), editBtn = e.target.closest('.edit-food-btn'), favoriteBtn = e.target.closest('.favorite-food-btn');
                 const dateKey = dateToKey(viewDate); let currentDayLog = allDailyLogs[dateKey];
                 if (removeBtn) { const index = parseInt(removeBtn.dataset.index, 10); showConfirmModal('Delete Log Entry?', 'Are you sure?', () => { if (currentDayLog) { currentDayLog.splice(index, 1); saveData(); updateDayView(viewDate); } }); }
-                if(editBtn) { const index = parseInt(editBtn.dataset.index, 10); const item = currentDayLog[index]; const servings = item.servings || 1; editingFoodLogIndex = index; ui.foodNameInput.value = item.name; ui.foodServingsInput.value = servings; document.getElementById('food-grams-input').value = (item.grams / servings)?.toFixed(2) || 0; document.getElementById('food-calories-input').value = (item.calories / servings)?.toFixed(2) || 0; document.getElementById('food-protein-input').value = (item.protein / servings)?.toFixed(2) || 0; document.getElementById('food-carbs-input').value = (item.carbs / servings)?.toFixed(2) || 0; document.getElementById('food-fat-input').value = (item.fat / servings)?.toFixed(2) || 0; document.getElementById('food-sugar-input').value = (item.sugar / servings)?.toFixed(2) || 0; document.getElementById('food-sodium-input').value = (item.sodium / servings)?.toFixed(2) || 0; document.getElementById('food-potassium-input').value = (item.potassium / servings)?.toFixed(2) || 0; ui.addFoodBtn.querySelector('.btn-text').textContent = 'Update Food'; updateTotalMacrosDisplay(); ui.logMealForm.scrollIntoView({ behavior: 'smooth' }); }
+                if(editBtn) { const index = parseInt(editBtn.dataset.index, 10); const item = currentDayLog[index]; editingFoodLogIndex = index; ui.foodNameInput.value = item.name; ui.foodGramsInput.value = item.grams?.toFixed(2) || 0; document.getElementById('food-calories-input').value = item.calories?.toFixed(2) || 0; document.getElementById('food-protein-input').value = item.protein?.toFixed(2) || 0; document.getElementById('food-carbs-input').value = item.carbs?.toFixed(2) || 0; document.getElementById('food-fat-input').value = item.fat?.toFixed(2) || 0; document.getElementById('food-sugar-input').value = item.sugar?.toFixed(2) || 0; document.getElementById('food-sodium-input').value = item.sodium?.toFixed(2) || 0; document.getElementById('food-potassium-input').value = item.potassium?.toFixed(2) || 0; ui.addFoodBtn.querySelector('.btn-text').textContent = 'Update Food'; ui.logMealForm.scrollIntoView({ behavior: 'smooth' }); }
                 if(favoriteBtn) { const index = parseInt(favoriteBtn.dataset.index, 10); toggleFavorite(index); }
             });
 
@@ -719,28 +760,47 @@
             
             ui.aiGetMacrosBtn.addEventListener('click', async () => {
                 const foodName = ui.foodNameInput.value.trim(), brand = ui.foodBrandInput.value.trim();
+                const grams = parseFloat(ui.foodGramsInput.value) || 100; // Default to 100g if not specified
+                if (!ui.foodGramsInput.value) ui.foodGramsInput.value = 100;
+
                 if (!foodName) { ui.addFoodError.textContent = "Please enter a food name first."; return; }
                 ui.addFoodError.textContent = ""; const btn = ui.aiGetMacrosBtn; btn.disabled = true;
                 btn.querySelector('.btn-text').style.display = 'none'; btn.querySelector('.loader').classList.remove('hidden');
-                const existingMacros = {};
-                if (document.getElementById('food-calories-input').value) existingMacros.calories = parseFloat(document.getElementById('food-calories-input').value);
-                if (document.getElementById('food-protein-input').value) existingMacros.protein = parseFloat(document.getElementById('food-protein-input').value);
-                if (document.getElementById('food-carbs-input').value) existingMacros.carbs = parseFloat(document.getElementById('food-carbs-input').value);
-                if (document.getElementById('food-fat-input').value) existingMacros.fat = parseFloat(document.getElementById('food-fat-input').value);
+                
                 try {
-                    const data = await getMacrosFromAI(foodName, brand, existingMacros);
-                    if (!document.getElementById('food-grams-input').value) ui.foodGramsInput.value = data.grams?.toFixed(0) || '';
-                    if (!document.getElementById('food-calories-input').value) document.getElementById('food-calories-input').value = data.calories?.toFixed(2) || 0;
-                    if (!document.getElementById('food-protein-input').value) document.getElementById('food-protein-input').value = data.protein?.toFixed(2) || 0;
-                    if (!document.getElementById('food-carbs-input').value) document.getElementById('food-carbs-input').value = data.carbs?.toFixed(2) || 0;
-                    if (!document.getElementById('food-fat-input').value) document.getElementById('food-fat-input').value = data.fat?.toFixed(2) || 0;
-                    if (!document.getElementById('food-sugar-input').value) document.getElementById('food-sugar-input').value = data.sugar?.toFixed(2) || 0;
-                    if (!document.getElementById('food-sodium-input').value) document.getElementById('food-sodium-input').value = data.sodium?.toFixed(2) || 0;
-                    if (!document.getElementById('food-potassium-input').value) document.getElementById('food-potassium-input').value = data.potassium?.toFixed(2) || 0;
-                    updateTotalMacrosDisplay();
-                } catch (error) { console.error("AI Get Macros Error:", error); ui.addFoodError.textContent = "Could not fetch nutrition data.";
+                    const data = await getMacrosFromAI(foodName, brand); // This gets per-serving data from AI
+                    aiBaseMacros = { baseGrams: data.grams || 100, calories: data.calories, protein: data.protein, carbs: data.carbs, fat: data.fat, sugar: data.sugar, sodium: data.sodium, potassium: data.potassium };
+                    
+                    const ratio = grams / aiBaseMacros.baseGrams;
+
+                    document.getElementById('food-calories-input').value = (aiBaseMacros.calories * ratio)?.toFixed(2) || 0;
+                    document.getElementById('food-protein-input').value = (aiBaseMacros.protein * ratio)?.toFixed(2) || 0;
+                    document.getElementById('food-carbs-input').value = (aiBaseMacros.carbs * ratio)?.toFixed(2) || 0;
+                    document.getElementById('food-fat-input').value = (aiBaseMacros.fat * ratio)?.toFixed(2) || 0;
+                    document.getElementById('food-sugar-input').value = (aiBaseMacros.sugar * ratio)?.toFixed(2) || 0;
+                    document.getElementById('food-sodium-input').value = (aiBaseMacros.sodium * ratio)?.toFixed(2) || 0;
+                    document.getElementById('food-potassium-input').value = (aiBaseMacros.potassium * ratio)?.toFixed(2) || 0;
+                } catch (error) { console.error("AI Get Macros Error:", error); ui.addFoodError.textContent = "Could not fetch nutrition data."; aiBaseMacros = null;
                 } finally { btn.disabled = false; btn.querySelector('.btn-text').style.display = 'inline'; btn.querySelector('.loader').classList.add('hidden'); }
             });
+
+            ui.foodGramsInput.addEventListener('input', () => {
+                if(aiBaseMacros) {
+                    const newGrams = parseFloat(ui.foodGramsInput.value);
+                    if(!isNaN(newGrams) && newGrams > 0) {
+                        const ratio = newGrams / aiBaseMacros.baseGrams;
+                        document.getElementById('food-calories-input').value = (aiBaseMacros.calories * ratio)?.toFixed(2) || 0;
+                        document.getElementById('food-protein-input').value = (aiBaseMacros.protein * ratio)?.toFixed(2) || 0;
+                        document.getElementById('food-carbs-input').value = (aiBaseMacros.carbs * ratio)?.toFixed(2) || 0;
+                        document.getElementById('food-fat-input').value = (aiBaseMacros.fat * ratio)?.toFixed(2) || 0;
+                        document.getElementById('food-sugar-input').value = (aiBaseMacros.sugar * ratio)?.toFixed(2) || 0;
+                        document.getElementById('food-sodium-input').value = (aiBaseMacros.sodium * ratio)?.toFixed(2) || 0;
+                        document.getElementById('food-potassium-input').value = (aiBaseMacros.potassium * ratio)?.toFixed(2) || 0;
+                    }
+                }
+            });
+            ['food-name-input', 'food-brand-input'].forEach(id => document.getElementById(id).addEventListener('input', () => { aiBaseMacros = null; }));
+
 
             ui.aiSuggestionBtn.addEventListener('click', async () => {
                 const btn = ui.aiSuggestionBtn, btnText = btn.querySelector('.btn-text'), loader = btn.querySelector('.loader');
@@ -762,7 +822,7 @@
             });
             function handleImageSelection(file) { if (file) { scannedImageData = file; const reader = new FileReader(); reader.onload = (e) => { ui.imagePreview.src = e.target.result; ui.imagePreview.classList.remove('hidden'); ui.imagePlaceholder.classList.add('hidden'); }; reader.readAsDataURL(file); } }
             function fileToGenerativePart(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onloadend = () => { const base64Data = reader.result.split(',')[1]; resolve({ inlineData: { mimeType: file.type, data: base64Data } }); }; reader.onerror = (err) => reject(err); reader.readAsDataURL(file); }); }
-            ui.scanFoodBtn.addEventListener('click', () => showModal(ui.foodScannerModal));
+            ui.scanFoodBtn.addEventListener('click', () => { scanningIngredientRow = null; showModal(ui.foodScannerModal); });
             ui.closeFoodScannerModalBtn.addEventListener('click', () => hideModal(ui.foodScannerModal));
             ui.uploadPhotoInput.addEventListener('change', (e) => handleImageSelection(e.target.files[0]));
             ui.takePictureInput.addEventListener('change', (e) => handleImageSelection(e.target.files[0]));
@@ -775,8 +835,24 @@
                     let data = {};
                     if(manualCalories) { data.calories = parseFloat(manualCalories); data.protein = parseFloat(document.getElementById('scanner-protein').value) || 0; data.carbs = parseFloat(document.getElementById('scanner-carbs').value) || 0; data.fat = parseFloat(document.getElementById('scanner-fat').value) || 0; data.sugar = parseFloat(document.getElementById('scanner-sugar').value) || 0; data.sodium = parseFloat(document.getElementById('scanner-sodium').value) || 0; data.potassium = parseFloat(document.getElementById('scanner-potassium').value) || 0; data.grams = parseFloat(document.getElementById('scanner-food-grams').value) || 0;
                     } else { const imagePart = await fileToGenerativePart(scannedImageData); let prompt = `Analyze the food in the image, identified as "${foodName}". `; if(brand) prompt += ` from the brand "${brand}"`; if (foodGrams) prompt += `The portion is ${foodGrams}g. `; else prompt += `Estimate the grams. `; prompt += `Respond ONLY with a JSON object with: grams, calories, protein, carbs, fat, sugar, sodium, potassium.`; const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20'); const payload = { contents: [{ parts: [{ text: prompt }, imagePart] }], generationConfig: { responseMimeType: "application/json" } }; const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) throw new Error(`API Error: ${response.status}`); const result = await response.json(); if (!result.candidates?.[0].content.parts[0].text) throw new Error("Invalid API response."); data = JSON.parse(result.candidates[0].content.parts[0].text); }
-                    ui.foodNameInput.value = foodName; ui.foodGramsInput.value = data.grams?.toFixed(0) || ''; ui.foodServingsInput.value = 1; document.getElementById('food-calories-input').value = data.calories?.toFixed(2) || 0; document.getElementById('food-protein-input').value = data.protein?.toFixed(2) || 0; document.getElementById('food-carbs-input').value = data.carbs?.toFixed(2) || 0; document.getElementById('food-fat-input').value = data.fat?.toFixed(2) || 0; document.getElementById('food-sugar-input').value = data.sugar?.toFixed(2) || 0; document.getElementById('food-sodium-input').value = data.sodium?.toFixed(2) || 0; document.getElementById('food-potassium-input').value = data.potassium?.toFixed(2) || 0;
-                    updateTotalMacrosDisplay(); hideModal(ui.foodScannerModal); showCustomAlert('Success', 'Macros populated from image!');
+                    const targetRow = scanningIngredientRow;
+                    if(targetRow){
+                        targetRow.querySelector('.ingredient-name').value = foodName;
+                        targetRow.querySelector('.ingredient-grams').value = data.grams?.toFixed(0) || '';
+                        targetRow.querySelector('.ingredient-calories').value = data.calories?.toFixed(2) || 0;
+                        targetRow.querySelector('.ingredient-protein').value = data.protein?.toFixed(2) || 0;
+                        targetRow.querySelector('.ingredient-carbs').value = data.carbs?.toFixed(2) || 0;
+                        targetRow.querySelector('.ingredient-fat').value = data.fat?.toFixed(2) || 0;
+                        targetRow.querySelector('.ingredient-sugar').value = data.sugar?.toFixed(2) || 0;
+                        targetRow.querySelector('.ingredient-sodium').value = data.sodium?.toFixed(2) || 0;
+                        targetRow.querySelector('.ingredient-potassium').value = data.potassium?.toFixed(2) || 0;
+                        updateRecipeTotals();
+                        showCustomAlert('Success', 'Ingredient macros populated from image!');
+                    } else {
+                        ui.foodNameInput.value = foodName; ui.foodGramsInput.value = data.grams?.toFixed(0) || ''; document.getElementById('food-calories-input').value = data.calories?.toFixed(2) || 0; document.getElementById('food-protein-input').value = data.protein?.toFixed(2) || 0; document.getElementById('food-carbs-input').value = data.carbs?.toFixed(2) || 0; document.getElementById('food-fat-input').value = data.fat?.toFixed(2) || 0; document.getElementById('food-sugar-input').value = data.sugar?.toFixed(2) || 0; document.getElementById('food-sodium-input').value = data.sodium?.toFixed(2) || 0; document.getElementById('food-potassium-input').value = data.potassium?.toFixed(2) || 0;
+                        showCustomAlert('Success', 'Macros populated from image! Data provided by Gemini AI.');
+                    }
+                     hideModal(ui.foodScannerModal);
                 } catch (error) { console.error("AI Image Scan Error:", error); ui.foodScannerStatus.textContent = 'Error analyzing image.';
                 } finally { btn.disabled = false; btn.querySelector('.loader').classList.add('hidden'); btn.querySelector('.btn-text').style.display = 'inline'; }
             });
@@ -792,26 +868,11 @@
             
             ui.ingredientListContainer.addEventListener('input', updateRecipeTotals);
             ui.ingredientListContainer.addEventListener('click', async (e) => {
-                 const aiBtn = e.target.closest('.recipe-ai-btn'); const removeBtn = e.target.closest('.remove-ingredient-btn');
+                 const aiBtn = e.target.closest('.recipe-ai-btn'); const removeBtn = e.target.closest('.remove-ingredient-btn'); const barcodeBtn = e.target.closest('.recipe-barcode-btn');
+                const row = e.target.closest('.ingredient-row');
                 if (removeBtn) { removeBtn.closest('.ingredient-row').remove(); updateRecipeTotals(); }
-                if (aiBtn) {
-                    const row = aiBtn.closest('.ingredient-row'); const nameInput = row.querySelector('.ingredient-name'); const gramsInput = row.querySelector('.ingredient-grams'); const foodName = nameInput.value.trim();
-                    if (!foodName) { showCustomAlert('Missing Info', 'Please enter an ingredient name.'); return; }
-                    aiBtn.disabled = true; aiBtn.innerHTML = '<div class="loader w-4 h-4"></div>';
-                    try {
-                        const data = await getMacrosFromAI(foodName); 
-                        gramsInput.value = data.grams?.toFixed(0) || '';
-                        row.querySelector('.ingredient-calories').value = data.calories?.toFixed(2) || '';
-                        row.querySelector('.ingredient-protein').value = data.protein?.toFixed(2) || '';
-                        row.querySelector('.ingredient-carbs').value = data.carbs?.toFixed(2) || '';
-                        row.querySelector('.ingredient-fat').value = data.fat?.toFixed(2) || '';
-                        row.querySelector('.ingredient-sugar').value = data.sugar?.toFixed(2) || '';
-                        row.querySelector('.ingredient-sodium').value = data.sodium?.toFixed(2) || '';
-                        row.querySelector('.ingredient-potassium').value = data.potassium?.toFixed(2) || '';
-                        updateRecipeTotals();
-                    } catch (error) { showCustomAlert('AI Error', `Could not fetch data for ${foodName}.`);
-                    } finally { aiBtn.disabled = false; aiBtn.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4 pointer-events-none"></i>'; lucide.createIcons(); }
-                }
+                if (barcodeBtn) { scanningIngredientRow = row; startBarcodeScanner(); }
+                if (aiBtn) { scanningIngredientRow = row; showModal(ui.foodScannerModal); }
             });
             
             ui.compoundFoodForm.addEventListener('submit', (e) => {
@@ -830,9 +891,6 @@
                 if (editingRecipeIndex !== null) { savedRecipes[editingRecipeIndex] = newRecipe; } else { savedRecipes.push(newRecipe); const dateKey = dateToKey(viewDate); if (!allDailyLogs[dateKey]) allDailyLogs[dateKey] = []; const logEntry = { ...newRecipe, servings: 1, grams: totalGrams }; allDailyLogs[dateKey].push(logEntry); }
                 saveData(); updateDayView(viewDate); hideModal(ui.compoundFoodModal); showCustomAlert('Success', `Recipe "${name}" has been saved.`);
             });
-
-            ui.foodServingsInput.addEventListener('input', updateTotalMacrosDisplay);
-            ui.macroInputs.forEach(input => input.addEventListener('input', updateTotalMacrosDisplay));
             
             ui.favoriteFoodsListDiv.addEventListener('click', (e) => {
                 const logBtn = e.target.closest('.log-favorite-btn'), editBtn = e.target.closest('.edit-favorite-btn'), deleteBtn = e.target.closest('.delete-favorite-btn');
@@ -893,8 +951,30 @@
             function handleHydrationClick(index) {
                 const dateKey = dateToKey(viewDate);
                 const currentCount = hydrationLog[dateKey] || 0;
-                if (index === currentCount) { hydrationLog[dateKey] = currentCount - 1; } else { hydrationLog[dateKey] = index; }
-                saveData(); renderHydration();
+                
+                if (index === currentCount) {
+                    hydrationLog[dateKey] = currentCount - 1;
+                } else {
+                    hydrationLog[dateKey] = index;
+                }
+
+                if (hydrationLog[dateKey] < 0) hydrationLog[dateKey] = 0;
+
+                const waterAmount = (hydrationLog[dateKey] || 0) * 250; 
+                const dateLog = allDailyLogs[dateKey] || [];
+                const waterIndex = dateLog.findIndex(item => item.name === 'Water');
+
+                if (waterAmount > 0) {
+                    const waterEntry = { name: 'Water', grams: waterAmount, calories: 0, protein: 0, carbs: 0, fat: 0, sugar: 0, sodium: 0, potassium: 0, servings: hydrationLog[dateKey] };
+                    if (waterIndex > -1) { dateLog[waterIndex] = waterEntry;
+                    } else { dateLog.push(waterEntry); }
+                } else {
+                    if (waterIndex > -1) { dateLog.splice(waterIndex, 1); }
+                }
+                allDailyLogs[dateKey] = dateLog;
+                
+                saveData();
+                fullRender();
             }
 
             ui.hydrationTracker.addEventListener('click', (e) => {
@@ -906,41 +986,184 @@
                 saveData();
                 renderHydration();
             });
-            ui.scanBarcodeBtn.addEventListener('click', () => { ui.barcodeResults.innerHTML = '<p class="text-secondary-text text-center">Use your camera or enter a number to find a food item.</p>'; ui.barcodeInput.value = ''; showModal(ui.barcodeScannerModal); });
-            ui.closeBarcodeScannerModalBtn.addEventListener('click', () => hideModal(ui.barcodeScannerModal));
-            ui.findBarcodeBtn.addEventListener('click', () => {
-                const barcode = ui.barcodeInput.value.trim(); 
-                if (!barcode) {
-                     ui.barcodeResults.innerHTML = '<p class="text-yellow-400 text-center">Please enter a barcode number first.</p>';
-                     return;
+            ui.removeHydrationTickBtn.addEventListener('click', () => {
+                goals.hydrationGoalTicks = Math.max(10, (goals.hydrationGoalTicks || 10) - 1);
+                const dateKey = dateToKey(viewDate);
+                if(hydrationLog[dateKey] > goals.hydrationGoalTicks){
+                    hydrationLog[dateKey] = goals.hydrationGoalTicks;
                 }
-                const food = BARCODE_DB[barcode];
-                if (food) { ui.barcodeResults.innerHTML = `<h4 class="font-bold">${food.name}</h4><p class="text-sm text-secondary-text">${food.grams}g per serving</p><p class="mt-2">${food.calories}kcal | ${food.protein}p | ${food.carbs}c | ${food.fat}f</p><button id="add-from-barcode-btn" class="btn btn-primary w-full mt-4">Add to Log</button>`;
-                } else { ui.barcodeResults.innerHTML = `<p class="text-yellow-400 text-center">Barcode not found.</p><p class="text-xs text-secondary-text text-center mt-2">This is a demo. Try one of these:</p><ul class="text-xs text-secondary-text text-center list-disc list-inside"><li>5060294101234 (Protein Bar)</li><li>5449000000996 (Coke)</li><li>0737628064502 (Oats)</li></ul>`; }
+                saveData();
+                renderHydration();
             });
-            ui.barcodeResults.addEventListener('click', (e) => {
-                if (e.target.id === 'add-from-barcode-btn') {
-                    const barcode = ui.barcodeInput.value.trim(); const food = BARCODE_DB[barcode];
-                    if (food) { ui.foodNameInput.value = food.name; ui.foodServingsInput.value = food.servings || 1; document.getElementById('food-grams-input').value = food.grams || ''; document.getElementById('food-calories-input').value = food.calories || ''; document.getElementById('food-protein-input').value = food.protein || ''; document.getElementById('food-carbs-input').value = food.carbs || ''; document.getElementById('food-fat-input').value = food.fat || ''; document.getElementById('food-sugar-input').value = food.sugar || ''; document.getElementById('food-sodium-input').value = food.sodium || ''; document.getElementById('food-potassium-input').value = food.potassium || ''; updateTotalMacrosDisplay(); hideModal(ui.barcodeScannerModal); }
+
+            const startBarcodeScanner = () => {
+                scanningIngredientRow = null;
+                showModal(ui.barcodeScannerModal);
+                document.getElementById('barcode-initial-options')?.classList.remove('hidden');
+                ui.barcodeReader.classList.add('hidden');
+                ui.barcodeResults.classList.add('hidden');
+                ui.barcodeScannerStatus.textContent = 'Choose an option to scan a barcode.';
+            };
+            
+            const stopBarcodeScanner = () => {
+                if (html5QrCode && html5QrCode.isScanning) {
+                    html5QrCode.stop().then(() => {}).catch(err => {});
                 }
-            });
-            ui.barcodePhotoInput.addEventListener('change', (e) => {
-                if (e.target.files && e.target.files[0]) {
-                    ui.barcodeResults.innerHTML = `<div class="flex items-center justify-center gap-2 text-secondary-text"><div class="loader"></div><span>Simulating Scan...</span></div>`;
-                    setTimeout(() => {
-                        const barcodeKeys = Object.keys(BARCODE_DB);
-                        const randomBarcode = barcodeKeys[Math.floor(Math.random() * barcodeKeys.length)];
-                        ui.barcodeInput.value = randomBarcode;
-                        ui.findBarcodeBtn.click();
-                        e.target.value = ''; 
-                    }, 1500);
+                 hideModal(ui.barcodeScannerModal);
+            };
+
+            const initiateLiveScanner = () => {
+                const initialOptions = document.getElementById('barcode-initial-options');
+                if(initialOptions) initialOptions.classList.add('hidden');
+                ui.barcodeReader.classList.remove('hidden');
+                ui.barcodeScannerStatus.textContent = "Starting camera...";
+
+                if (html5QrCode && html5QrCode.isScanning) { html5QrCode.stop(); }
+                html5QrCode = new Html5Qrcode("barcode-reader");
+                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+                html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
+                    .catch(err => {
+                        ui.barcodeScannerStatus.innerHTML = `Camera permission denied. <br>Please allow camera access or use the upload option.`;
+                        setTimeout(() => {
+                             if(initialOptions) initialOptions.classList.remove('hidden');
+                             ui.barcodeReader.classList.add('hidden');
+                             ui.barcodeScannerStatus.textContent = 'Choose an option to scan a barcode.';
+                        }, 3000);
+                    });
+            };
+            
+            async function onScanSuccess(decodedText, decodedResult) {
+                ui.barcodeScannerStatus.textContent = `Found barcode: ${decodedText}. Fetching data...`;
+                if(html5QrCode && html5QrCode.isScanning) html5QrCode.pause();
+
+                try {
+                    await new Promise(res => setTimeout(res, 1000));
+                    const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${decodedText}?fields=product_name,brands,nutriments,serving_size`);
+                    if(!response.ok) throw new Error('Product not found in Open Food Facts database.');
+                    const data = await response.json();
+                    if(data.status === 0) throw new Error(data.status_verbose);
+                    const product = data.product, nutriments = product.nutriments;
+                    const servingSizeG = parseFloat(product.serving_size?.match(/(\d+(\.\d+)?)/)?.[0]) || 100;
+
+                    const foodData = { name: product.product_name || 'Unknown', brand: product.brands || '', grams: servingSizeG, calories: (nutriments['energy-kcal_100g'] / 100 * servingSizeG) || 0, protein: (nutriments.proteins_100g / 100 * servingSizeG) || 0, carbs: (nutriments.carbohydrates_100g / 100 * servingSizeG) || 0, fat: (nutriments.fat_100g / 100 * servingSizeG) || 0, sugar: (nutriments.sugars_100g / 100 * servingSizeG) || 0, sodium: (nutriments.sodium_100g * 1000 / 100 * servingSizeG) || 0, potassium: (nutriments.potassium_100g * 1000 / 100 * servingSizeG) || 0 };
+
+                    ui.barcodeResults.innerHTML = `<h4 class="font-bold">${foodData.name}</h4><p class="text-sm text-secondary-text">Brand: ${foodData.brand} | Serving: ${foodData.grams.toFixed(0)}g</p><p class="mt-2">${foodData.calories.toFixed(0)}kcal | ${foodData.protein.toFixed(1)}p | ${foodData.carbs.toFixed(1)}c | ${foodData.fat.toFixed(1)}f</p><p class="text-xs text-secondary-text mt-1">Data from: Open Food Facts</p><button id="add-from-barcode-btn" class="btn btn-primary w-full mt-4">Add to Log</button>`;
+                    ui.barcodeResults.querySelector('#add-from-barcode-btn').onclick = () => {
+                         const targetRow = scanningIngredientRow;
+                         if (targetRow) {
+                             targetRow.querySelector('.ingredient-name').value = foodData.name;
+                             targetRow.querySelector('.ingredient-grams').value = foodData.grams.toFixed(0);
+                             ['calories', 'protein', 'carbs', 'fat', 'sugar', 'sodium', 'potassium'].forEach(m => targetRow.querySelector(`.ingredient-${m}`).value = foodData[m].toFixed(2));
+                             updateRecipeTotals();
+                         } else {
+                            ui.foodNameInput.value = foodData.name; ui.foodBrandInput.value = foodData.brand; 
+                            document.getElementById('food-grams-input').value = foodData.grams.toFixed(0);
+                            ['calories', 'protein', 'carbs', 'fat', 'sugar', 'sodium', 'potassium'].forEach(m => document.getElementById(`food-${m}-input`).value = foodData[m].toFixed(2));
+                         }
+                        stopBarcodeScanner();
+                    };
+                    ui.barcodeResults.classList.remove('hidden');
+                } catch (error) {
+                    ui.barcodeResults.innerHTML = `<p class="text-yellow-400 text-center">Could not retrieve data.</p><p class="text-xs text-secondary-text text-center mt-2">${error.message}</p><button id="retry-scan-btn" class="btn btn-secondary w-full mt-4">Scan Again</button>`;
+                    ui.barcodeResults.querySelector('#retry-scan-btn').onclick = () => { ui.barcodeResults.classList.add('hidden'); if(html5QrCode) html5QrCode.resume(); };
+                    ui.barcodeResults.classList.remove('hidden');
                 }
+            }
+            function onScanFailure(error) { ui.barcodeScannerStatus.textContent = 'Looking for barcode...'; }
+            
+            ui.scanBarcodeBtn.addEventListener('click', () => { scanningIngredientRow = null; startBarcodeScanner(); });
+            ui.closeBarcodeScannerModalBtn.addEventListener('click', stopBarcodeScanner);
+            document.getElementById('start-camera-scan-btn')?.addEventListener('click', initiateLiveScanner);
+            document.getElementById('barcode-upload-input')?.addEventListener('change', (e) => {
+                const file = e.target.files[0]; if (!file) return;
+                ui.barcodeScannerStatus.textContent = 'Scanning image for barcode...';
+                document.getElementById('barcode-initial-options').classList.add('hidden');
+                const qrCodeInstance = new Html5Qrcode("barcode-reader");
+                qrCodeInstance.scanFile(file, false)
+                    .then(decodedText => { onScanSuccess(decodedText, {}); qrCodeInstance.clear(); })
+                    .catch(err => { ui.barcodeResults.innerHTML = `<p class="text-yellow-400 text-center">No barcode found in image.</p><button id="retry-scan-btn" class="btn btn-secondary w-full mt-4">Try Again</button>`; ui.barcodeResults.querySelector('#retry-scan-btn').onclick = () => { ui.barcodeResults.classList.add('hidden'); document.getElementById('barcode-initial-options').classList.remove('hidden'); ui.barcodeScannerStatus.textContent = 'Choose an option to scan a barcode.'; }; ui.barcodeResults.classList.remove('hidden'); qrCodeInstance.clear(); });
             });
+            
+            // --- Mobile Menu ---
+            ui.hamburgerBtn.addEventListener('click', () => { ui.mobileMenu.classList.add('open'); ui.mobileMenuOverlay.classList.remove('hidden'); });
+            ui.mobileMenuOverlay.addEventListener('click', () => { ui.mobileMenu.classList.remove('open'); ui.mobileMenuOverlay.classList.add('hidden'); });
+
+            // --- AI Nutritionist Chat ---
+            ui.openNutritionistChatBtn.addEventListener('click', () => {
+                if(chatHistory.length === 0) {
+                     ui.aiChatHistory.innerHTML = `<div class="text-center text-secondary-text p-4"><i data-lucide="bot" class="w-10 h-10 mx-auto mb-2"></i><p>Hello! I'm your AI Nutritionist. Ask me anything about your diet, food logs, or general nutrition.</p></div>`;
+                     lucide.createIcons();
+                }
+                showModal(ui.aiNutritionistModal);
+            });
+            ui.closeAiNutritionistModalBtn.addEventListener('click', () => hideModal(ui.aiNutritionistModal));
+            ui.aiChatSendBtn.addEventListener('click', handleAiChatSend);
+            ui.aiChatInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') handleAiChatSend(); });
+
+            async function handleAiChatSend() {
+                const userInput = ui.aiChatInput.value.trim();
+                if(!userInput) return;
+
+                addMessageToChat(userInput, 'user');
+                ui.aiChatInput.value = '';
+                ui.aiChatSendBtn.disabled = true;
+                addMessageToChat('<div class="loader"></div>', 'ai', true);
+
+                try {
+                    const sevenDaysAgo = new Date();
+                    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                    const recentLogs = Object.entries(allDailyLogs).filter(([date]) => new Date(date) >= sevenDaysAgo);
+                    const recentHydration = Object.entries(hydrationLog).filter(([date]) => new Date(date) >= sevenDaysAgo);
+                    const context = `
+                        User Profile: ${JSON.stringify(userProfile)}
+                        Nutrition Goals: ${JSON.stringify(goals)}
+                        Last 7 Days Food Log: ${JSON.stringify(recentLogs)}
+                        Last 7 Days Hydration: ${JSON.stringify(recentHydration)}
+                    `;
+                    const systemPrompt = `You are FitTrack AI, a helpful and knowledgeable nutritionist. Analyze the user's provided data to give specific, actionable advice based on their question. Be encouraging and provide clear, concise answers. Here is the user's data context: ${context}`;
+                    
+                    const response = await fetch(getApiUrl('gemini-2.5-flash-preview-05-20'), {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ role: "user", parts: [{ text: userInput }] }],
+                            systemInstruction: { parts: [{ text: systemPrompt }] }
+                        })
+                    });
+                    if(!response.ok) throw new Error('Failed to get response from AI.');
+                    const result = await response.json();
+                    const aiResponse = result.candidates[0].content.parts[0].text;
+                    updateLastMessage(aiResponse.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>'));
+
+                } catch(error) {
+                    updateLastMessage('Sorry, I am having trouble connecting right now. Please try again later.');
+                } finally {
+                    ui.aiChatSendBtn.disabled = false;
+                }
+            }
+
+            function addMessageToChat(message, sender, isLoading = false) {
+                 if (chatHistory.length === 0 && sender === 'user') { ui.aiChatHistory.innerHTML = ''; }
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `p-3 rounded-lg max-w-[85%] ${sender === 'user' ? 'bg-blue-600 self-end' : 'bg-input-bg self-start'}`;
+                if(isLoading) messageDiv.id = 'ai-loading-message';
+                messageDiv.innerHTML = message;
+                ui.aiChatHistory.appendChild(messageDiv);
+                ui.aiChatHistory.scrollTop = ui.aiChatHistory.scrollHeight;
+            }
+             function updateLastMessage(newMessage) {
+                const loadingMessage = document.getElementById('ai-loading-message');
+                if (loadingMessage) {
+                    loadingMessage.innerHTML = newMessage;
+                    loadingMessage.removeAttribute('id');
+                }
+             }
+
 
             // --- INITIALIZATION ---
             loadData();
             updateDayView(viewDate);
-            updateTotalMacrosDisplay();
         });
     </script>
 </body>

@@ -201,7 +201,7 @@
 
         .mobile-menu {
             transition: transform 0.3s ease-in-out;
-            transform: translateX(-100%);
+            transform: translateX(100%);
         }
         .mobile-menu.open {
             transform: translateX(0);
@@ -238,7 +238,7 @@
         </header>
         
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="mobile-menu fixed top-0 left-0 h-full w-64 bg-card-bg z-40 p-6 md:hidden">
+        <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 h-full w-64 bg-card-bg z-40 p-6 md:hidden">
             <a href="index.html" class="flex items-center gap-3 mb-8">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m6 2 4 4"/><path d="m3 10.5 4.5-4.5"/><path d="m13.5 21 4.5-4.5"/></svg>
                 <h1 class="text-xl font-bold">FitTrack AI</h1>
@@ -501,11 +501,13 @@
                 localStorage.setItem('fitTrackAI_favoriteFoods', JSON.stringify(favoriteFoods));
                 localStorage.setItem('fitTrackAI_savedRecipes', JSON.stringify(savedRecipes));
                 localStorage.setItem('fitTrackAI_goals', JSON.stringify(goals));
+                localStorage.setItem('fitTrackAI_chatHistory', JSON.stringify(chatHistory));
             }
 
             function loadData() {
                 allDailyLogs = JSON.parse(localStorage.getItem('fitTrackAI_allDailyLogs')) || {};
                 hydrationLog = JSON.parse(localStorage.getItem('fitTrackAI_hydrationLog')) || {};
+                chatHistory = JSON.parse(localStorage.getItem('fitTrackAI_chatHistory')) || [];
                 const legacyDailyLog = JSON.parse(localStorage.getItem('fitTrackAI_dailyLog'));
                 if (legacyDailyLog && !Object.keys(allDailyLogs).length) {
                     allDailyLogs[dateToKey(new Date())] = legacyDailyLog;
@@ -743,7 +745,10 @@
                 if (foodItem.calories === 0 && editingFoodLogIndex === null) { ui.addFoodError.textContent = 'Please enter macros or use "Get Macros with AI".'; return; }
                 if (editingFoodLogIndex !== null) { currentDayLog[editingFoodLogIndex] = foodItem; editingFoodLogIndex = null; ui.addFoodBtn.querySelector('.btn-text').textContent = 'Add Food';
                 } else { currentDayLog.push(foodItem); }
-                ui.logMealForm.reset(); saveData(); updateDayView(viewDate);
+                ui.logMealForm.reset(); 
+                aiBaseMacros = null;
+                saveData(); 
+                updateDayView(viewDate);
             });
             
             ui.dailyLogContentDiv.addEventListener('click', (e) => {
@@ -997,7 +1002,6 @@
             });
 
             const startBarcodeScanner = () => {
-                scanningIngredientRow = null;
                 showModal(ui.barcodeScannerModal);
                 document.getElementById('barcode-initial-options')?.classList.remove('hidden');
                 ui.barcodeReader.classList.add('hidden');
@@ -1044,30 +1048,59 @@
                     const data = await response.json();
                     if(data.status === 0) throw new Error(data.status_verbose);
                     const product = data.product, nutriments = product.nutriments;
-                    const servingSizeG = parseFloat(product.serving_size?.match(/(\d+(\.\d+)?)/)?.[0]) || 100;
-
-                    const foodData = { name: product.product_name || 'Unknown', brand: product.brands || '', grams: servingSizeG, calories: (nutriments['energy-kcal_100g'] / 100 * servingSizeG) || 0, protein: (nutriments.proteins_100g / 100 * servingSizeG) || 0, carbs: (nutriments.carbohydrates_100g / 100 * servingSizeG) || 0, fat: (nutriments.fat_100g / 100 * servingSizeG) || 0, sugar: (nutriments.sugars_100g / 100 * servingSizeG) || 0, sodium: (nutriments.sodium_100g * 1000 / 100 * servingSizeG) || 0, potassium: (nutriments.potassium_100g * 1000 / 100 * servingSizeG) || 0 };
-
-                    ui.barcodeResults.innerHTML = `<h4 class="font-bold">${foodData.name}</h4><p class="text-sm text-secondary-text">Brand: ${foodData.brand} | Serving: ${foodData.grams.toFixed(0)}g</p><p class="mt-2">${foodData.calories.toFixed(0)}kcal | ${foodData.protein.toFixed(1)}p | ${foodData.carbs.toFixed(1)}c | ${foodData.fat.toFixed(1)}f</p><p class="text-xs text-secondary-text mt-1">Data from: Open Food Facts</p><button id="add-from-barcode-btn" class="btn btn-primary w-full mt-4">Add to Log</button>`;
-                    ui.barcodeResults.querySelector('#add-from-barcode-btn').onclick = () => {
-                         const targetRow = scanningIngredientRow;
-                         if (targetRow) {
-                             targetRow.querySelector('.ingredient-name').value = foodData.name;
-                             targetRow.querySelector('.ingredient-grams').value = foodData.grams.toFixed(0);
-                             ['calories', 'protein', 'carbs', 'fat', 'sugar', 'sodium', 'potassium'].forEach(m => targetRow.querySelector(`.ingredient-${m}`).value = foodData[m].toFixed(2));
-                             updateRecipeTotals();
-                         } else {
-                            ui.foodNameInput.value = foodData.name; ui.foodBrandInput.value = foodData.brand; 
-                            document.getElementById('food-grams-input').value = foodData.grams.toFixed(0);
-                            ['calories', 'protein', 'carbs', 'fat', 'sugar', 'sodium', 'potassium'].forEach(m => document.getElementById(`food-${m}-input`).value = foodData[m].toFixed(2));
-                         }
-                        stopBarcodeScanner();
+                    
+                    // Set base macros to per 100g
+                    aiBaseMacros = {
+                        baseGrams: 100,
+                        calories: nutriments['energy-kcal_100g'] || 0,
+                        protein: nutriments.proteins_100g || 0,
+                        carbs: nutriments.carbohydrates_100g || 0,
+                        fat: nutriments.fat_100g || 0,
+                        sugar: nutriments.sugars_100g || 0,
+                        sodium: (nutriments.sodium_100g || 0) * 1000, // Convert g to mg
+                        potassium: (nutriments.potassium_100g || 0) * 1000, // Convert g to mg
                     };
-                    ui.barcodeResults.classList.remove('hidden');
+
+                    const servingSizeG = parseFloat(product.serving_size?.match(/(\d+(\.\d+)?)/)?.[0]) || 100;
+                    
+                    const targetRow = scanningIngredientRow;
+                    if (targetRow) {
+                        targetRow.querySelector('.ingredient-name').value = product.product_name || 'Scanned Item';
+                        targetRow.querySelector('.ingredient-grams').value = servingSizeG.toFixed(0);
+                        
+                        const ratio = servingSizeG / 100;
+                        targetRow.querySelector('.ingredient-calories').value = (aiBaseMacros.calories * ratio).toFixed(2);
+                        targetRow.querySelector('.ingredient-protein').value = (aiBaseMacros.protein * ratio).toFixed(2);
+                        targetRow.querySelector('.ingredient-carbs').value = (aiBaseMacros.carbs * ratio).toFixed(2);
+                        targetRow.querySelector('.ingredient-fat').value = (aiBaseMacros.fat * ratio).toFixed(2);
+                        targetRow.querySelector('.ingredient-sugar').value = (aiBaseMacros.sugar * ratio).toFixed(2);
+                        targetRow.querySelector('.ingredient-sodium').value = (aiBaseMacros.sodium * ratio).toFixed(2);
+                        targetRow.querySelector('.ingredient-potassium').value = (aiBaseMacros.potassium * ratio).toFixed(2);
+                        
+                        updateRecipeTotals();
+                        showCustomAlert('Barcode Scanned', 'Ingredient macros have been populated.');
+                    } else {
+                        ui.foodNameInput.value = product.product_name || 'Scanned Item';
+                        ui.foodBrandInput.value = product.brands || '';
+                        ui.foodGramsInput.value = servingSizeG.toFixed(0);
+                        // Trigger input event to calculate macros for the serving size
+                        ui.foodGramsInput.dispatchEvent(new Event('input'));
+                        showCustomAlert('Barcode Scanned', 'Nutritional information has been populated in the main form. Please verify and click Add Food.');
+                    }
+                    
+                    stopBarcodeScanner();
+
                 } catch (error) {
                     ui.barcodeResults.innerHTML = `<p class="text-yellow-400 text-center">Could not retrieve data.</p><p class="text-xs text-secondary-text text-center mt-2">${error.message}</p><button id="retry-scan-btn" class="btn btn-secondary w-full mt-4">Scan Again</button>`;
-                    ui.barcodeResults.querySelector('#retry-scan-btn').onclick = () => { ui.barcodeResults.classList.add('hidden'); if(html5QrCode) html5QrCode.resume(); };
                     ui.barcodeResults.classList.remove('hidden');
+                    ui.barcodeResults.querySelector('#retry-scan-btn').onclick = () => { 
+                        ui.barcodeResults.classList.add('hidden'); 
+                        if(html5QrCode && !html5QrCode.isScanning) {
+                            html5QrCode.resume();
+                        } else {
+                            initiateLiveScanner();
+                        }
+                    };
                 }
             }
             function onScanFailure(error) { ui.barcodeScannerStatus.textContent = 'Looking for barcode...'; }
@@ -1091,10 +1124,7 @@
 
             // --- AI Nutritionist Chat ---
             ui.openNutritionistChatBtn.addEventListener('click', () => {
-                if(chatHistory.length === 0) {
-                     ui.aiChatHistory.innerHTML = `<div class="text-center text-secondary-text p-4"><i data-lucide="bot" class="w-10 h-10 mx-auto mb-2"></i><p>Hello! I'm your AI Nutritionist. Ask me anything about your diet, food logs, or general nutrition.</p></div>`;
-                     lucide.createIcons();
-                }
+                renderChatHistory();
                 showModal(ui.aiNutritionistModal);
             });
             ui.closeAiNutritionistModalBtn.addEventListener('click', () => hideModal(ui.aiNutritionistModal));
@@ -1105,10 +1135,11 @@
                 const userInput = ui.aiChatInput.value.trim();
                 if(!userInput) return;
 
+                chatHistory.push({ role: "user", parts: [{ text: userInput }] });
                 addMessageToChat(userInput, 'user');
                 ui.aiChatInput.value = '';
                 ui.aiChatSendBtn.disabled = true;
-                addMessageToChat('<div class="loader"></div>', 'ai', true);
+                addMessageToChat('<div class="loader"></div>', 'model', true);
 
                 try {
                     const sevenDaysAgo = new Date();
@@ -1127,24 +1158,42 @@
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            contents: [{ role: "user", parts: [{ text: userInput }] }],
+                            contents: chatHistory,
                             systemInstruction: { parts: [{ text: systemPrompt }] }
                         })
                     });
                     if(!response.ok) throw new Error('Failed to get response from AI.');
                     const result = await response.json();
                     const aiResponse = result.candidates[0].content.parts[0].text;
+                    
+                    chatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
                     updateLastMessage(aiResponse.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>'));
 
                 } catch(error) {
                     updateLastMessage('Sorry, I am having trouble connecting right now. Please try again later.');
+                    // Remove the last user message if AI fails, so they can try again
+                    chatHistory.pop();
                 } finally {
                     ui.aiChatSendBtn.disabled = false;
+                    saveData();
+                }
+            }
+            
+            function renderChatHistory() {
+                if(chatHistory.length === 0) {
+                     ui.aiChatHistory.innerHTML = `<div class="text-center text-secondary-text p-4"><i data-lucide="bot" class="w-10 h-10 mx-auto mb-2"></i><p>Hello! I'm your AI Nutritionist. Ask me anything about your diet, food logs, or general nutrition.</p></div>`;
+                     lucide.createIcons();
+                } else {
+                    ui.aiChatHistory.innerHTML = '';
+                    chatHistory.forEach(msg => {
+                        addMessageToChat(msg.parts[0].text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>'), msg.role);
+                    });
                 }
             }
 
+
             function addMessageToChat(message, sender, isLoading = false) {
-                 if (chatHistory.length === 0 && sender === 'user') { ui.aiChatHistory.innerHTML = ''; }
+                 if (chatHistory.length === 1 && sender === 'user') { ui.aiChatHistory.innerHTML = ''; }
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `p-3 rounded-lg max-w-[85%] ${sender === 'user' ? 'bg-blue-600 self-end' : 'bg-input-bg self-start'}`;
                 if(isLoading) messageDiv.id = 'ai-loading-message';

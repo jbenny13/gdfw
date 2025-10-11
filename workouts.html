@@ -388,14 +388,12 @@
                         <div id="ai-advice-output" class="mt-4 p-3 bg-black/30 rounded-md text-sm min-h-[50px]"></div>
                     </div>
 
-                    <div id="ai-panel-general" class="hidden">
-                        <p class="text-gray-400 text-sm mb-3 text-center">Ask the AI anything about your workout data.</p>
-                        <textarea id="ai-general-prompt" class="form-input" rows="3" placeholder="e.g., 'Am I doing enough volume for my back?'"></textarea>
-                        <button id="get-ai-general-advice-btn" class="btn btn-secondary w-full mt-2">
-                            <span class="btn-text">Ask AI</span>
-                            <div class="loader hidden ml-2"></div>
-                        </button>
-                        <div id="ai-general-output" class="mt-4 p-3 bg-black/30 rounded-md text-sm min-h-[50px]"></div>
+                    <div id="ai-panel-general" class="hidden text-center">
+                        <p class="text-gray-400 text-sm mb-4">Ask for specific advice about your plan, or have a general chat about your training.</p>
+                        <div class="bg-black/30 p-4 rounded-lg">
+                             <i data-lucide="message-circle" class="w-12 h-12 text-blue-400 mx-auto mb-4"></i>
+                            <button id="open-workout-chat-btn" class="btn btn-primary w-full">Chat with AI Coach</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -408,9 +406,31 @@
     <div id="exercise-detail-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 id="exercise-detail-title" class="text-xl sm:text-2xl font-bold">Exercise Details</h2><button id="close-exercise-detail-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-gray-800"><img id="exercise-detail-video" src="" alt="Exercise demonstration" class="w-full h-full object-contain"></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Instructions</h3><textarea id="exercise-detail-instructions" class="form-input mt-1 w-full bg-input-bg text-sm" readonly></textarea><button id="save-instructions-btn" class="mt-2 w-full btn btn-secondary">Edit Instructions</button></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Rep Range</h3><p id="exercise-detail-rep-range" class="text-gray-300"></p></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Personal Notes & Advice</h3><textarea id="exercise-detail-notes" rows="4" class="form-input mt-1" placeholder="Add your personal cues, weight progression goals, etc."></textarea><button id="save-exercise-notes-btn" class="mt-2 w-full btn btn-secondary">Save Notes</button></div><button id="log-from-detail-btn" class="w-full btn btn-primary mt-4">Log This Exercise</button></div></div></div>
     <div id="warmup-manage-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 class="text-xl sm:text-2xl font-bold">Manage Warm-ups</h2><button id="close-warmup-manage-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div><label for="warmup-day-select" class="form-label">Workout Day</label><select id="warmup-day-select" class="form-select mt-1"></select></div><div id="warmup-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div><hr class="border-gray-800"><form id="warmup-form" class="space-y-3"><h3 id="warmup-form-title" class="font-bold text-lg text-blue-400">Add New Warm-up</h3><div><label for="warmup-name" class="form-label">Name</label><input type="text" id="warmup-name" class="form-input mt-1" required></div><div><label for="warmup-instructions" class="form-label">Instructions (one per line)</label><textarea id="warmup-instructions" rows="4" class="form-input mt-1"></textarea></div><button type="submit" id="save-warmup-btn" class="w-full btn btn-primary">Add Warm-up</button></form></div></div></div>
     <div id="workout-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="modal-title" class="text-xl sm:text-2xl font-bold">Log Exercise</h2><div class="flex items-center gap-1 border border-border-color rounded-lg p-1"><button type="button" id="unit-toggle-kg" class="btn !py-1 !px-3 text-sm unit-toggle-btn">kg</button><button type="button" id="unit-toggle-lbs" class="btn !py-1 !px-3 text-sm unit-toggle-btn">lbs</button></div><button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="workout-log-form"><div class="space-y-4"><div id="sets-container"></div><button type="button" id="add-set-btn" class="w-full btn btn-secondary">Add Set</button><button type="submit" id="save-workout-btn" class="w-full btn btn-primary mt-2">Save Workout</button></div></form></div></div>
-    <div id="exercise-library-modal" class="modal-backdrop"><div class="modal-content !max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-xl sm:text-2xl font-bold" id="exercise-library-title">Exercise Library</h2><button id="close-exercise-library-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="flex gap-2 mb-4"><input type="search" id="exercise-library-search" class="form-input" placeholder="Search exercises..."><select id="exercise-library-filter" class="form-select w-48"><option value="">All Groups</option></select><button id="create-new-exercise-from-library-btn" class="btn btn-secondary !px-3" title="Create New Exercise"><i data-lucide="plus"></i></button></div><div id="exercise-library-list" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-2"></div><button id="add-selected-exercises-btn" class="btn btn-primary w-full mt-4">Add Selected</button></div></div>
+    <div id="exercise-library-modal" class="modal-backdrop"><div class="modal-content !max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-xl sm:text-2xl font-bold" id="exercise-library-title">Exercise Library</h2><button id="close-exercise-library-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div>
+    <div class="flex flex-wrap gap-2 mb-4">
+        <input type="search" id="exercise-library-search" class="form-input flex-grow" placeholder="Search exercises...">
+        <select id="exercise-library-filter" class="form-select w-full sm:w-48"><option value="">All Muscle Groups</option></select>
+        <select id="exercise-library-equipment-filter" class="form-select w-full sm:w-48"><option value="">All Equipment</option></select>
+        <button id="create-new-exercise-from-library-btn" class="btn btn-secondary !px-3" title="Create New Exercise"><i data-lucide="plus"></i></button>
+    </div>
+    <div id="exercise-library-list" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-2"></div><button id="add-selected-exercises-btn" class="btn btn-primary w-full mt-4">Add Selected</button></div></div>
     <div id="confirm-modal" class="modal-backdrop"><div class="modal-content"><h2 id="confirm-modal-title" class="text-xl font-bold mb-4">Are you sure?</h2><p id="confirm-modal-text" class="text-gray-300 mb-6">This action cannot be undone.</p><div class="flex justify-end gap-4"><button id="confirm-modal-cancel-btn" class="btn btn-secondary">Cancel</button><button id="confirm-modal-confirm-btn" class="btn btn-danger">Confirm</button></div></div></div>
     <div id="alert-modal" class="modal-backdrop"><div class="modal-content"><h2 id="alert-modal-title" class="text-xl font-bold mb-4">Alert</h2><p id="alert-modal-text" class="text-gray-300 mb-6"></p><div class="flex justify-end"><button id="alert-modal-ok-btn" class="btn btn-primary">OK</button></div></div></div>
+    
+    <!-- AI Workout Coach Chat Modal -->
+    <div id="ai-workout-chat-modal" class="modal-backdrop">
+        <div class="modal-content !max-w-2xl flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">AI Workout Coach</h2>
+                <button id="close-ai-workout-chat-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+            </div>
+            <div id="ai-chat-history" class="flex-grow flex flex-col gap-4 overflow-y-auto custom-scrollbar pr-2 mb-4 min-h-[300px]"></div>
+            <div class="flex gap-2">
+                <input type="text" id="ai-chat-input" class="form-input" placeholder="Ask a fitness question...">
+                <button id="ai-chat-send-btn" class="btn btn-primary"><i data-lucide="send"></i></button>
+            </div>
+        </div>
+    </div>
     
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
@@ -421,6 +441,7 @@
             let warmups = {};
             let workoutStatusHistory = {};
             let userSettings = { unit: 'kg' };
+            let workoutChatHistory = [];
             let currentlyLoggingExercise = null;
             let editingWorkoutLogId = null;
             let editingExerciseId = null;
@@ -444,43 +465,69 @@
     {"id":"uuid-bench-decline-bb","name":"Decline Barbell Bench Press","group":"Chest","type":"Barbell","instructions":["Secure your legs at the end of a decline bench.","Lie back and grip the bar with a medium-width grip.","Unrack the bar and lower it to your lower chest, keeping elbows tucked.","Press the bar back to the starting position."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":true},
     {"id":"uuid-bench-flat-db","name":"Flat Dumbbell Press","group":"Chest","type":"Dumbbell","instructions":["Lie on a flat bench with a dumbbell in each hand resting on your thighs.","Use your thighs to help kick the dumbbells up to shoulder height.","Press the dumbbells up until your arms are fully extended, palms facing forward.","Lower the dumbbells slowly to the sides of your chest."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":true},
     {"id":"uuid-bench-incline-db","name":"Incline Dumbbell Press","group":"Chest","type":"Dumbbell","instructions":["Set a bench to a 30-45 degree incline.","Sit and place dumbbells on your thighs.","Kick the weights up to your shoulders and lie back.","Press the dumbbells up and slightly together over your chest.","Lower them slowly with control, getting a good stretch."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-decline-db-press","name":"Decline Dumbbell Press","group":"Chest","type":"Dumbbell","instructions":["Lie on a decline bench with a dumbbell in each hand.","Press the dumbbells up over your lower chest.","Lower the weights slowly and with control."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-db-pullover","name":"Dumbbell Pullover","group":"Chest","type":"Dumbbell","instructions":["Lie with your upper back across a flat bench, feet firm on the floor.","Hold one dumbbell with both hands over your chest.","Lower the dumbbell back over your head in an arc, feeling a stretch in your chest and lats.","Pull the dumbbell back over your chest."],"repRange":"10-15 reps","notes":"Also works the lats.","favorite":false,"isCompound":false},
     {"id":"uuid-fly-db","name":"Dumbbell Flyes","group":"Chest","type":"Dumbbell","instructions":["Lie on a flat bench with a dumbbell in each hand, palms facing each other.","Press the weights above your chest.","With a slight bend in your elbows, lower the weights out to your sides in a wide arc.","Bring the weights back to the starting position using your chest muscles in a 'hugging' motion."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-fly-cable","name":"High-to-low Cable Crossover","group":"Chest","type":"Cable","instructions":["Set pulleys to a high position.","Grab the handles and step forward to create tension, with a slight forward lean.","With a slight bend in your elbows, pull the handles down and across your body until they meet in front of your lower chest.","Squeeze your chest at the peak contraction and slowly return."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-pushup","name":"Push Up","group":"Chest","type":"Bodyweight","instructions":["Start in a high plank position with hands slightly wider than your shoulders.","Lower your body until your chest nearly touches the floor, keeping your body in a straight line from head to heels.","Push back up to the starting position."],"repRange":"As many as possible","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-incline-pushup","name":"Incline Push Up","group":"Chest","type":"Bodyweight","instructions":["Place your hands on an elevated surface like a bench or box.","Position your body in a straight line from head to heels.","Lower your chest to the surface and press back up."],"repRange":"10-20 reps","notes":"Easier variation of a standard push-up, targets lower chest.","favorite":false,"isCompound":true},
+    {"id":"uuid-decline-pushup","name":"Decline Push Up","group":"Chest","type":"Bodyweight","instructions":["Place your feet on an elevated surface and your hands on the floor.","Lower your body until your head nearly touches the floor.","Press back up to the starting position."],"repRange":"8-15 reps","notes":"Harder variation, targets upper chest and shoulders.","favorite":false,"isCompound":true},
     {"id":"uuid-dips-chest","name":"Dips (Chest Focus)","group":"Chest","type":"Bodyweight","instructions":["Use parallel bars.","Lean your torso forward as you lower your body by bending your elbows.","Go down until you feel a good stretch in your chest, then press back up.","A forward lean emphasizes the chest over the triceps."],"repRange":"8-15 reps","notes":"","favorite":false,"isCompound":true},
     {"id":"uuid-pec-deck","name":"Pec Deck Machine","group":"Chest","type":"Machine","instructions":["Sit on the machine with your back flat against the pad.","Place your forearms on the padded levers or grab the handles.","Bring the levers together in a hugging motion, squeezing your chest.","Return slowly to the start with control."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-pullup","name":"Pull Ups","group":"Back","type":"Bodyweight","instructions":["Hang from a pull-up bar with an overhand grip, slightly wider than your shoulders.","Pull your chest up to the bar, leading with your chest and squeezing your back muscles.","Lower yourself down with control until your arms are nearly straight."],"repRange":"As many as possible","notes":"","favorite":false,"isCompound":true},
     {"id":"uuid-chinup","name":"Chin Ups","group":"Back","type":"Bodyweight","instructions":["Hang from a pull-up bar with an underhand (palms facing you) grip, shoulder-width apart.","Pull your chest up to the bar, focusing on using your lats and biceps.","Lower yourself down with control."],"repRange":"As many as possible","notes":"Engages more biceps than a standard pull-up.","favorite":false,"isCompound":true},
+    {"id":"uuid-superman","name":"Superman","group":"Back","type":"Bodyweight","instructions":["Lie face down on the floor with your arms and legs extended.","Simultaneously lift your arms, chest, and legs off the floor.","Hold for a count, squeezing your lower back, then slowly lower."],"repRange":"12-20 reps","notes":"Excellent for lower back strength.","favorite":false,"isCompound":false},
     {"id":"uuid-lat-pulldown","name":"Lat Pulldown","group":"Back","type":"Machine","instructions":["Sit at the machine and secure your knees under the pads.","Grab the bar with a wide overhand grip.","Pull the bar down to your upper chest, keeping your torso upright and squeezing your lats.","Slowly return the bar to the starting position."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-row-bb","name":"Barbell Row","group":"Back","type":"Barbell","instructions":["Stand with feet shoulder-width apart, holding a barbell with an overhand grip.","Hinge at your hips until your torso is nearly parallel to the floor, back straight.","Pull the bar towards your lower chest/upper abdomen, squeezing your back muscles.","Lower the bar with control."],"repRange":"6-10 reps","notes":"","favorite":false,"isCompound":true},
     {"id":"uuid-row-db","name":"Single Arm Dumbbell Row","group":"Back","type":"Dumbbell","instructions":["Place one knee and one hand on a flat bench, keeping your back parallel to the floor.","Hold a dumbbell in the other hand with your arm extended.","Pull the dumbbell up to the side of your chest, squeezing your back and keeping your elbow close to your body.","Lower the dumbbell with control."],"repRange":"8-12 reps per arm","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-renegade-row","name":"Renegade Row","group":"Back","type":"Dumbbell","instructions":["Start in a high plank position, holding a dumbbell in each hand.","Keeping your core tight and hips stable, row one dumbbell up to your chest.","Lower it with control and repeat on the other side."],"repRange":"8-12 reps per side","notes":"Also a great core stability exercise.","favorite":false,"isCompound":true},
     {"id":"uuid-row-cable","name":"Seated Cable Row","group":"Back","type":"Cable","instructions":["Sit at the cable row machine with your feet on the platform.","Grab the handle (V-bar or straight bar) and pull it towards your abdomen, keeping your back straight.","Squeeze your shoulder blades together at the peak.","Slowly extend your arms back to the start."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-deadlift","name":"Conventional Deadlift","group":"Back","type":"Barbell","instructions":["Stand with mid-foot under the barbell.","Hinge at your hips and bend your knees to grip the bar just outside your shins.","Keep your back straight, chest up, and pull the weight up by driving through your legs.","Stand up tall, pulling the bar up your legs. Reverse the motion to lower."],"repRange":"4-6 reps","notes":"Full-body compound lift, primarily targeting the posterior chain.","favorite":false,"isCompound":true},
     {"id":"uuid-face-pull","name":"Face Pull","group":"Shoulders","type":"Cable","instructions":["Set a cable pulley at head height with a rope attachment.","Grab the rope with an overhand grip and step back.","Pull the rope towards your face, separating your hands as you pull.","Focus on squeezing your rear delts and upper back.","Your elbows should be high and out to the sides."],"repRange":"12-20 reps","notes":"Excellent for rear delts and shoulder health.","favorite":false,"isCompound":false},
     {"id":"uuid-overhead-press-bb","name":"Barbell Overhead Press","group":"Shoulders","type":"Barbell","instructions":["Stand with the bar on your front shoulders, hands just outside shoulder-width.","Keep your core tight and glutes squeezed.","Press the bar straight overhead until your arms are fully extended.","Lower the bar back to your shoulders with control."],"repRange":"6-10 reps","notes":"","favorite":false,"isCompound":true},
     {"id":"uuid-overhead-press-db","name":"Seated Dumbbell Press","group":"Shoulders","type":"Dumbbell","instructions":["Sit on a bench with back support, holding dumbbells at shoulder height, palms forward.","Press the dumbbells overhead until your arms are fully extended.","Lower the dumbbells back to the starting position with control."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-arnold-press","name":"Arnold Press","group":"Shoulders","type":"Dumbbell","instructions":["Sit on a bench holding dumbbells in front of your shoulders, palms facing you.","Press the weights overhead while rotating your palms to face forward.","Reverse the motion on the way down."],"repRange":"8-12 reps","notes":"Hits all three heads of the deltoid.","favorite":false,"isCompound":true},
     {"id":"uuid-lat-raise-db","name":"Dumbbell Lateral Raise","group":"Shoulders","type":"Dumbbell","instructions":["Stand holding dumbbells at your sides with palms facing in.","With a slight bend in your elbows, raise the weights out to your sides until they reach shoulder height.","Imagine pouring a jug of water at the top to correctly orient your hands.","Lower with control."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-bent-over-db-raise","name":"Bent-Over Dumbbell Raise","group":"Shoulders","type":"Dumbbell","instructions":["Hinge at your hips with your back straight, holding dumbbells with palms facing each other.","Raise the dumbbells out to your sides, squeezing your rear delts.","Lower with control."],"repRange":"10-15 reps","notes":"Targets the rear deltoids.","favorite":false,"isCompound":false},
     {"id":"uuid-front-raise-db","name":"Dumbbell Front Raise","group":"Shoulders","type":"Dumbbell","instructions":["Stand holding dumbbells in front of your thighs with palms facing you.","Raise one dumbbell straight up to shoulder height, keeping your arm mostly straight.","Lower with control and alternate arms."],"repRange":"10-15 reps per arm","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-pike-pushup","name":"Pike Push Up","group":"Shoulders","type":"Bodyweight","instructions":["Get into a downward dog yoga position with your hands shoulder-width apart.","Lower the top of your head towards the floor by bending your elbows.","Press back up to the start."],"repRange":"8-15 reps","notes":"A progression towards handstand push-ups.","favorite":false,"isCompound":true},
     {"id":"uuid-squat-bb","name":"Barbell Back Squat","group":"Quads","type":"Barbell","instructions":["Place a barbell on your upper back/traps.","Stand with your feet shoulder-width apart, toes slightly out.","Lower your hips down and back as if sitting in a chair, keeping your chest up and back straight.","Descend until your thighs are at least parallel to the floor.","Drive back up through your heels."],"repRange":"6-10 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-goblet-squat","name":"Goblet Squat","group":"Quads","type":"Dumbbell","instructions":["Hold one end of a dumbbell vertically in front of your chest.","Keep your feet shoulder-width apart.","Lower into a deep squat, keeping your chest up.","Drive back up through your heels."],"repRange":"8-15 reps","notes":"Great for learning squat form.","favorite":false,"isCompound":true},
+    {"id":"uuid-bulgarian-split-squat","name":"Bulgarian Split Squat","group":"Quads","type":"Dumbbell","instructions":["Place the top of your rear foot on a bench behind you.","Hold dumbbells in each hand.","Lower your body until your front thigh is parallel to the floor.","Push back up to the start. Complete all reps on one side before switching."],"repRange":"8-12 reps per leg","notes":"Excellent for single-leg strength and stability.","favorite":false,"isCompound":true},
     {"id":"uuid-leg-press","name":"Leg Press","group":"Quads","type":"Machine","instructions":["Sit in the leg press machine and place your feet on the platform shoulder-width apart.","Push the platform away from you by extending your knees, without locking them out.","Lower the platform with control, do not let your lower back round off the pad."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-lunge-db","name":"Dumbbell Lunges","group":"Quads","type":"Dumbbell","instructions":["Stand holding a dumbbell in each hand.","Step forward with one leg and lower your hips until both knees are bent at a 90-degree angle.","Push off your front foot to return to the starting position. Alternate legs."],"repRange":"10-12 reps per leg","notes":"Also targets glutes and hamstrings.","favorite":false,"isCompound":false},
     {"id":"uuid-leg-extension","name":"Leg Extension","group":"Quads","type":"Machine","instructions":["Sit on the machine with your legs under the pad, knees aligned with the machine's pivot point.","Extend your legs to lift the weight, squeezing your quads at the top for a moment.","Lower slowly with control."],"repRange":"12-20 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-bodyweight-squat","name":"Bodyweight Squat","group":"Quads","type":"Bodyweight","instructions":["Stand with feet shoulder-width apart, toes slightly out.","Lower your hips down and back, keeping your chest up.","Go as low as you can comfortably, then press back up."],"repRange":"15-30 reps","notes":"","favorite":false,"isCompound":true},
     {"id":"uuid-rdl-bb","name":"Romanian Deadlift","group":"Hamstrings","type":"Barbell","instructions":["Hold a barbell in front of your thighs, feet hip-width apart.","Hinge at your hips, pushing them back while keeping your back straight and a slight bend in your knees.","Lower the bar along your shins until you feel a deep stretch in your hamstrings.","Return to the start by squeezing your glutes and driving your hips forward."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":true},
+    {"id":"uuid-single-leg-rdl-db","name":"Single Leg Dumbbell RDL","group":"Hamstrings","type":"Dumbbell","instructions":["Hold a dumbbell in one hand.","Balance on the opposite leg.","Hinge at your hip, extending your non-balancing leg straight behind you for balance.","Lower the dumbbell towards the ground until you feel a stretch in your standing hamstring.","Return to the start with control."],"repRange":"8-12 reps per leg","notes":"Great for balance and hamstring isolation.","favorite":false,"isCompound":true},
     {"id":"uuid-leg-curl-lying","name":"Lying Leg Curl","group":"Hamstrings","type":"Machine","instructions":["Lie face down on a leg curl machine with the pad on the back of your ankles.","Curl the weight up by bending your knees and squeezing your hamstrings.","Hold the contraction at the top, then lower with control."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-glute-bridge-bw","name":"Glute Bridge","group":"Hamstrings","type":"Bodyweight","instructions":["Lie on your back with your knees bent, feet flat on the floor.","Drive your hips up towards the ceiling, squeezing your glutes and hamstrings.","Hold at the top, then lower with control."],"repRange":"15-25 reps","notes":"Also works glutes.","favorite":false,"isCompound":false},
     {"id":"uuid-hip-thrust-bb","name":"Hip Thrust","group":"Glutes","type":"Barbell","instructions":["Sit on the floor with your upper back against a bench and a barbell across your hips (use a pad for comfort).","Drive your hips up towards the ceiling, squeezing your glutes hard at the top until your body is parallel to the floor.","Lower with control without touching the ground and repeat."],"repRange":"8-15 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-db-hip-thrust","name":"Dumbbell Hip Thrust","group":"Glutes","type":"Dumbbell","instructions":["Sit on the floor with your upper back against a bench.","Place a dumbbell across your hips.","Drive your hips up towards the ceiling, squeezing your glutes.","Lower with control."],"repRange":"12-20 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-db-step-up","name":"Dumbbell Step-Up","group":"Glutes","type":"Dumbbell","instructions":["Hold dumbbells in each hand and stand in front of a bench or box.","Step up onto the box with one foot, driving through your heel.","Bring your other foot up to meet it.","Step down with control and repeat, alternating lead legs."],"repRange":"10-15 reps per leg","notes":"Also works quads.","favorite":false,"isCompound":true},
+    {"id":"uuid-single-leg-glute-bridge","name":"Single Leg Glute Bridge","group":"Glutes","type":"Bodyweight","instructions":["Lie on your back with one knee bent and the other leg extended straight.","Drive the heel of your bent leg into the floor to lift your hips.","Keep your hips level. Squeeze your glute at the top.","Lower with control."],"repRange":"12-20 reps per leg","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-calf-raise-standing","name":"Standing Calf Raise","group":"Calves","type":"Machine","instructions":["Stand on a calf raise machine or a step with a weight.","Press up onto the balls of your feet as high as possible.","Hold the peak contraction, then slowly lower your heels below the level of the step to get a full stretch."],"repRange":"10-20 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-single-leg-db-calf-raise","name":"Single Leg Dumbbell Calf Raise","group":"Calves","type":"Dumbbell","instructions":["Hold a dumbbell in one hand and stand on one leg.","Use your other hand for balance.","Raise your heel as high as possible.","Lower with control."],"repRange":"12-20 reps per leg","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-bodyweight-calf-raise","name":"Bodyweight Calf Raise","group":"Calves","type":"Bodyweight","instructions":["Stand on a flat surface or the edge of a step.","Raise your heels as high as possible, squeezing your calves.","Hold for a moment at the top, then lower with control."],"repRange":"20-30 reps","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-calf-raise-seated","name":"Seated Calf Raise","group":"Calves","type":"Machine","instructions":["Sit on the machine with your knees under the pad.","Place the balls of your feet on the platform.","Raise your heels as high as possible, squeezing your soleus muscle.","Lower your heels slowly to feel a stretch."],"repRange":"15-25 reps","notes":"Targets the soleus muscle more than standing raises.","favorite":false,"isCompound":false},
     {"id":"uuid-curl-bb","name":"Barbell Curl","group":"Biceps","type":"Barbell","instructions":["Stand holding a barbell with an underhand grip, hands shoulder-width apart.","Keep your elbows close to your torso and curl the weight up towards your shoulders.","Squeeze your biceps at the top of the movement.","Lower the barbell with control until arms are nearly straight."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-curl-db-incline","name":"Incline Dumbbell Curl","group":"Biceps","type":"Dumbbell","instructions":["Sit on an incline bench, holding a dumbbell in each hand with arms hanging straight down.","Curl the weights up towards your shoulders, keeping your upper arms stationary.","Supinate your wrists (turn palms up) as you curl.","Lower with control."],"repRange":"8-12 reps","notes":"Provides a great stretch on the bicep long head.","favorite":false,"isCompound":false},
+    {"id":"uuid-concentration-curl","name":"Concentration Curl","group":"Biceps","type":"Dumbbell","instructions":["Sit on a bench and lean forward, resting your elbow against your inner thigh.","Curl the dumbbell up towards your chest, focusing on squeezing the bicep.","Lower with control."],"repRange":"10-15 reps per arm","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-preacher-curl","name":"Preacher Curl","group":"Biceps","type":"Machine","instructions":["Sit at a preacher curl machine and adjust the seat height.","Place the back of your upper arms on the pad and grab the handles.","Curl the weight up towards your shoulders, focusing on isolating the bicep.","Slowly lower the weight until your arms are almost fully extended."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-tricep-pushdown","name":"Tricep Pushdown (Rope)","group":"Triceps","type":"Cable","instructions":["Attach a rope to a high pulley.","Grab the rope with both hands and push down until your arms are fully extended.","Keep your elbows pinned to your sides and separate the rope handles at the bottom.","Slowly let the attachment return to the starting position."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-skull-crusher","name":"Skull Crushers","group":"Triceps","type":"Barbell","instructions":["Lie on a flat bench holding an EZ bar or barbell above your chest with a close grip.","Lower the bar towards your forehead by bending only at the elbows.","Extend your arms to press the weight back to the start, focusing on the triceps contraction."],"repRange":"8-12 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-db-kickback","name":"Dumbbell Kickback","group":"Triceps","type":"Dumbbell","instructions":["Hinge at your hips, keeping your back straight. Support yourself with one hand on a bench.","Hold a dumbbell in the other hand with your elbow bent at 90 degrees, upper arm parallel to the floor.","Extend your arm straight back, squeezing your tricep.","Return to the start with control."],"repRange":"10-15 reps per arm","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-close-grip-db-press","name":"Close Grip Dumbbell Press","group":"Triceps","type":"Dumbbell","instructions":["Lie on a bench holding two dumbbells together over your chest, palms facing each other.","Lower the dumbbells to your chest, keeping your elbows tucked in.","Press the weights back up, squeezing your triceps."],"repRange":"8-12 reps","notes":"Also works the chest.","favorite":false,"isCompound":true},
+    {"id":"uuid-bench-dips","name":"Bench Dips","group":"Triceps","type":"Bodyweight","instructions":["Sit on the edge of a bench and place your hands on the edge next to your hips.","Slide your butt off the bench and support your weight with your arms.","Lower your body by bending your elbows until they are at a 90-degree angle.","Press back up to the start."],"repRange":"10-20 reps","notes":"","favorite":false,"isCompound":true},
     {"id":"uuid-overhead-ext-db","name":"Overhead Tricep Extension","group":"Triceps","type":"Dumbbell","instructions":["Sit on a bench and hold one dumbbell with both hands over your head.","Lower the dumbbell behind your head by bending your elbows.","Extend your arms to lift the dumbbell back to the starting position.","Keep your upper arms stationary throughout."],"repRange":"10-15 reps","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-leg-raise-hanging","name":"Hanging Leg Raise","group":"Abs","type":"Bodyweight","instructions":["Hang from a pull-up bar.","Raise your legs up as high as you can, keeping them straight or with a slight bend for an easier variation.","Lower with control, avoiding swinging."],"repRange":"10-20 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-weighted-crunch","name":"Weighted Crunch","group":"Abs","type":"Dumbbell","instructions":["Lie on your back with your knees bent.","Hold a dumbbell or weight plate across your chest.","Crunch your shoulders off the floor, squeezing your abs.","Lower with control."],"repRange":"12-20 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-bicycle-crunch","name":"Bicycle Crunches","group":"Abs","type":"Bodyweight","instructions":["Lie on your back and bring your knees to a 90-degree angle.","Alternate bringing your opposite elbow to your opposite knee in a twisting, pedaling motion."],"repRange":"20-40 reps total","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-cable-crunch","name":"Cable Crunch","group":"Abs","type":"Cable","instructions":["Kneel in front of a high pulley with a rope attachment.","Grab the rope and pull it down so your hands are on either side of your head.","Crunch your torso downwards, bringing your elbows towards your knees, rounding your back.","Return to the starting position slowly."],"repRange":"12-20 reps","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-plank","name":"Plank","group":"Abs","type":"Bodyweight","instructions":["Hold a push-up position, but rest on your forearms instead of your hands.","Keep your back straight, and core and glutes tight.","Hold this position for the desired time."],"repRange":"30-90 seconds","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-hammer-curl","name":"Hammer Curl","group":"Biceps","type":"Dumbbell","instructions":["Stand holding a dumbbell in each hand with a neutral (hammer) grip.","Curl the weights up towards your shoulders, keeping your palms facing each other.","Squeeze at the top and lower with control."],"repRange":"8-15 reps","notes":"","favorite":false,"isCompound":false},
     {"id":"uuid-wrist-curl","name":"Wrist Curl","group":"Forearms","type":"Dumbbell","instructions":["Sit on a bench and rest your forearms on your thighs, with your wrists hanging off your knees.","Hold a light dumbbell in each hand with your palms facing up.","Curl your wrists upwards as far as possible.","Lower the dumbbells with control."],"repRange":"15-25 reps","notes":"","favorite":false,"isCompound":false},
+    {"id":"uuid-farmers-walk","name":"Farmer's Walk","group":"Forearms","type":"Dumbbell","instructions":["Hold a heavy dumbbell in each hand at your sides.","Walk for a set distance or time, maintaining an upright posture.","Keep your core engaged."],"repRange":"30-60 seconds","notes":"Excellent for grip strength and overall stability.","favorite":false,"isCompound":true},
     {"id":"uuid-reverse-wrist-curl","name":"Reverse Wrist Curl","group":"Forearms","type":"Dumbbell","instructions":["Sit on a bench and rest your forearms on your thighs, with your wrists hanging off your knees.","Hold a light dumbbell in each hand with your palms facing down.","Extend your wrists upwards as far as possible.","Lower the dumbbells with control."],"repRange":"15-25 reps","notes":"","favorite":false,"isCompound":false},
     {
         "id":"uuid-cable-kickback",
@@ -582,6 +629,7 @@
             const defaultExerciseDB = [];
 
             let ALL_MUSCLE_GROUPS = [];
+            let ALL_EQUIPMENT_TYPES = [];
 
             // --- UI ELEMENTS ---
             const ui = {
@@ -606,8 +654,7 @@
                 deletePlanBtn: document.getElementById('delete-plan-btn'), 
                 historyActionsBtn: document.getElementById('history-actions-btn'), 
                 prevDayBtn: document.getElementById('prev-day-btn'), nextDayBtn: document.getElementById('next-day-btn'),
-                aiTabSpecific: document.getElementById('ai-tab-specific'), aiTabGeneral: document.getElementById('ai-tab-general'), aiPanelSpecific: document.getElementById('ai-panel-specific'), aiPanelGeneral: document.getElementById('ai-panel-general'),
-                aiGeneralPrompt: document.getElementById('ai-general-prompt'), getAIGeneralAdviceBtn: document.getElementById('get-ai-general-advice-btn'), aiGeneralOutput: document.getElementById('ai-general-output'),
+                aiTabSpecific: document.getElementById('ai-tab-specific'), aiTabGeneral: document.getElementById('ai-tab-general'), aiPanelSpecific: document.getElementById('ai-panel-specific'), openWorkoutChatBtn: document.getElementById('open-workout-chat-btn'),
                 workoutStatusControls: document.getElementById('workout-status-controls'),
                 unitToggleKg: document.getElementById('unit-toggle-kg'), unitToggleLbs: document.getElementById('unit-toggle-lbs'),
                 // Plan Generator
@@ -657,6 +704,7 @@
                 localStorage.setItem('fitTrackAI_warmups', JSON.stringify(warmups));
                 localStorage.setItem('fitTrackAI_workoutStatus', JSON.stringify(workoutStatusHistory));
                 localStorage.setItem('fitTrackAI_userSettings', JSON.stringify(userSettings));
+                localStorage.setItem('fitTrackAI_workoutChatHistory', JSON.stringify(workoutChatHistory));
             }
 
             async function loadAllData() {
@@ -676,12 +724,14 @@
 
                 exerciseDB.forEach(ex => { if (!ex.id) ex.id = crypto.randomUUID(); });
                 ALL_MUSCLE_GROUPS = [...new Set(exerciseDB.map(ex => ex.group))].sort();
+                ALL_EQUIPMENT_TYPES = [...new Set(exerciseDB.map(ex => ex.type))].sort();
 
                 workoutPlan = JSON.parse(localStorage.getItem('fitTrackAI_workoutPlan')) || {};
                 workoutHistory = JSON.parse(localStorage.getItem('fitTrackAI_workoutHistory')) || [];
                 warmups = JSON.parse(localStorage.getItem('fitTrackAI_warmups')) || defaultWarmups;
                 workoutStatusHistory = JSON.parse(localStorage.getItem('fitTrackAI_workoutStatus')) || {};
                 userSettings = JSON.parse(localStorage.getItem('fitTrackAI_userSettings')) || { unit: 'kg' };
+                workoutChatHistory = JSON.parse(localStorage.getItem('fitTrackAI_workoutChatHistory')) || [];
             }
 
             // --- CORE & HELPER FUNCTIONS ---
@@ -1156,31 +1206,6 @@
                 showModal(ui.workoutModal);
             };
 
-            async function getAIGeneralAdvice() {
-                const userPrompt = ui.aiGeneralPrompt.value.trim();
-                if (!userPrompt) { ui.aiGeneralOutput.innerHTML = `<p class="text-yellow-400">Please enter a question.</p>`; return; }
-                
-                const btn = ui.getAIGeneralAdviceBtn;
-                btn.disabled = true; btn.querySelector('.btn-text').style.display = 'none'; btn.querySelector('.loader').classList.remove('hidden'); ui.aiGeneralOutput.innerHTML = '';
-                const twoWeeksAgo = new Date(); twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-                const recentHistory = workoutHistory.filter(log => new Date(log.date) >= twoWeeksAgo).map(log => {
-                    const sets = typeof log.sets === 'string' ? JSON.parse(log.sets) : log.sets;
-                    return `On ${new Date(log.date.replace(/-/g, '/')).toLocaleDateString()}: ${log.name} - ${sets.map(s => s.map(p => `${p.weight}kg x ${p.reps}r`).join('/')).join(', ')}`;
-                }).join('; ');
-                const fullExerciseList = exerciseDB.map(ex => `${ex.name} (${ex.group})`).join(', ');
-                const systemPrompt = `You are FitTrack AI, an expert fitness coach. Your answers must be encouraging, evidence-based, and concise. Here is a summary of the user's workout data from the last 14 days: ${recentHistory || "No workouts logged."}. Here is the user's full list of available exercises: ${fullExerciseList}. Use this data to answer the user's question precisely and personally. Keep responses under 150 words.`;
-                const apiUrl = getApiUrl('gemini-2.5-flash-preview-05-20');
-                const payload = { contents: [{ parts: [{ text: userPrompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
-                try {
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
-                    const result = await response.json();
-                    let text = result.candidates[0].content.parts[0].text;
-                    ui.aiGeneralOutput.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`;
-                } catch (error) { console.error("AI General Advice Error:", error); ui.aiGeneralOutput.innerHTML = `<p class="text-red-400">Could not get AI advice.</p>`;
-                } finally { btn.disabled = false; btn.querySelector('.btn-text').style.display = 'inline'; btn.querySelector('.loader').classList.add('hidden'); }
-            }
-
             function openExerciseDetailModal(itemName, itemType, dayType = null) {
                 let item;
                 if (itemType === 'warmup') {
@@ -1476,10 +1501,9 @@
 
 
             // AI Coach Tab Listeners
-            ui.aiTabSpecific.addEventListener('click', () => { ui.aiTabSpecific.classList.add('border-accent', 'text-primary-text'); ui.aiTabSpecific.classList.remove('border-transparent', 'text-secondary-text'); ui.aiTabGeneral.classList.add('border-transparent', 'text-secondary-text'); ui.aiTabGeneral.classList.remove('border-accent', 'text-primary-text'); ui.aiPanelSpecific.classList.remove('hidden'); ui.aiPanelGeneral.classList.add('hidden'); });
-            ui.aiTabGeneral.addEventListener('click', () => { ui.aiTabGeneral.classList.add('border-accent', 'text-primary-text'); ui.aiTabGeneral.classList.remove('border-transparent', 'text-secondary-text'); ui.aiTabSpecific.classList.add('border-transparent', 'text-secondary-text'); ui.aiTabSpecific.classList.remove('border-accent', 'text-primary-text'); ui.aiPanelGeneral.classList.remove('hidden'); ui.aiPanelSpecific.classList.add('hidden'); });
-            ui.getAIGeneralAdviceBtn.addEventListener('click', getAIGeneralAdvice);
-
+            ui.aiTabSpecific.addEventListener('click', () => { ui.aiTabSpecific.classList.add('border-accent', 'text-primary-text'); ui.aiTabSpecific.classList.remove('border-transparent', 'text-secondary-text'); ui.aiTabGeneral.classList.add('border-transparent', 'text-secondary-text'); ui.aiTabGeneral.classList.remove('border-accent', 'text-primary-text'); ui.aiPanelSpecific.classList.remove('hidden'); document.getElementById('ai-panel-general').classList.add('hidden'); });
+            ui.aiTabGeneral.addEventListener('click', () => { ui.aiTabGeneral.classList.add('border-accent', 'text-primary-text'); ui.aiTabGeneral.classList.remove('border-transparent', 'text-secondary-text'); ui.aiTabSpecific.classList.add('border-transparent', 'text-secondary-text'); ui.aiTabSpecific.classList.remove('border-accent', 'text-primary-text'); document.getElementById('ai-panel-general').classList.remove('hidden'); ui.aiPanelSpecific.classList.add('hidden'); });
+            
             // Plan Generator Listeners
             ui.aiPlanGeneratorBtn.addEventListener('click', () => {
                 const splitSelect = document.getElementById('ai-plan-split-select');
@@ -1602,17 +1626,25 @@
                 
                 const libraryList = document.getElementById('exercise-library-list');
                 const filterSelect = document.getElementById('exercise-library-filter');
+                const equipmentFilterSelect = document.getElementById('exercise-library-equipment-filter');
                 const searchInput = document.getElementById('exercise-library-search');
 
                 filterSelect.innerHTML = '<option value="">All Groups</option>' + ALL_MUSCLE_GROUPS.map(g => `<option value="${g}">${g}</option>`).join('');
+                equipmentFilterSelect.innerHTML = '<option value="">All Equipment</option>' + ALL_EQUIPMENT_TYPES.map(t => `<option value="${t}">${t}</option>`).join('');
+
                 filterSelect.value = group || "";
+                equipmentFilterSelect.value = "";
                 searchInput.value = '';
                 
                 const preSelected = libraryModalContext.purpose === 'pref' ? exercisePrefs[group] : undefined;
 
-                const renderLibrary = (filter = '', search = '') => {
+                const renderLibrary = (muscleFilter = '', search = '', equipmentFilter = '') => {
                     libraryList.innerHTML = exerciseDB
-                        .filter(ex => (filter ? ex.group === filter : true) && (search ? ex.name.toLowerCase().includes(search.toLowerCase()) : true))
+                        .filter(ex => 
+                            (muscleFilter ? ex.group === muscleFilter : true) && 
+                            (equipmentFilter ? ex.type === equipmentFilter : true) &&
+                            (search ? ex.name.toLowerCase().includes(search.toLowerCase()) : true)
+                        )
                         .sort((a,b) => a.name.localeCompare(b.name))
                         .map(ex => `
                         <div class="flex items-center justify-between p-2 rounded-md hover:bg-input-bg group">
@@ -1628,9 +1660,14 @@
                         lucide.createIcons();
                 };
                 
-                renderLibrary(group || '');
-                searchInput.oninput = (e) => renderLibrary(filterSelect.value, e.target.value);
-                filterSelect.onchange = (e) => renderLibrary(e.target.value, searchInput.value);
+                const renderFilteredLibrary = () => {
+                    renderLibrary(filterSelect.value, searchInput.value, equipmentFilterSelect.value);
+                };
+                
+                renderFilteredLibrary();
+                searchInput.oninput = renderFilteredLibrary;
+                filterSelect.onchange = renderFilteredLibrary;
+                equipmentFilterSelect.onchange = renderFilteredLibrary;
                 
                 showModal(ui.exerciseLibraryModal);
             };
@@ -2077,6 +2114,98 @@
             ui.unitToggleLbs.addEventListener('click', () => convertModalWeights('lbs'));
 
             window.addEventListener('beforeunload', (e) => { if (isLogging) { e.preventDefault(); e.returnValue = ''; } });
+
+            // --- AI Chat Functions ---
+            function renderChatHistory() {
+                const chatHistoryContainer = document.getElementById('ai-chat-history');
+                if(workoutChatHistory.length === 0) {
+                     chatHistoryContainer.innerHTML = `<div class="text-center text-secondary-text p-4"><i data-lucide="bot" class="w-10 h-10 mx-auto mb-2"></i><p>Hello! I'm your AI Coach. Ask me anything about your workout plan, exercise form, or general fitness.</p></div>`;
+                     lucide.createIcons();
+                } else {
+                    chatHistoryContainer.innerHTML = '';
+                    workoutChatHistory.forEach(msg => {
+                        addMessageToChat(msg.parts[0].text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>'), msg.role);
+                    });
+                }
+            }
+
+            function addMessageToChat(message, sender, isLoading = false) {
+                 const chatHistoryContainer = document.getElementById('ai-chat-history');
+                 if (workoutChatHistory.length === 1 && sender === 'user') { chatHistoryContainer.innerHTML = ''; }
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `p-3 rounded-lg max-w-[85%] ${sender === 'user' ? 'bg-blue-600 self-end' : 'bg-input-bg self-start'}`;
+                if(isLoading) messageDiv.id = 'ai-loading-message';
+                messageDiv.innerHTML = message;
+                chatHistoryContainer.appendChild(messageDiv);
+                chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
+            }
+
+             function updateLastMessage(newMessage) {
+                const loadingMessage = document.getElementById('ai-loading-message');
+                if (loadingMessage) {
+                    loadingMessage.innerHTML = newMessage;
+                    loadingMessage.removeAttribute('id');
+                }
+             }
+
+            async function handleAiChatSend() {
+                const chatInput = document.getElementById('ai-chat-input');
+                const sendBtn = document.getElementById('ai-chat-send-btn');
+                const userInput = chatInput.value.trim();
+                if(!userInput) return;
+
+                workoutChatHistory.push({ role: "user", parts: [{ text: userInput }] });
+                addMessageToChat(userInput, 'user');
+                chatInput.value = '';
+                sendBtn.disabled = true;
+                addMessageToChat('<div class="loader"></div>', 'model', true);
+
+                try {
+                    const twoWeeksAgo = new Date(); twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+                    const recentHistory = workoutHistory.filter(log => new Date(log.date) >= twoWeeksAgo).map(log => {
+                        const sets = typeof log.sets === 'string' ? JSON.parse(log.sets) : log.sets;
+                        return `On ${new Date(log.date.replace(/-/g, '/')).toLocaleDateString()}: ${log.name} - ${sets.map(s => s.map(p => `${p.weight}kg x ${p.reps}r`).join('/')).join(', ')}`;
+                    }).join('; ');
+                    
+                    const context = `
+                        User's Workout Plan: ${JSON.stringify(workoutPlan)}
+                        User's Exercise Library: ${exerciseDB.map(ex => `${ex.name} (${ex.group})`).join(', ')}
+                        Last 14 Days Workout History: ${recentHistory || "No workouts logged."}
+                    `;
+                    const systemPrompt = `You are FitTrack AI, an expert fitness and workout coach. Analyze the user's provided data (plan, history, available exercises) to give specific, actionable advice based on their question. Be encouraging and provide clear, concise answers. Here is the user's data context: ${context}`;
+                    
+                    const response = await fetch(getApiUrl('gemini-2.5-flash-preview-05-20'), {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: workoutChatHistory,
+                            systemInstruction: { parts: [{ text: systemPrompt }] }
+                        })
+                    });
+                    if(!response.ok) throw new Error('Failed to get response from AI.');
+                    const result = await response.json();
+                    const aiResponse = result.candidates[0].content.parts[0].text;
+                    
+                    workoutChatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
+                    updateLastMessage(aiResponse.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>'));
+
+                } catch(error) {
+                    updateLastMessage('Sorry, I am having trouble connecting right now. Please try again later.');
+                    workoutChatHistory.pop();
+                } finally {
+                    sendBtn.disabled = false;
+                    saveData();
+                }
+            }
+            
+            ui.openWorkoutChatBtn.addEventListener('click', () => {
+                renderChatHistory();
+                showModal(document.getElementById('ai-workout-chat-modal'));
+            });
+            document.getElementById('close-ai-workout-chat-modal-btn').addEventListener('click', () => hideModal(document.getElementById('ai-workout-chat-modal')));
+            document.getElementById('ai-chat-send-btn').addEventListener('click', handleAiChatSend);
+            document.getElementById('ai-chat-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') handleAiChatSend(); });
+
 
             // --- INITIALIZATION ---
             async function initializeApp() {

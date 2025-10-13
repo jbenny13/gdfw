@@ -322,14 +322,6 @@
                                 <div class="flex justify-between items-center mb-2 border-b border-border-color pb-1">
                                     <h5 class="font-semibold text-lg">Plan</h5>
                                     <div class="flex items-center gap-2">
-                                        <!-- Plan Button -->
-                                        <div class="relative group" data-menu-group>
-                                            <button class="btn btn-secondary !p-1.5" title="Plan Settings"><i data-lucide="clipboard-list" class="w-4 h-4 pointer-events-none"></i></button>
-                                            <div class="absolute right-0 mt-2 w-48 border border-border-color rounded-md shadow-lg submenu actions-dropdown">
-                                                <button id="edit-plan-btn" class="w-full text-left px-4 py-2 text-sm text-primary-text hover:bg-input-bg flex items-center gap-2 rounded-t-md"><i data-lucide="edit" class="w-4 h-4"></i> Edit Plan</button>
-                                                <button id="delete-plan-btn" class="w-full text-left px-4 py-2 text-sm btn-danger hover:bg-input-bg flex items-center gap-2 rounded-b-md"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete Plan</button>
-                                            </div>
-                                        </div>
                                         <!-- Exercise Button -->
                                         <div class="relative group" data-menu-group>
                                             <button class="btn btn-secondary !p-1.5" title="Exercise Settings"><i data-lucide="dumbbell" class="w-4 h-4 pointer-events-none"></i></button>
@@ -673,8 +665,6 @@
                 warmupNameInput: document.getElementById('warmup-name'), warmupInstructionsInput: document.getElementById('warmup-instructions'), saveWarmupBtn: document.getElementById('save-warmup-btn'),
                 dayViewDateDisplayBtn: document.getElementById('day-view-date-display-btn'), dayViewStatus: document.getElementById('day-view-status'), dayViewDateDisplay: document.getElementById('day-view-date-display-btn'),
                 workoutPlanForDay: document.getElementById('workout-plan-for-day'), historyDayContent: document.getElementById('history-day-content'), 
-                deletePlanBtn: document.getElementById('delete-plan-btn'), 
-                historyActionsBtn: document.getElementById('history-actions-btn'), 
                 prevDayBtn: document.getElementById('prev-day-btn'), nextDayBtn: document.getElementById('next-day-btn'),
                 aiTabSpecific: document.getElementById('ai-tab-specific'), aiTabGeneral: document.getElementById('ai-tab-general'), aiPanelSpecific: document.getElementById('ai-panel-specific'), openWorkoutChatBtn: document.getElementById('open-workout-chat-btn'),
                 workoutStatusControls: document.getElementById('workout-status-controls'),
@@ -704,7 +694,6 @@
                 // Edit Mode Toolbar
                 planViewHeader: document.getElementById('plan-view-header'),
                 editModeToolbar: document.getElementById('edit-mode-toolbar'),
-                editPlanBtn: document.getElementById('edit-plan-btn'),
                 editModeFavoriteBtn: document.getElementById('edit-mode-favorite-btn'),
                 editModeDeleteBtn: document.getElementById('edit-mode-delete-btn'),
                 editModeDoneBtn: document.getElementById('edit-mode-done-btn')
@@ -1510,16 +1499,6 @@
                 updateUI();
             })});
             
-             ui.deletePlanBtn.addEventListener('click', () => {
-                showConfirmModal('Delete Plan?', 'This will delete your current workout plan and schedule. This action cannot be undone.', () => {
-                    workoutPlan = { name: "No Plan", schedule: {}, workouts: [] };
-                    saveData();
-                    updateUI();
-                    showCustomAlert("Plan Deleted", "Your workout plan has been removed.");
-                });
-            });
-            
-
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('[data-menu-group]')) {
                     document.querySelectorAll('.group.open').forEach(group => {
@@ -2070,12 +2049,6 @@
                 }
             });
 
-            ui.editPlanBtn.addEventListener('click', () => {
-                ui.workoutPlanForDay.classList.add('edit-mode');
-                ui.planViewHeader.classList.add('hidden');
-                ui.editModeToolbar.classList.remove('hidden');
-            });
-
             ui.editModeDoneBtn.addEventListener('click', () => {
                 ui.workoutPlanForDay.classList.remove('edit-mode');
                 ui.planViewHeader.classList.remove('hidden');
@@ -2245,7 +2218,7 @@
                     const result = await response.json();
                     const aiResponse = result.candidates[0].content.parts[0].text;
                     
-                    workoutChatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
+                    chatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
                     updateLastMessage(aiResponse.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>'));
 
                 } catch(error) {

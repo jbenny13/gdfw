@@ -357,6 +357,17 @@
             border-top: 2px solid var(--edit);
         }
 
+        /* GIF ANIMATION STYLES */
+        #exercise-gif-animation {
+             /* The animation-name will be set dynamically if a cached image is found */
+            background-size: 800% 100%;
+        }
+        
+        @keyframes play-sprite {
+            from { background-position: 0% 0; }
+            to { background-position: 100% 0; }
+        }
+
     </style>
 </head>
 <body class="antialiased">
@@ -399,12 +410,12 @@
             </div>
             <nav>
                 <ul class="flex flex-col space-y-4 text-lg font-medium">
-                      <li><a href="index.html" class="nav-link w-full block">Home</a></li>
-                      <li><a href="nutrition.html" class="nav-link w-full block">Nutrition</a></li>
-                      <li><a href="workouts.html" class="nav-link active w-full block">Workouts</a></li>
-                      <li><a href="goals.html" class="nav-link w-full block">Goals</a></li>
-                      <li><a href="sleep.html" class="nav-link w-full block">Sleep</a></li>
-                      <li><a href="settings.html" class="nav-link w-full block">Settings</a></li>
+                        <li><a href="index.html" class="nav-link w-full block">Home</a></li>
+                        <li><a href="nutrition.html" class="nav-link w-full block">Nutrition</a></li>
+                        <li><a href="workouts.html" class="nav-link active w-full block">Workouts</a></li>
+                        <li><a href="goals.html" class="nav-link w-full block">Goals</a></li>
+                        <li><a href="sleep.html" class="nav-link w-full block">Sleep</a></li>
+                        <li><a href="settings.html" class="nav-link w-full block">Settings</a></li>
                 </ul>
             </nav>
         </div>
@@ -412,21 +423,21 @@
 
         <main>
              <div class="flex flex-col sm:flex-row justify-between items-center mb-8 px-2">
-                  <div>
+                    <div>
                         <h2 id="plan-main-title" class="text-2xl sm:text-3xl font-bold">Your Workout Plan</h2>
                         <p id="plan-subtitle" class="text-gray-400 mt-1 sm:mt-2">Your personalized workout schedule.</p>
-                  </div>
-                  <div class="flex flex-col sm:flex-row gap-2 mt-4 sm:mt-0 w-full sm:w-auto">
-                    <button id="edit-plan-btn" class="btn btn-secondary w-full sm:w-auto">
-                        <i data-lucide="edit" class="w-4 h-4"></i>
-                        <span>Edit Current Plan</span>
-                    </button>
-                    <button id="ai-plan-generator-btn" class="btn btn-primary w-full sm:w-auto">
-                        <i data-lucide="wand-2" class="w-4 h-4"></i>
-                        <span>New AI Plan</span>
-                    </button>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-2 mt-4 sm:mt-0 w-full sm:w-auto">
+                      <button id="edit-plan-btn" class="btn btn-secondary w-full sm:w-auto">
+                          <i data-lucide="edit" class="w-4 h-4"></i>
+                          <span>Edit Current Plan</span>
+                      </button>
+                      <button id="ai-plan-generator-btn" class="btn btn-primary w-full sm:w-auto">
+                          <i data-lucide="wand-2" class="w-4 h-4"></i>
+                          <span>New AI Plan</span>
+                      </button>
+                    </div>
                 </div>
-              </div>
             
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-8">
                 <div class="lg:col-span-4 content-card">
@@ -494,34 +505,34 @@
                     </div>
                 </div>
                  <div class="content-card lg:col-span-4">
-                       <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-center">AI Coach</h3>
-                      
-                       <div class="flex border-b border-border-color mb-4">
-                           <button id="ai-tab-specific" class="flex-1 py-2 text-center font-semibold border-b-2 border-accent text-primary-text">Specific Advice</button>
-                           <button id="ai-tab-general" class="flex-1 py-2 text-center font-semibold border-b-2 border-transparent text-secondary-text">General Chat</button>
-                       </div>
+                        <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-center">AI Coach</h3>
+                        
+                        <div class="flex border-b border-border-color mb-4">
+                            <button id="ai-tab-specific" class="flex-1 py-2 text-center font-semibold border-b-2 border-accent text-primary-text">Specific Advice</button>
+                            <button id="ai-tab-general" class="flex-1 py-2 text-center font-semibold border-b-2 border-transparent text-secondary-text">General Chat</button>
+                        </div>
 
-                       <div id="ai-panel-specific">
-                           <p class="text-gray-400 text-sm mb-3 text-center">Select an exercise to get science-based advice on when to add weight or reps.</p>
-                           <div class="flex flex-col sm:flex-row gap-2">
-                               <select id="ai-advice-exercise-select" class="w-full form-select">
-                                   <option value="">Select an exercise...</option>
-                               </select>
-                               <button id="get-ai-advice-btn" class="btn btn-secondary w-full sm:w-auto">
-                                   <span class="btn-text">Get Advice</span>
-                                   <div class="loader hidden ml-2"></div>
-                               </button>
-                           </div>
-                           <div id="ai-advice-output" class="mt-4 p-3 bg-black/30 rounded-md text-sm min-h-[50px]"></div>
-                       </div>
+                        <div id="ai-panel-specific">
+                            <p class="text-gray-400 text-sm mb-3 text-center">Select an exercise to get science-based advice on when to add weight or reps.</p>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <select id="ai-advice-exercise-select" class="w-full form-select">
+                                    <option value="">Select an exercise...</option>
+                                </select>
+                                <button id="get-ai-advice-btn" class="btn btn-secondary w-full sm:w-auto">
+                                    <span class="btn-text">Get Advice</span>
+                                    <div class="loader hidden ml-2"></div>
+                                </button>
+                            </div>
+                            <div id="ai-advice-output" class="mt-4 p-3 bg-black/30 rounded-md text-sm min-h-[50px]"></div>
+                        </div>
 
-                       <div id="ai-panel-general" class="hidden text-center">
-                           <p class="text-gray-400 text-sm mb-4">Ask for specific advice about your plan, or have a general chat about your training.</p>
-                           <div class="bg-black/30 p-4 rounded-lg">
-                               <i data-lucide="message-circle" class="w-12 h-12 text-blue-400 mx-auto mb-4"></i>
-                               <button id="open-workout-chat-btn" class="btn btn-primary w-full">Chat with AI Coach</button>
-                           </div>
-                       </div>
+                        <div id="ai-panel-general" class="hidden text-center">
+                            <p class="text-gray-400 text-sm mb-4">Ask for specific advice about your plan, or have a general chat about your training.</p>
+                            <div class="bg-black/30 p-4 rounded-lg">
+                                <i data-lucide="message-circle" class="w-12 h-12 text-blue-400 mx-auto mb-4"></i>
+                                <button id="open-workout-chat-btn" class="btn btn-primary w-full">Chat with AI Coach</button>
+                            </div>
+                        </div>
                   </div>
             </div>
         </main>
@@ -563,32 +574,32 @@
             </div>
             <div class="space-y-8">
                  <div>
-                       <h3 class="font-bold text-lg text-blue-400 mb-2">Weekly Schedule</h3>
-                       <p class="text-sm text-secondary-text mb-4">Tap a day to cycle through your available workout types. This changes when you do each workout.</p>
-                       <div id="edit-plan-schedule-builder" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2"></div>
+                        <h3 class="font-bold text-lg text-blue-400 mb-2">Weekly Schedule</h3>
+                        <p class="text-sm text-secondary-text mb-4">Tap a day to cycle through your available workout types. This changes when you do each workout.</p>
+                        <div id="edit-plan-schedule-builder" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2"></div>
                  </div>
                  <div>
-                     <h3 class="font-bold text-lg text-blue-400 mb-2">Manage Warmups</h3>
-                     <p class="text-sm text-secondary-text mb-4">Select a workout type to manage its warm-up routine.</p>
-                     <div class="flex flex-col sm:flex-row gap-2 items-center mb-4">
+                    <h3 class="font-bold text-lg text-blue-400 mb-2">Manage Warmups</h3>
+                    <p class="text-sm text-secondary-text mb-4">Select a workout type to manage its warm-up routine.</p>
+                    <div class="flex flex-col sm:flex-row gap-2 items-center mb-4">
                          <select id="edit-plan-warmup-day-type-select" class="form-select"></select>
                          <button id="edit-plan-add-warmup-btn" class="btn btn-secondary w-full sm:w-auto">
                              <i data-lucide="plus" class="w-4 h-4"></i>
                              <span>Add Warmup</span>
                          </button>
-                     </div>
-                     <div id="edit-plan-warmup-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2 border border-border-color p-2 rounded-lg min-h-[100px]">
-                     </div>
+                    </div>
+                    <div id="edit-plan-warmup-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2 border border-border-color p-2 rounded-lg min-h-[100px]">
+                    </div>
                  </div>
                 <div>
                     <h3 class="font-bold text-lg text-blue-400 mb-2">Manage Workouts</h3>
                     <p class="text-sm text-secondary-text mb-4">Select a workout type to add, remove, or reorder its exercises.</p>
                     <div class="flex flex-col sm:flex-row gap-2 items-center mb-4">
-                       <select id="edit-plan-day-type-select" class="form-select"></select>
-                       <button id="edit-plan-add-exercise-btn" class="btn btn-secondary w-full sm:w-auto">
-                           <i data-lucide="plus" class="w-4 h-4"></i>
-                           <span>Add Exercise</span>
-                       </button>
+                        <select id="edit-plan-day-type-select" class="form-select"></select>
+                        <button id="edit-plan-add-exercise-btn" class="btn btn-secondary w-full sm:w-auto">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Add Exercise</span>
+                        </button>
                     </div>
                     <div id="edit-plan-exercise-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2 border border-border-color p-2 rounded-lg min-h-[100px]">
                     </div>
@@ -599,7 +610,16 @@
     </div>
 
     <div id="custom-exercise-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-6"><h2 id="custom-exercise-modal-title" class="text-xl sm:text-2xl font-bold">Add Custom Exercise</h2><button id="close-custom-exercise-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div id="custom-exercise-initial-choice" class="flex gap-4"><button id="custom-exercise-ai-choice-btn" class="btn btn-primary w-full"><i data-lucide="sparkles"></i>Use AI</button><button id="custom-exercise-manual-choice-btn" class="btn btn-secondary w-full"><i data-lucide="edit-3"></i>Manual</button></div><form id="custom-exercise-form" class="hidden space-y-4 mt-4"><div><label for="custom-exercise-name" class="form-label">Exercise Name *</label><div class="flex gap-2"><input type="text" id="custom-exercise-name" class="form-input" required placeholder="e.g., Kneeling Landmine Press"><button type="button" id="ai-generate-exercise-details-btn" class="btn btn-secondary !px-3 hidden"><i data-lucide="sparkles"></i></button></div></div><div id="custom-exercise-details-container" class="space-y-4 pt-4 border-t border-border-color"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-border-color"><div id="custom-exercise-img-loader" class="loader hidden"></div><img id="custom-exercise-img" src="" class="w-full h-full object-contain hidden"></div><div class="grid grid-cols-2 gap-2"><label for="custom-img-upload" class="btn btn-secondary !py-1 text-xs cursor-pointer">Upload Image<input type="file" id="custom-img-upload" class="hidden" accept="image/*"></label><input type="url" id="custom-img-url" class="form-input !py-1 text-xs" placeholder="Or paste image/video URL"></div><div><label for="custom-exercise-instructions" class="form-label">Instructions</label><textarea id="custom-exercise-instructions" rows="5" class="form-input mt-1"></textarea></div><div><label for="custom-exercise-rep-range" class="form-label">Rep Range</label><input type="text" id="custom-exercise-rep-range" class="form-input mt-1"></div><div class="grid grid-cols-2 gap-4"><div><label for="custom-exercise-group" class="form-label">Muscle Group</label><select id="custom-exercise-group" class="form-select mt-1"></select></div><div><label for="custom-exercise-type" class="form-label">Equipment</label><select id="custom-exercise-type" class="form-select mt-1"></select></div></div><div id="custom-exercise-action-buttons" class="flex flex-col sm:flex-row gap-2 pt-2"></div></div></form></div></div>
-    <div id="exercise-detail-modal" class="modal-backdrop"><div class="modal-content !max-w-xl custom-scrollbar"><div class="flex justify-between items-center mb-4"><h2 id="exercise-detail-title" class="text-xl sm:text-2xl font-bold">Exercise Details</h2><button id="close-exercise-detail-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4"><div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-gray-800"><img id="exercise-detail-video" src="" alt="Exercise demonstration" class="w-full h-full object-contain"></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Instructions</h3><textarea id="exercise-detail-instructions" class="form-input mt-1 w-full bg-input-bg text-sm transition-colors" disabled style="resize: none; overflow-y: hidden;"></textarea><button id="save-instructions-btn" class="mt-2 w-full btn btn-secondary">Edit Instructions</button></div><div class="grid grid-cols-2 gap-4"><div><h3 class="font-bold text-lg text-blue-400 mb-2">Sets</h3><p id="exercise-detail-sets" class="text-gray-300"></p></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Rep Range</h3><p id="exercise-detail-rep-range" class="text-gray-300"></p></div></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Personal Notes & Advice</h3><textarea id="exercise-detail-notes" rows="4" class="form-input mt-1" placeholder="Add your personal cues, weight progression goals, etc."></textarea><button id="save-exercise-notes-btn" class="mt-2 w-full btn btn-secondary">Save Notes</button></div><button id="log-from-detail-btn" class="w-full btn btn-primary mt-4">Log This Exercise</button></div></div></div>
+    <div id="exercise-detail-modal" class="modal-backdrop"><div class="modal-content !max-w-xl custom-scrollbar"><div class="flex justify-between items-center mb-4"><h2 id="exercise-detail-title" class="text-xl sm:text-2xl font-bold">Exercise Details</h2><button id="close-exercise-detail-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><div class="space-y-4">
+        <!-- MODIFIED: Replaced img with a div container for the animation -->
+        <div class="w-full aspect-video bg-black rounded-lg flex items-center justify-center overflow-hidden border border-gray-800 relative">
+            <div id="exercise-gif-loader" class="loader hidden"></div>
+            <div id="exercise-gif-animation" class="w-full h-full bg-no-repeat bg-contain bg-center"></div>
+             <button id="redo-gif-btn" class="absolute bottom-2 right-2 btn btn-secondary !p-1.5 hidden" title="Redo Animation">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+        </div>
+        <div><h3 class="font-bold text-lg text-blue-400 mb-2">Instructions</h3><textarea id="exercise-detail-instructions" class="form-input mt-1 w-full bg-input-bg text-sm transition-colors" disabled style="resize: none; overflow-y: hidden;"></textarea><button id="save-instructions-btn" class="mt-2 w-full btn btn-secondary">Edit Instructions</button></div><div class="grid grid-cols-2 gap-4"><div><h3 class="font-bold text-lg text-blue-400 mb-2">Sets</h3><p id="exercise-detail-sets" class="text-gray-300"></p></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Rep Range</h3><p id="exercise-detail-rep-range" class="text-gray-300"></p></div></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Personal Notes & Advice</h3><textarea id="exercise-detail-notes" rows="4" class="form-input mt-1" placeholder="Add your personal cues, weight progression goals, etc."></textarea><button id="save-exercise-notes-btn" class="mt-2 w-full btn btn-secondary">Save Notes</button></div><button id="log-from-detail-btn" class="w-full btn btn-primary mt-4">Log This Exercise</button></div></div></div>
     <div id="warmup-manage-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 id="warmup-form-title" class="text-xl sm:text-2xl font-bold">Manage Warm-up</h2><button id="close-warmup-manage-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="warmup-form" class="space-y-3"><div><label for="warmup-name" class="form-label">Name</label><input type="text" id="warmup-name" class="form-input mt-1" required></div><div><label for="warmup-instructions" class="form-label">Instructions (one per line)</label><textarea id="warmup-instructions" rows="4" class="form-input mt-1"></textarea></div><button type="submit" id="save-warmup-btn" class="w-full btn btn-primary">Add Warm-up</button></form></div></div>
     <div id="workout-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="modal-title" class="text-xl sm:text-2xl font-bold">Log Exercise</h2><div class="flex items-center gap-1 border border-border-color rounded-lg p-1"><button type="button" id="unit-toggle-kg" class="btn !py-1 !px-3 text-sm unit-toggle-btn">kg</button><button type="button" id="unit-toggle-lbs" class="btn !py-1 !px-3 text-sm unit-toggle-btn">lbs</button></div><button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="workout-log-form"><div class="space-y-4"><div id="sets-container"></div><button type="button" id="add-set-btn" class="w-full btn btn-secondary">Add Set</button><button type="submit" id="save-workout-btn" class="w-full btn btn-primary mt-2">Save Workout</button></div></form></div></div>
     <div id="exercise-library-modal" class="modal-backdrop"><div class="modal-content !max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-xl sm:text-2xl font-bold" id="exercise-library-title">Exercise Library</h2><button id="close-exercise-library-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div>
@@ -696,7 +716,8 @@
                 progressExerciseSelect: document.getElementById('progress-exercise-select'), clearHistoryBtn: document.getElementById('clear-history-btn'),
                 aiAdviceExerciseSelect: document.getElementById('ai-advice-exercise-select'), getAIAdviceBtn: document.getElementById('get-ai-advice-btn'), aiAdviceOutput: document.getElementById('ai-advice-output'),
                 exerciseDetailModal: document.getElementById('exercise-detail-modal'), closeExerciseDetailModalBtn: document.getElementById('close-exercise-detail-modal-btn'), exerciseDetailTitle: document.getElementById('exercise-detail-title'),
-                exerciseDetailVideo: document.getElementById('exercise-detail-video'), exerciseDetailInstructions: document.getElementById('exercise-detail-instructions'), saveInstructionsBtn: document.getElementById('save-instructions-btn'), exerciseDetailRepRange: document.getElementById('exercise-detail-rep-range'),
+                exerciseGifContainer: document.getElementById('exercise-detail-gif-container'), exerciseGifLoader: document.getElementById('exercise-gif-loader'), exerciseGifAnimation: document.getElementById('exercise-gif-animation'), redoGifBtn: document.getElementById('redo-gif-btn'),
+                exerciseDetailInstructions: document.getElementById('exercise-detail-instructions'), saveInstructionsBtn: document.getElementById('save-instructions-btn'), exerciseDetailRepRange: document.getElementById('exercise-detail-rep-range'),
                 exerciseDetailNotes: document.getElementById('exercise-detail-notes'), saveExerciseNotesBtn: document.getElementById('save-exercise-notes-btn'), logFromDetailBtn: document.getElementById('log-from-detail-btn'),
                 dayViewDateDisplayBtn: document.getElementById('day-view-date-display-btn'), dayViewStatus: document.getElementById('day-view-status'), dayViewDateDisplay: document.getElementById('day-view-date-display-btn'),
                 workoutPlanForDay: document.getElementById('workout-plan-for-day'), historyDayContent: document.getElementById('history-day-content'), 
@@ -760,6 +781,51 @@
                 type: 'line', data: { labels: [], datasets: [] },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { color: '#FFFFFF' }, grid: { color: 'rgba(255, 255, 255, 0.2)' } }, x: { ticks: { color: '#FFFFFF' }, grid: { color: 'rgba(255, 255, 255, 0.2)' } } }, plugins: { legend: { labels: { color: '#FFFFFF' } } } }
             });
+
+            // --- IndexedDB for GIF Caching ---
+            let db;
+            function openDB() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open('FitTrackGifsDB', 1);
+                    request.onupgradeneeded = event => {
+                        db = event.target.result;
+                        db.createObjectStore('gifs', { keyPath: 'name' });
+                    };
+                    request.onsuccess = event => {
+                        db = event.target.result;
+                        resolve(db);
+                    };
+                    request.onerror = event => {
+                        console.error("IndexedDB error:", event.target.errorCode);
+                        reject(event.target.errorCode);
+                    };
+                });
+            }
+
+            function saveGif(name, blob) {
+                return new Promise((resolve, reject) => {
+                    if (!db) { reject("DB not open"); return; }
+                    const transaction = db.transaction(['gifs'], 'readwrite');
+                    const store = transaction.objectStore('gifs');
+                    const request = store.put({ name, blob });
+                    request.onsuccess = () => resolve();
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            }
+            
+            function getGif(name) {
+                return new Promise((resolve, reject) => {
+                     if (!db) { reject("DB not open"); return; }
+                    const transaction = db.transaction(['gifs'], 'readonly');
+                    const store = transaction.objectStore('gifs');
+                    const request = store.get(name);
+                    request.onsuccess = event => {
+                        resolve(event.target.result ? event.target.result.blob : null);
+                    };
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            }
+
 
             // --- LOCALSTORAGE & DATA FUNCTIONS ---
             function saveData() {
@@ -1599,6 +1665,56 @@ Respond with a valid JSON object ONLY with two keys: "newSchedule" (the complete
                 showModal(ui.workoutModal);
             };
 
+            // --- GIF Generation & Display ---
+            async function loadExerciseGif(exerciseName, forceRedo = false) {
+                ui.exerciseGifLoader.classList.remove('hidden');
+                ui.exerciseGifAnimation.style.backgroundImage = 'none';
+                ui.exerciseGifAnimation.style.animation = 'none';
+                ui.redoGifBtn.classList.add('hidden');
+
+                try {
+                    let gifBlob = forceRedo ? null : await getGif(exerciseName);
+
+                    if (!gifBlob) {
+                        const imagePrompt = `Create an animated GIF sprite sheet of a person demonstrating the exercise '${exerciseName}'. The animation should be a seamless loop showing the full range of motion. Use a clean, white background. The sprite sheet should be a single horizontal row of 8 frames.`;
+                        const imageApiUrl = getApiUrl('imagen-3.0-generate-002', 'predict');
+                        const imageResponse = await fetch(imageApiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ instances: [{ prompt: imagePrompt }], parameters: { "sampleCount": 1 } })
+                        });
+                        if (!imageResponse.ok) throw new Error(`Image Gen Error: ${imageResponse.status}`);
+                        const imageResult = await imageResponse.json();
+                        const base64Data = imageResult.predictions[0].bytesBase64Encoded;
+                        
+                        // Convert base64 to blob to save in IndexedDB
+                        const byteString = atob(base64Data);
+                        const mimeString = 'image/png';
+                        const ab = new ArrayBuffer(byteString.length);
+                        const ia = new Uint8Array(ab);
+                        for (let i = 0; i < byteString.length; i++) {
+                            ia[i] = byteString.charCodeAt(i);
+                        }
+                        gifBlob = new Blob([ab], { type: mimeString });
+
+                        await saveGif(exerciseName, gifBlob);
+                    }
+                    
+                    const gifUrl = URL.createObjectURL(gifBlob);
+                    ui.exerciseGifAnimation.style.backgroundImage = `url(${gifUrl})`;
+                    ui.exerciseGifAnimation.style.animation = 'play-sprite 1.5s steps(8) infinite';
+                
+                } catch (error) {
+                    console.error("Failed to load or generate exercise GIF:", error);
+                    ui.exerciseGifAnimation.style.backgroundImage = `url('https://placehold.co/400x225/111111/FFFFFF?text=Animation+Failed')`;
+                } finally {
+                    ui.exerciseGifLoader.classList.add('hidden');
+                    ui.redoGifBtn.classList.remove('hidden');
+                    lucide.createIcons();
+                }
+            }
+
+
             function openExerciseDetailModal(itemName, itemType = 'exercise', dayType = null) {
                 let item;
                 if (itemType === 'warmup') {
@@ -1611,7 +1727,9 @@ Respond with a valid JSON object ONLY with two keys: "newSchedule" (the complete
 
                 currentlyLoggingExercise = item.name;
                 ui.exerciseDetailTitle.textContent = item.name;
-                ui.exerciseDetailVideo.src = item.videoPlaceholder || "https://placehold.co/400x225/111111/FFFFFF?text=No+Image";
+
+                loadExerciseGif(item.name); // Generate/load GIF
+                
                 const instructions = Array.isArray(item.instructions) ? item.instructions : (item.instructions || "").split('\n');
                 
                 const instructionsTextarea = ui.exerciseDetailInstructions;
@@ -1681,58 +1799,58 @@ Respond with a valid JSON object ONLY with two keys: "newSchedule" (the complete
             });
             
              ui.workoutLogForm.addEventListener('submit', (e) => {
-                  e.preventDefault();
-                  let formIsValid = true;
-                  document.querySelectorAll('.set-row .set-part-row').forEach(partRow => {
-                       partRow.querySelectorAll('input').forEach(input => input.classList.remove('!border-red-500'));
-                       const weightInput = partRow.querySelector('.set-weight'), repsInput = partRow.querySelector('.set-reps');
-                       const weight = parseFloat(weightInput.value), reps = parseFloat(repsInput.value);
-                       if ((isNaN(weight) || weight < 0) && (isNaN(reps) || reps < 1)) return;
-                       if (isNaN(weight) || weight < 0) { weightInput.classList.add('!border-red-500'); formIsValid = false; }
-                       if (isNaN(reps) || reps < 1 || !Number.isInteger(reps)) { repsInput.classList.add('!border-red-500'); formIsValid = false; }
-              });
-              if(!formIsValid){ showCustomAlert("Invalid Input", "Weight must be a positive number and reps must be a positive whole number."); return; }
-              
-              const sets = Array.from(document.querySelectorAll('.set-row')).map(row => 
-                   Array.from(row.querySelectorAll('.set-part-row')).map(partRow => {
-                         let weightKg = parseFloat(partRow.querySelector('.set-weight').value) || 0;
-                         if (modalUnit === 'lbs') {
-                             weightKg = lbsToKg(weightKg);
-                         }
-                         return {
-                             weight: parseFloat(weightKg.toFixed(2)),
-                             reps: parseInt(partRow.querySelector('.set-reps').value) || 0,
-                             partial: partRow.querySelector('.set-partial').checked
-                         }
-                   }).filter(p => p.reps > 0)
-              ).filter(set => set.length > 0);
+                 e.preventDefault();
+                 let formIsValid = true;
+                 document.querySelectorAll('.set-row .set-part-row').forEach(partRow => {
+                      partRow.querySelectorAll('input').forEach(input => input.classList.remove('!border-red-500'));
+                      const weightInput = partRow.querySelector('.set-weight'), repsInput = partRow.querySelector('.set-reps');
+                      const weight = parseFloat(weightInput.value), reps = parseFloat(repsInput.value);
+                      if ((isNaN(weight) || weight < 0) && (isNaN(reps) || reps < 1)) return;
+                      if (isNaN(weight) || weight < 0) { weightInput.classList.add('!border-red-500'); formIsValid = false; }
+                      if (isNaN(reps) || reps < 1 || !Number.isInteger(reps)) { repsInput.classList.add('!border-red-500'); formIsValid = false; }
+             });
+             if(!formIsValid){ showCustomAlert("Invalid Input", "Weight must be a positive number and reps must be a positive whole number."); return; }
+            
+             const sets = Array.from(document.querySelectorAll('.set-row')).map(row => 
+                 Array.from(row.querySelectorAll('.set-part-row')).map(partRow => {
+                      let weightKg = parseFloat(partRow.querySelector('.set-weight').value) || 0;
+                      if (modalUnit === 'lbs') {
+                          weightKg = lbsToKg(weightKg);
+                      }
+                      return {
+                          weight: parseFloat(weightKg.toFixed(2)),
+                          reps: parseInt(partRow.querySelector('.set-reps').value) || 0,
+                          partial: partRow.querySelector('.set-partial').checked
+                      }
+                 }).filter(p => p.reps > 0)
+             ).filter(set => set.length > 0);
 
-              if(sets.length === 0) return showCustomAlert('Empty Workout', 'Please log at least one valid set.');
-              
-              const dateString = dateToKey(viewDate);
-              
-              if (editingWorkoutLogId) {
-                   const logIndex = workoutHistory.findIndex(log => log.id === editingWorkoutLogId);
-                   if(logIndex > -1){
-                      workoutHistory[logIndex].sets = JSON.stringify(sets);
-                      workoutHistory[logIndex].date = dateString;
-                      workoutHistory[logIndex].name = currentlyLoggingExercise;
-                      workoutHistory[logIndex].createdAt = new Date().toISOString();
-                   }
-              } else {
-                   const newLog = { id: crypto.randomUUID(), name: currentlyLoggingExercise, date: dateString, sets: JSON.stringify(sets), createdAt: new Date().toISOString() };
-                   workoutHistory.push(newLog);
-              }
+             if(sets.length === 0) return showCustomAlert('Empty Workout', 'Please log at least one valid set.');
+            
+             const dateString = dateToKey(viewDate);
+            
+             if (editingWorkoutLogId) {
+                 const logIndex = workoutHistory.findIndex(log => log.id === editingWorkoutLogId);
+                 if(logIndex > -1){
+                   workoutHistory[logIndex].sets = JSON.stringify(sets);
+                   workoutHistory[logIndex].date = dateString;
+                   workoutHistory[logIndex].name = currentlyLoggingExercise;
+                   workoutHistory[logIndex].createdAt = new Date().toISOString();
+                 }
+             } else {
+                 const newLog = { id: crypto.randomUUID(), name: currentlyLoggingExercise, date: dateString, sets: JSON.stringify(sets), createdAt: new Date().toISOString() };
+                 workoutHistory.push(newLog);
+             }
 
-              editingWorkoutLogId = null;
-              if (workoutStatusHistory[dateString] !== undefined) {
-                  delete workoutStatusHistory[dateString];
-              }
-              saveData();
-              updateUI();
-              hideModal(ui.workoutModal);
-              isLogging = false;
-              stopRestTimer();
+             editingWorkoutLogId = null;
+             if (workoutStatusHistory[dateString] !== undefined) {
+                 delete workoutStatusHistory[dateString];
+             }
+             saveData();
+             updateUI();
+             hideModal(ui.workoutModal);
+             isLogging = false;
+             stopRestTimer();
            });
 
             ui.setsContainer.addEventListener('input', e => {
@@ -2123,26 +2241,26 @@ Respond with a valid JSON object ONLY. The root object must have "name", "schedu
             });
 
             function applyNewPlan() {
-                 try {
-                     const newPlan = JSON.parse(ui.aiPlanJsonOutput.textContent);
-                     delete newPlan.reasoning;
-                     
-                     const todayKey = dateToKey(new Date());
-                     const hasWorkedOutToday = workoutHistory.some(log => log.date === todayKey);
-                     
-                     if(hasWorkedOutToday) {
-                         const oldTodayType = getWorkoutDayType(new Date());
-                         newPlan.schedule[(new Date()).toLocaleDateString('en-US', { weekday: 'long' })] = oldTodayType;
-                     }
+               try {
+                   const newPlan = JSON.parse(ui.aiPlanJsonOutput.textContent);
+                   delete newPlan.reasoning;
+                   
+                   const todayKey = dateToKey(new Date());
+                   const hasWorkedOutToday = workoutHistory.some(log => log.date === todayKey);
+                   
+                   if(hasWorkedOutToday) {
+                       const oldTodayType = getWorkoutDayType(new Date());
+                       newPlan.schedule[(new Date()).toLocaleDateString('en-US', { weekday: 'long' })] = oldTodayType;
+                   }
 
-                     workoutPlan = newPlan;
-                     saveData();
-                     updateUI();
-                     hideModal(ui.aiPlanGeneratorModal);
-                     showCustomAlert("Success", "Your new workout plan has been applied!");
-                 } catch (error) {
-                     showCustomAlert("Error", "Could not save the new plan. The generated data might be invalid.");
-                 }
+                   workoutPlan = newPlan;
+                   saveData();
+                   updateUI();
+                   hideModal(ui.aiPlanGeneratorModal);
+                   showCustomAlert("Success", "Your new workout plan has been applied!");
+               } catch (error) {
+                   showCustomAlert("Error", "Could not save the new plan. The generated data might be invalid.");
+               }
             }
             
             // --- EDIT PLAN MODAL FUNCTIONS ---
@@ -2528,7 +2646,7 @@ Respond with a valid JSON object ONLY. The root object must have "name", "schedu
                     ui.customExerciseInstructions.value = details.instructions.join('\n');
                     ui.customExerciseRepRange.value = details.repRange;
 
-                    const imagePrompt = `Photorealistic image, clean white background. A person demonstrating the exercise '${exerciseName}'. Based on an analysis of instructional videos, the image should be from an angle that clearly shows proper form. Show the moment of peak muscle contraction.`;
+                    const imagePrompt = ` an image, clean white background. A person demonstrating the exercise '${exerciseName}'. Based on an analysis of instructional videos, the image should be from an angle that clearly shows proper form. Show the moment of peak muscle contraction.`;
                     const imageApiUrl = getApiUrl('imagen-3.0-generate-002', 'predict');
                     const imageResponse = await fetch(imageApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ instances: [{ prompt: imagePrompt }], parameters: { "sampleCount": 1 } }) });
                     if(!imageResponse.ok) throw new Error(`Image Gen Error: ${imageResponse.status}`);
@@ -2796,9 +2914,17 @@ Respond with a valid JSON object ONLY. The root object must have "name", "schedu
                 openEditPlanModal();
             });
 
+            // --- NEW: Redo GIF Listener ---
+            ui.redoGifBtn.addEventListener('click', () => {
+                if(currentlyLoggingExercise) {
+                    loadExerciseGif(currentlyLoggingExercise, true); // forceRedo = true
+                }
+            });
+
 
             // --- INITIALIZATION ---
             async function initializeApp() {
+                await openDB(); // Open IndexedDB first
                 await loadAllData();
                 if (!workoutPlan || !workoutPlan.schedule || Object.keys(workoutPlan.schedule).length === 0) {
                     if (exerciseDB.length > 0) {

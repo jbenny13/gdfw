@@ -968,13 +968,27 @@
 
             // --- WORKOUT LOGGING FUNCTIONS ---
             function openWorkoutModal(exerciseName) {
-                isLogging = true; 
+                isLogging = true;
                 editingWorkoutLogId = null;
                 currentlyLoggingExercise = exerciseName;
                 ui.modalTitle.textContent = `Log: ${exerciseName}`;
                 ui.saveWorkoutBtn.textContent = 'Save Workout';
                 ui.setsContainer.innerHTML = '';
-                addSetRow(); addSetRow(); addSetRow();
+            
+                // --- MODIFICATION START: Dynamic Set Rows ---
+                const exerciseDetails = exerciseDB.find(ex => ex.name === exerciseName);
+                let numSets = 3; // Default to 3 sets
+                if (exerciseDetails && exerciseDetails.sets) {
+                    const setsMatch = String(exerciseDetails.sets).match(/\d+/); // Get the first number (e.g., from "3-4")
+                    if (setsMatch) {
+                        numSets = parseInt(setsMatch[0], 10);
+                    }
+                }
+                for (let i = 0; i < numSets; i++) {
+                    addSetRow();
+                }
+                // --- MODIFICATION END ---
+            
                 modalUnit = userSettings.unit;
                 updateUnitToggleUI(modalUnit);
                 showModal(ui.workoutModal);
@@ -1338,7 +1352,11 @@
             let isDayNavSwiping = false;
 
             function handleDayNavPointerDown(e) {
-                if (e.target.closest('.swipe-item, button, a, select, input')) return;
+                // --- MODIFICATION START: Allow swipe on title/date button ---
+                // The original check for 'button' prevented swipe from starting on the main date display area.
+                // We remove 'button' so the swipe can begin anywhere on the card that isn't another interactive element.
+                if (e.target.closest('.swipe-item, a, select, input')) return;
+                // --- MODIFICATION END ---
                 const coords = getPointerCoordinates(e);
                 dayNavPointerStart.x = coords.x; dayNavPointerStart.y = coords.y;
                 dayNavCurrentX = 0; isDayNavSwiping = false;

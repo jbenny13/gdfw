@@ -684,6 +684,7 @@
             let restTimerInterval = null;
             let isAddingFromLibrary = false;
             let modalUnit = 'kg';
+            let isNativeDragging = false; // FIX: Flag to prevent swipe/drag conflicts
             
             // Undo Toast State
             let undoTimeout = null;
@@ -876,7 +877,7 @@
 
             // --- CORE & HELPER FUNCTIONS ---
             const getApiUrl = (model, action = 'generateContent') => {
-                const apiKey = "AIzaSyDY48xF1byvU05kS9qKvN8iyrIR3hheP8w"; // API key is handled by the environment
+                const apiKey = ""; // API key is handled by the environment
                 return `https://generativelanguage.googleapis.com/v1beta/models/${model}:${action}?key=${apiKey}`;
             };
             
@@ -1036,6 +1037,10 @@
                     const isLogged = loggedExercisesForDay.has(ex.name);
                     const isFavorite = type === 'exercise' && ex.favorite;
                     
+                    const statusIcon = isLogged
+                        ? '<i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>'
+                        : (!isFutureDay && dayType !== 'Rest' ? '<i data-lucide="x-circle" class="w-5 h-5 text-red-400/80"></i>' : '');
+
                     return `
                         <div class="swipe-item plan-item-container rounded-lg" data-name="${ex.name}" data-type="${type}" data-day-type="${dayType}" draggable="true">
                             <div class="swipe-actions">
@@ -1050,7 +1055,7 @@
                                 <div class="text-base text-gray-300 flex justify-between items-center group">
                                     <div class="flex-grow flex items-center gap-3">
                                         <div class="w-5 h-5 flex-shrink-0 flex items-center justify-center">
-                                          ${isLogged ? '<i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>' : ''}
+                                          ${statusIcon}
                                         </div>
                                         ${type === 'exercise' ? `<i data-lucide="star" class="w-4 h-4 flex-shrink-0 favorite-indicator ${isFavorite ? 'text-yellow-400 fill-yellow-400' : 'text-transparent'}"></i>` : '<div class="w-4 h-4 flex-shrink-0"></div>'}
                                         <div>
@@ -1261,6 +1266,7 @@
             function handlePointerDown(e) {
                 const target = e.target.closest('.swipe-item');
                 if (!target || e.target.closest('button, a')) return;
+                isNativeDragging = false; // FIX: Reset flag on new interaction start
                 const coords = getPointerCoordinates(e);
                 pointerStart.x = coords.x; pointerStart.y = coords.y;
                 currentX = 0; swipedElement = target;
@@ -1270,6 +1276,7 @@
             }
 
             function handlePointerMove(e) {
+                if (isNativeDragging) return; // FIX: Prevent custom swipe if native drag is happening
                 if (!swipedElement) return;
                 const coords = getPointerCoordinates(e);
                 const deltaX = coords.x - pointerStart.x; const deltaY = coords.y - pointerStart.y;
@@ -1373,6 +1380,7 @@
                     e.preventDefault();
                     return;
                 }
+                isNativeDragging = true; // FIX: Set flag
                 draggedPlanItem = e.target;
                 setTimeout(() => { if (draggedPlanItem) draggedPlanItem.classList.add('dragging'); }, 0);
             }
@@ -1383,6 +1391,7 @@
                     draggedPlanItem = null;
                 }
                 document.querySelectorAll('.plan-item-container.drag-over').forEach(el => el.classList.remove('drag-over'));
+                isNativeDragging = false; // FIX: Reset flag
             }
             
             function getDragAfterElementPlan(container, y) {
@@ -1398,7 +1407,14 @@
             function handlePlanDragOver(e) {
                 e.preventDefault();
                 const container = e.target.closest('.warmup-list, .exercise-list');
-                if (!container || !draggedPlanItem || draggedPlanItem.parentElement !== container) return;
+                if (!container || !draggedPlanItem) return;
+
+                // FIX: Prevent mixing warmup and workout items
+                const draggedType = draggedPlanItem.dataset.type;
+                if ((draggedType === 'warmup' && !container.classList.contains('warmup-list')) ||
+                    (draggedType === 'exercise' && !container.classList.contains('exercise-list'))) {
+                    return;
+                }
 
                 const afterElement = getDragAfterElementPlan(container, e.clientY);
                 document.querySelectorAll('.plan-item-container.drag-over').forEach(el => el.classList.remove('drag-over'));
@@ -1409,6 +1425,14 @@
                 e.preventDefault();
                 const container = e.target.closest('.warmup-list, .exercise-list');
                 if (!container || !draggedPlanItem) return;
+
+                // FIX: Prevent mixing warmup and workout items
+                const draggedType = draggedPlanItem.dataset.type;
+                if ((draggedType === 'warmup' && !container.classList.contains('warmup-list')) ||
+                    (draggedType === 'exercise' && !container.classList.contains('exercise-list'))) {
+                    handlePlanDragEnd();
+                    return;
+                }
 
                 const afterElement = getDragAfterElementPlan(container, e.clientY);
                 if (afterElement == null) { container.appendChild(draggedPlanItem); } 
@@ -1946,13 +1970,23 @@
             function handleDragStart(e) { if (!e.target.classList.contains('draggable-item')) return; draggedItem = e.target; setTimeout(() => { if (draggedItem) draggedItem.classList.add('dragging'); }, 0); }
             function handleDragEnd() { if(draggedItem) { draggedItem.classList.remove('dragging'); draggedItem = null; } document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
             function handleDragOver(e) {
-                 e.preventDefault(); const container = e.currentTarget; const afterElement = getDragAfterElement(container, e.clientY);
+                 e.preventDefault(); const container = e.currentTarget; 
+                 // FIX: Prevent mixing
+                 if (!draggedItem || (draggedItem.dataset.type === 'warmup' && !container.id.includes('warmup')) || (draggedItem.dataset.type !== 'warmup' && container.id.includes('warmup'))) {
+                     return;
+                 }
+                 const afterElement = getDragAfterElement(container, e.clientY);
                  const currentDragged = document.querySelector('.dragging'); if(!currentDragged) return;
                  document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
                  if(afterElement) { afterElement.classList.add('drag-over'); }
             }
             function handleDrop(e) {
-                e.preventDefault(); const container = e.currentTarget; const afterElement = getDragAfterElement(container, e.clientY);
+                e.preventDefault(); const container = e.currentTarget; 
+                // FIX: Prevent mixing
+                if (!draggedItem || (draggedItem.dataset.type === 'warmup' && !container.id.includes('warmup')) || (draggedItem.dataset.type !== 'warmup' && container.id.includes('warmup'))) {
+                    return;
+                }
+                const afterElement = getDragAfterElement(container, e.clientY);
                 const currentDragged = document.querySelector('.dragging'); if(!currentDragged) return;
                 if (afterElement == null) { container.appendChild(currentDragged); } else { container.insertBefore(currentDragged, afterElement); }
                  document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));

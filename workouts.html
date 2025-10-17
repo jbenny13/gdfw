@@ -332,22 +332,22 @@
             cursor: grabbing;
         }
         
-        /* Edit Plan Modal Dragging Styles */
-        .draggable-item {
+        /* Edit Plan Modal & Plan View Dragging Styles */
+        .draggable-item, .plan-item-container[draggable="true"] {
             transition: background-color 0.2s ease;
             cursor: grab;
         }
-        .draggable-item.dragging {
+        .draggable-item.dragging, .plan-item-container.dragging {
             opacity: 0.5;
             background-color: var(--input-bg);
         }
-        .draggable-item .drag-handle {
+        .draggable-item .drag-handle, .plan-item-container[draggable="true"] {
             cursor: grab;
         }
-        .draggable-item .drag-handle:active {
+        .draggable-item .drag-handle:active, .plan-item-container[draggable="true"]:active {
             cursor: grabbing;
         }
-        .draggable-item.drag-over {
+        .draggable-item.drag-over, .plan-item-container.drag-over {
             border-top: 2px solid var(--edit);
         }
 
@@ -1037,7 +1037,7 @@
                     const isFavorite = type === 'exercise' && ex.favorite;
                     
                     return `
-                        <div class="swipe-item plan-item-container rounded-lg" data-name="${ex.name}" data-type="${type}" data-day-type="${dayType}">
+                        <div class="swipe-item plan-item-container rounded-lg" data-name="${ex.name}" data-type="${type}" data-day-type="${dayType}" draggable="true">
                             <div class="swipe-actions">
                                 <div class="swipe-action-container left">
                                     <div class="action delete"><i data-lucide="trash-2" class="pointer-events-none"></i><span class="ml-2 pointer-events-none">Remove</span></div>
@@ -1049,6 +1049,9 @@
                             <div class="swipe-content p-3 rounded-lg">
                                 <div class="text-base text-gray-300 flex justify-between items-center group">
                                     <div class="flex-grow flex items-center gap-3">
+                                        <div class="w-5 h-5 flex-shrink-0 flex items-center justify-center">
+                                          ${isLogged ? '<i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>' : ''}
+                                        </div>
                                         ${type === 'exercise' ? `<i data-lucide="star" class="w-4 h-4 flex-shrink-0 favorite-indicator ${isFavorite ? 'text-yellow-400 fill-yellow-400' : 'text-transparent'}"></i>` : '<div class="w-4 h-4 flex-shrink-0"></div>'}
                                         <div>
                                             <span class="flex-grow text-left">${ex.name}</span>
@@ -1056,7 +1059,6 @@
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        ${isLogged ? '<i data-lucide="check-circle-2" class="w-5 h-5 text-green-400 flex-shrink-0"></i>' : ''}
                                         <button class="btn btn-secondary !p-2 log-workout-btn" data-name="${ex.name}" ${isFutureDay ? 'disabled' : ''}>
                                             <i data-lucide="plus" class="w-4 h-4 pointer-events-none"></i>
                                         </button>
@@ -1140,8 +1142,25 @@
 
                 ui.historyDayContent.innerHTML = logsForDay.map(log => {
                     const sets = typeof log.sets === 'string' ? JSON.parse(log.sets) : log.sets;
-                     const setsHtml = sets.map((setParts, i) => `<span><strong>Set ${i+1}:</strong> ${setParts.map(p => `${formatWeight(p.weight)} x ${p.reps}r ${p.partial ? '(P)' : ''}`).join(', ')}</span>`).join('<br>');
-                     return `<div class="bg-black/30 p-2 rounded-md"><div class="flex justify-between items-start"><strong class="text-primary-text">${log.name}</strong><div class="flex items-center gap-1"><button class="edit-history-btn p-1 text-gray-500 hover:text-yellow-400 rounded-md" data-id="${log.id}" title="Edit Log"><i data-lucide="pencil" class="w-4 h-4 pointer-events-none"></i></button><button class="delete-history-btn p-1 text-gray-500 hover:text-red-400 rounded-md" data-id="${log.id}" title="Delete Log"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button></div></div><div class="text-sm text-secondary-text mt-1">${setsHtml}</div></div>`;
+                    const setsHtml = sets.map((setParts, i) => `<span><strong>Set ${i+1}:</strong> ${setParts.map(p => `${formatWeight(p.weight)} x ${p.reps}r ${p.partial ? '(P)' : ''}`).join(', ')}</span>`).join('<br>');
+                    return `
+                        <div class="swipe-item history-item-container rounded-lg" data-id="${log.id}">
+                            <div class="swipe-actions">
+                                <div class="swipe-action-container left">
+                                    <div class="action delete"><i data-lucide="trash-2" class="pointer-events-none"></i><span class="ml-2 pointer-events-none">Delete</span></div>
+                                </div>
+                                <div class="swipe-action-container right">
+                                    <div class="action edit"><span class="mr-2 pointer-events-none">Edit</span><i data-lucide="pencil" class="pointer-events-none"></i></div>
+                                </div>
+                            </div>
+                            <div class="swipe-content p-3 rounded-lg bg-black/30">
+                                <div class="flex justify-between items-start">
+                                    <strong class="text-primary-text">${log.name}</strong>
+                                </div>
+                                <div class="text-sm text-secondary-text mt-1">${setsHtml}</div>
+                            </div>
+                        </div>
+                    `;
                 }).join('');
                 lucide.createIcons();
             }
@@ -1155,32 +1174,62 @@
             let tapTimeout = null;
 
             function handleItemDelete(element) {
-                const name = element.dataset.name;
-                const type = element.dataset.type;
-                const dayType = element.dataset.dayType;
+                if (element.classList.contains('plan-item-container')) {
+                    const name = element.dataset.name;
+                    const type = element.dataset.type;
+                    const dayType = element.dataset.dayType;
 
-                if (type === 'warmup') {
-                    showConfirmModal('Delete Warmup?', `Permanently remove "${name}" from your ${dayType} warm-up?`, () => {
-                        if(warmups[dayType]) {
-                            warmups[dayType] = warmups[dayType].filter(w => w.name !== name);
-                            saveData(); updateUI();
-                        }
+                    if (type === 'warmup') {
+                        showConfirmModal('Delete Warmup?', `Permanently remove "${name}" from your ${dayType} warm-up?`, () => {
+                            if(warmups[dayType]) {
+                                warmups[dayType] = warmups[dayType].filter(w => w.name !== name);
+                                saveData(); updateUI();
+                            }
+                        });
+                        return;
+                    }
+
+                    const dateKey = dateToKey(viewDate);
+                    if (!dailyModifications[dateKey]) dailyModifications[dateKey] = { removed: [], added: [] };
+                    const modsForDay = dailyModifications[dateKey];
+                    
+                    if (!modsForDay.removed.includes(name)) modsForDay.removed.push(name);
+                    saveData(); updateUI(); 
+
+                    showUndoToast(`${name} removed for today.`, () => {
+                        const index = modsForDay.removed.indexOf(name);
+                        if (index > -1) modsForDay.removed.splice(index, 1);
+                        saveData(); updateUI();
                     });
-                    return;
+                } else if (element.classList.contains('history-item-container')) {
+                    const logId = element.dataset.id;
+                    const originalLog = workoutHistory.find(log => log.id === logId);
+                    if (!originalLog) return;
+
+                    showConfirmModal('Delete Log?', 'Are you sure?', () => {
+                        workoutHistory = workoutHistory.filter(log => log.id !== logId); 
+                        saveData(); 
+                        updateUI();
+                        
+                        showUndoToast(`${originalLog.name} log deleted.`, () => {
+                            workoutHistory.push(originalLog);
+                            saveData();
+                            updateUI();
+                        });
+                    });
                 }
-
-                const dateKey = dateToKey(viewDate);
-                if (!dailyModifications[dateKey]) dailyModifications[dateKey] = { removed: [], added: [] };
-                const modsForDay = dailyModifications[dateKey];
-                
-                if (!modsForDay.removed.includes(name)) modsForDay.removed.push(name);
-                saveData(); updateUI(); 
-
-                showUndoToast(`${name} removed for today.`, () => {
-                    const index = modsForDay.removed.indexOf(name);
-                    if (index > -1) modsForDay.removed.splice(index, 1);
-                    saveData(); updateUI();
-                });
+            }
+            
+            function handleItemEdit(element) {
+                if (element.classList.contains('plan-item-container')) {
+                    const name = element.dataset.name;
+                    const type = element.dataset.type;
+                    if (type === 'exercise') { showPermanentEditWarningModal(); } 
+                    else if (type === 'warmup') { openEditPlanModal(); }
+                } else if (element.classList.contains('history-item-container')) {
+                    const logId = element.dataset.id;
+                    openEditWorkoutModal(logId);
+                }
             }
             
             function showPermanentEditWarningModal() {
@@ -1191,13 +1240,6 @@
                 }
             }
 
-            function handleItemEdit(element) {
-                const name = element.dataset.name;
-                const type = element.dataset.type;
-                if (type === 'exercise') { showPermanentEditWarningModal(); } 
-                else if (type === 'warmup') { openEditPlanModal(); }
-            }
-            
             function handleItemFavorite(element) {
                 const exName = element.dataset.name;
                 if (element.dataset.type !== 'exercise') return;
@@ -1261,10 +1303,12 @@
                 } else {
                     const currentTime = new Date().getTime(); const tapLength = currentTime - lastTap;
                     clearTimeout(tapTimeout);
-                    if (tapLength < 300 && tapLength > 0) { handleItemFavorite(elementToClean); lastTap = 0; } 
-                    else {
-                        lastTap = currentTime;
-                        tapTimeout = setTimeout(() => { const { name, type, dayType } = elementToClean.dataset; openExerciseDetailModal(name, type, dayType); }, 300);
+                    if (elementToClean.classList.contains('plan-item-container')) {
+                        if (tapLength < 300 && tapLength > 0) { handleItemFavorite(elementToClean); lastTap = 0; } 
+                        else {
+                            lastTap = currentTime;
+                            tapTimeout = setTimeout(() => { const { name, type, dayType } = elementToClean.dataset; openExerciseDetailModal(name, type, dayType); }, 300);
+                        }
                     }
                 }
                 
@@ -1321,9 +1365,75 @@
                 setTimeout(() => { ui.planHistoryContainerCard.style.transition = ''; }, 300);
             }
 
+            // --- PLAN REORDERING DRAG & DROP ---
+            let draggedPlanItem = null;
+
+            function handlePlanDragStart(e) {
+                if (!e.target.classList.contains('plan-item-container')) {
+                    e.preventDefault();
+                    return;
+                }
+                draggedPlanItem = e.target;
+                setTimeout(() => { if (draggedPlanItem) draggedPlanItem.classList.add('dragging'); }, 0);
+            }
+
+            function handlePlanDragEnd() {
+                if (draggedPlanItem) {
+                    draggedPlanItem.classList.remove('dragging');
+                    draggedPlanItem = null;
+                }
+                document.querySelectorAll('.plan-item-container.drag-over').forEach(el => el.classList.remove('drag-over'));
+            }
+            
+            function getDragAfterElementPlan(container, y) {
+                const draggableElements = [...container.querySelectorAll('.plan-item-container:not(.dragging)')];
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = y - box.top - box.height / 2;
+                    if (offset < 0 && offset > closest.offset) { return { offset: offset, element: child }; } 
+                    else { return closest; }
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
+
+            function handlePlanDragOver(e) {
+                e.preventDefault();
+                const container = e.target.closest('.warmup-list, .exercise-list');
+                if (!container || !draggedPlanItem || draggedPlanItem.parentElement !== container) return;
+
+                const afterElement = getDragAfterElementPlan(container, e.clientY);
+                document.querySelectorAll('.plan-item-container.drag-over').forEach(el => el.classList.remove('drag-over'));
+                if (afterElement) afterElement.classList.add('drag-over');
+            }
+
+            function handlePlanDrop(e) {
+                e.preventDefault();
+                const container = e.target.closest('.warmup-list, .exercise-list');
+                if (!container || !draggedPlanItem) return;
+
+                const afterElement = getDragAfterElementPlan(container, e.clientY);
+                if (afterElement == null) { container.appendChild(draggedPlanItem); } 
+                else { container.insertBefore(draggedPlanItem, afterElement); }
+
+                const dayType = draggedPlanItem.dataset.dayType;
+                if (container.classList.contains('warmup-list')) {
+                    const newOrder = Array.from(container.querySelectorAll('.plan-item-container')).map(el => el.dataset.name);
+                    const reorderedWarmups = newOrder.map(name => warmups[dayType].find(w => w.name === name)).filter(Boolean);
+                    warmups[dayType] = reorderedWarmups;
+                } else if (container.classList.contains('exercise-list')) {
+                    const workout = workoutPlan.workouts.find(w => w.day === dayType);
+                    if (workout) {
+                        workout.exercises = Array.from(container.querySelectorAll('.plan-item-container')).map(el => el.dataset.name);
+                    }
+                }
+                saveData();
+                handlePlanDragEnd();
+            }
+
             // --- EVENT LISTENERS ---
             ui.workoutPlanForDay.addEventListener('mousedown', handlePointerDown);
             ui.workoutPlanForDay.addEventListener('touchstart', handlePointerDown, { passive: true });
+            ui.historyDayContent.addEventListener('mousedown', handlePointerDown);
+            ui.historyDayContent.addEventListener('touchstart', handlePointerDown, { passive: true });
             
             ui.workoutPlanForDay.addEventListener('click', (e) => {
                 const logBtn = e.target.closest('.log-workout-btn');
@@ -1559,16 +1669,6 @@
                 showModal(ui.exerciseDetailModal);
             }
             
-            ui.historyDayContent.addEventListener('click', (e) => {
-                const editBtn = e.target.closest('.edit-history-btn');
-                const deleteBtn = e.target.closest('.delete-history-btn');
-                if (editBtn) openEditWorkoutModal(editBtn.dataset.id);
-                if (deleteBtn) {
-                    const logId = deleteBtn.dataset.id;
-                    showConfirmModal('Delete Log?', 'Are you sure?', () => { workoutHistory = workoutHistory.filter(log => log.id !== logId); saveData(); updateUI(); });
-                }
-            });
-
             ui.closeExerciseDetailModalBtn.addEventListener('click', () => hideModal(ui.exerciseDetailModal));
             ui.logFromDetailBtn.addEventListener('click', () => { hideModal(ui.exerciseDetailModal); openWorkoutModal(currentlyLoggingExercise); });
             
@@ -2137,6 +2237,12 @@
                     loadExerciseGif(currentlyLoggingExercise, true); // forceRedo = true
                 }
             });
+            
+            // --- NEW: Add Drag/Drop Listeners for Plan View Reordering ---
+            ui.workoutPlanForDay.addEventListener('dragstart', handlePlanDragStart);
+            ui.workoutPlanForDay.addEventListener('dragend', handlePlanDragEnd);
+            ui.workoutPlanForDay.addEventListener('dragover', handlePlanDragOver);
+            ui.workoutPlanForDay.addEventListener('drop', handlePlanDrop);
 
 
             // --- INITIALIZATION ---

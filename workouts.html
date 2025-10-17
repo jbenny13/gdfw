@@ -470,6 +470,8 @@
                         <div>
                             <div class="flex justify-between items-center mb-2 border-b border-border-color pb-1">
                                 <h5 class="font-semibold text-lg">Plan</h5>
+                                <!-- NEW: Add Temporary Exercise Button -->
+                                <button id="add-temporary-exercise-btn" class="btn btn-secondary !p-1.5 hidden" title="Add Exercise for Today"><i data-lucide="plus" class="w-4 h-4"></i></button>
                             </div>
                             <div id="workout-plan-for-day" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar pr-2"></div>
                         </div>
@@ -1025,10 +1027,17 @@
 
                 const today = new Date(); today.setHours(0,0,0,0);
                 const isToday = dateToKey(date) === dateToKey(today);
+                const isFutureDay = date > today;
 
                 ui.dayViewDateDisplay.querySelector('#day-view-title-span').textContent = date.toLocaleDateString(undefined, { weekday: 'long' }) + (isToday ? ' (Today)' : '');
                 ui.dayViewDateDisplay.querySelector('#day-view-date-span').textContent = date.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
                 
+                // NEW: Show/hide temporary add button
+                const addTempBtn = document.getElementById('add-temporary-exercise-btn');
+                if (addTempBtn) {
+                    addTempBtn.classList.toggle('hidden', isFutureDay);
+                }
+
                 lucide.createIcons();
             }
 
@@ -1046,10 +1055,12 @@
                 const loggedExercisesForDay = new Set(workoutHistory.filter(log => log.date === dateKey).map(l => l.name));
                 let exercisesHtml = '';
 
+                // Handle daily modifications
                 const modsForDay = dailyModifications[dateKey] || { removed: [], added: [] };
                 const removedExercises = new Set(modsForDay.removed);
+                const addedExercises = modsForDay.added || [];
 
-                const createExerciseHTML = (exName, type) => {
+                const createExerciseHTML = (exName, type, isTemporary = false) => {
                     const ex = type === 'exercise' ? exerciseDB.find(e => e.name === exName) : { name: exName };
                     if (!ex) return '';
                     const isLogged = loggedExercisesForDay.has(ex.name);
@@ -1058,6 +1069,8 @@
                     const statusIcon = isLogged
                         ? '<i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>'
                         : (!isFutureDay && dayType !== 'Rest' ? '<i data-lucide="x-circle" class="w-5 h-5 text-red-400/80"></i>' : '');
+                    
+                    const temporaryBadge = isTemporary ? '<span class="text-xs ml-2 bg-blue-500/30 text-blue-300 px-1.5 py-0.5 rounded">Today</span>' : '';
 
                     return `
                         <div class="swipe-item plan-item-container rounded-lg" data-name="${ex.name}" data-type="${type}" data-day-type="${dayType}" draggable="true">
@@ -1077,7 +1090,7 @@
                                         </div>
                                         ${type === 'exercise' ? `<i data-lucide="star" class="w-4 h-4 flex-shrink-0 favorite-indicator ${isFavorite ? 'text-yellow-400 fill-yellow-400' : 'text-transparent'}"></i>` : '<div class="w-4 h-4 flex-shrink-0"></div>'}
                                         <div>
-                                            <span class="flex-grow text-left">${ex.name}</span>
+                                            <span class="flex-grow text-left flex items-center">${ex.name}${temporaryBadge}</span>
                                             ${type === 'exercise' ? `<p class="text-xs text-blue-400">${ex.group}</p>` : ''}
                                         </div>
                                     </div>
@@ -1101,10 +1114,19 @@
                         exercisesHtml += `<div><h5 class="font-semibold text-green-400 text-sm mb-1">Warm-up</h5><div class="space-y-1 warmup-list">${warmupExercises.map(w => createExerciseHTML(w.name, 'warmup')).join('')}</div></div>`;
                     }
                     
+                    let planExercisesHtml = '';
                     if (workoutForDay && workoutForDay.exercises && workoutForDay.exercises.length > 0) {
                         const finalExercises = workoutForDay.exercises.filter(exName => !removedExercises.has(exName));
-                        exercisesHtml += `<div><h5 class="font-semibold text-blue-400 text-sm my-2">Workout</h5><div class="space-y-1 exercise-list">${finalExercises.map(exName => createExerciseHTML(exName, 'exercise')).join('')}</div></div>`;
-                    } else {
+                        planExercisesHtml = finalExercises.map(exName => createExerciseHTML(exName, 'exercise', false)).join('');
+                    }
+                    
+                    let temporaryExercisesHtml = addedExercises.map(exName => createExerciseHTML(exName, 'exercise', true)).join('');
+
+                    if (planExercisesHtml || temporaryExercisesHtml) {
+                        exercisesHtml += `<div><h5 class="font-semibold text-blue-400 text-sm my-2">Workout</h5><div class="space-y-1 exercise-list">${planExercisesHtml}${temporaryExercisesHtml}</div></div>`;
+                    }
+                    
+                    if (!planExercisesHtml && !temporaryExercisesHtml && warmupExercises.length === 0) {
                         exercisesHtml += `<p class="text-secondary-text mt-4">No exercises planned for ${dayType} day. Use the Plan Editor to add some!</p>`;
                     }
                 }
@@ -1197,11 +1219,12 @@
             let tapTimeout = null;
 
             function handleItemDelete(element) {
+                const name = element.dataset.name;
+                const type = element.dataset.type;
+                const dayType = element.dataset.dayType;
+                const dateKey = dateToKey(viewDate);
+                
                 if (element.classList.contains('plan-item-container')) {
-                    const name = element.dataset.name;
-                    const type = element.dataset.type;
-                    const dayType = element.dataset.dayType;
-
                     if (type === 'warmup') {
                         showConfirmModal('Delete Warmup?', `Permanently remove "${name}" from your ${dayType} warm-up?`, () => {
                             if(warmups[dayType]) {
@@ -1211,19 +1234,27 @@
                         });
                         return;
                     }
-
-                    const dateKey = dateToKey(viewDate);
+                    
                     if (!dailyModifications[dateKey]) dailyModifications[dateKey] = { removed: [], added: [] };
                     const modsForDay = dailyModifications[dateKey];
+                    const addedIndex = (modsForDay.added || []).indexOf(name);
                     
-                    if (!modsForDay.removed.includes(name)) modsForDay.removed.push(name);
+                    if (addedIndex > -1) {
+                        modsForDay.added.splice(addedIndex, 1);
+                        showUndoToast(`${name} removed for today.`, () => {
+                            if (!modsForDay.added.includes(name)) modsForDay.added.push(name);
+                            saveData(); updateUI();
+                        });
+                    } else {
+                        if (!modsForDay.removed.includes(name)) modsForDay.removed.push(name);
+                        showUndoToast(`${name} removed for today.`, () => {
+                            const index = modsForDay.removed.indexOf(name);
+                            if (index > -1) modsForDay.removed.splice(index, 1);
+                            saveData(); updateUI();
+                        });
+                    }
                     saveData(); updateUI(); 
 
-                    showUndoToast(`${name} removed for today.`, () => {
-                        const index = modsForDay.removed.indexOf(name);
-                        if (index > -1) modsForDay.removed.splice(index, 1);
-                        saveData(); updateUI();
-                    });
                 } else if (element.classList.contains('history-item-container')) {
                     const logId = element.dataset.id;
                     const originalLog = workoutHistory.find(log => log.id === logId);
@@ -1263,18 +1294,22 @@
                 }
             }
 
+            // NEW: Function to handle favoriting an exercise
             function handleItemFavorite(element) {
                 const exName = element.dataset.name;
                 if (element.dataset.type !== 'exercise') return;
+
                 const exIndex = exerciseDB.findIndex(ex => ex.name === exName);
                 if (exIndex > -1) {
                     exerciseDB[exIndex].favorite = !exerciseDB[exIndex].favorite;
                     saveData();
+                    
                     const indicator = element.querySelector('.favorite-indicator');
                     if (indicator) {
-                        indicator.classList.toggle('text-yellow-400', exerciseDB[exIndex].favorite);
-                        indicator.classList.toggle('fill-yellow-400', exerciseDB[exIndex].favorite);
-                        indicator.classList.toggle('text-transparent', !exerciseDB[exIndex].favorite);
+                        const isFavorite = exerciseDB[exIndex].favorite;
+                        indicator.classList.toggle('text-yellow-400', isFavorite);
+                        indicator.classList.toggle('fill-yellow-400', isFavorite);
+                        indicator.classList.toggle('text-transparent', !isFavorite);
                     }
                 }
             }
@@ -1329,10 +1364,16 @@
                     const currentTime = new Date().getTime(); const tapLength = currentTime - lastTap;
                     clearTimeout(tapTimeout);
                     if (elementToClean.classList.contains('plan-item-container')) {
-                        if (tapLength < 300 && tapLength > 0) { handleItemFavorite(elementToClean); lastTap = 0; } 
-                        else {
+                        if (tapLength < 300 && tapLength > 0) { // This is a double tap
+                            handleItemFavorite(elementToClean); 
+                            lastTap = 0; 
+                        } 
+                        else { // This is a single tap
                             lastTap = currentTime;
-                            tapTimeout = setTimeout(() => { const { name, type, dayType } = elementToClean.dataset; openExerciseDetailModal(name, type, dayType); }, 300);
+                            tapTimeout = setTimeout(() => { 
+                                const { name, type, dayType } = elementToClean.dataset; 
+                                openExerciseDetailModal(name, type, dayType); 
+                            }, 300);
                         }
                     }
                 }
@@ -1352,11 +1393,7 @@
             let isDayNavSwiping = false;
 
             function handleDayNavPointerDown(e) {
-                // --- MODIFICATION START: Allow swipe on title/date button ---
-                // The original check for 'button' prevented swipe from starting on the main date display area.
-                // We remove 'button' so the swipe can begin anywhere on the card that isn't another interactive element.
-                if (e.target.closest('.swipe-item, a, select, input')) return;
-                // --- MODIFICATION END ---
+                if (e.target.closest('.swipe-item, a, select, input, button')) return;
                 const coords = getPointerCoordinates(e);
                 dayNavPointerStart.x = coords.x; dayNavPointerStart.y = coords.y;
                 dayNavCurrentX = 0; isDayNavSwiping = false;
@@ -1384,10 +1421,19 @@
                 document.removeEventListener('mousemove', handleDayNavPointerMove); document.removeEventListener('mouseup', handleDayNavPointerUp);
                 document.removeEventListener('touchmove', handleDayNavPointerMove); document.removeEventListener('touchend', handleDayNavPointerUp);
                 const swipeThreshold = 75; 
+                const today = new Date(); today.setHours(0,0,0,0);
+                const nextDay = new Date(viewDate); nextDay.setDate(nextDay.getDate() + 1);
+
                 ui.dayNavigationCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
                 if (isDayNavSwiping) {
-                    if (dayNavCurrentX < -swipeThreshold) { viewDate.setDate(viewDate.getDate() + 1); updateUI(); } 
-                    else if (dayNavCurrentX > swipeThreshold) { viewDate.setDate(viewDate.getDate() - 1); updateUI(); }
+                    if (dayNavCurrentX < -swipeThreshold && nextDay <= today) { // Swipe left for next day
+                        viewDate.setDate(viewDate.getDate() + 1); 
+                        updateUI(); 
+                    } 
+                    else if (dayNavCurrentX > swipeThreshold) { // Swipe right for previous day
+                        viewDate.setDate(viewDate.getDate() - 1); 
+                        updateUI(); 
+                    }
                 }
                 ui.dayNavigationCard.style.transform = 'translateX(0)'; ui.dayNavigationCard.style.opacity = '1';
                 isDayNavSwiping = false; dayNavCurrentX = 0;
@@ -1506,8 +1552,19 @@
                         workout.exercises = Array.from(existingExercises);
                         renderExercisesForEdit(dayType);
                     }
-                }
-                 else if (libraryModalContext.purpose === 'pref') {
+                } else if (libraryModalContext.purpose === 'add-temporary') { // NEW: Handle temporary add
+                    const { dateKey } = libraryModalContext;
+                    if (selected.length > 0 && dateKey) {
+                        if (!dailyModifications[dateKey]) {
+                            dailyModifications[dateKey] = { removed: [], added: [] };
+                        }
+                        const existingAdded = new Set(dailyModifications[dateKey].added || []);
+                        selected.forEach(name => existingAdded.add(name));
+                        dailyModifications[dateKey].added = Array.from(existingAdded);
+                        saveData();
+                        updateUI();
+                    }
+                } else if (libraryModalContext.purpose === 'pref') {
                     const group = libraryModalContext.group;
                     const allInGroup = exerciseDB.filter(ex => ex.group === group).length;
                     if(selected.length === allInGroup) { delete exercisePrefs[group]; } 
@@ -1914,7 +1971,7 @@
             document.getElementById('customize-sets-btn').addEventListener('click', (e) => { const container = ui.aiPlanSetsContainer; container.classList.toggle('hidden'); e.target.textContent = container.classList.contains('hidden') ? 'Customize per muscle group' : 'Use default sets'; });
             
             const openExerciseLibrary = (group) => {
-                if (libraryModalContext.purpose === 'edit-plan-add') { ui.exerciseLibraryTitle.textContent = `Add to ${libraryModalContext.dayType} Day`; ui.addSelectedExercisesBtn.textContent = 'Add to Plan'; } 
+                if (libraryModalContext.purpose === 'edit-plan-add' || libraryModalContext.purpose === 'add-temporary') { ui.exerciseLibraryTitle.textContent = `Add to ${libraryModalContext.dayType || 'Today'}`; ui.addSelectedExercisesBtn.textContent = 'Add to Plan'; } 
                 else if (libraryModalContext.purpose === 'manage') { ui.exerciseLibraryTitle.textContent = 'Manage Exercise Library'; ui.addSelectedExercisesBtn.textContent = 'Done'; }
                 else { ui.exerciseLibraryTitle.textContent = `Select Preferred Exercises for ${group}`; ui.addSelectedExercisesBtn.textContent = 'Confirm Selection'; }
                 const libraryList = document.getElementById('exercise-library-list'), filterSelect = document.getElementById('exercise-library-filter'), equipmentFilterSelect = document.getElementById('exercise-library-equipment-filter'), searchInput = document.getElementById('exercise-library-search');
@@ -2038,6 +2095,17 @@
                 const dayType = ui.editPlanDayTypeSelect.value;
                 if (!dayType) { showCustomAlert("Select Day", "Please select a workout day type first."); return; }
                 libraryModalContext = { purpose: 'edit-plan-add', dayType: dayType }; openExerciseLibrary();
+            });
+
+            // NEW: Add temporary exercise listener
+            document.getElementById('add-temporary-exercise-btn').addEventListener('click', () => {
+                const dayType = getWorkoutDayType(viewDate);
+                if (!dayType || dayType === 'Rest') {
+                    showCustomAlert("Action Not Available", "Cannot add exercises to a rest day.");
+                    return;
+                }
+                libraryModalContext = { purpose: 'add-temporary', dateKey: dateToKey(viewDate), dayType: dayType };
+                openExerciseLibrary();
             });
 
             ui.editPlanExerciseList.addEventListener('click', e => {

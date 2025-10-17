@@ -208,22 +208,20 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #666; }
         
-        .log-workout-btn:disabled {
-            opacity: 0.5;
-            pointer-events: none;
-            cursor: not-allowed;
-        }
-
         .status-btn, .progress-range-btn {
             border: 1px solid var(--border-color);
             background-color: transparent;
             color: var(--secondary-text);
         }
 
-        .status-btn.selected-full, .unit-toggle-btn.selected-full, .progress-range-btn.selected-full {
+        .status-btn.selected-full, .unit-toggle-btn.selected-full, .progress-range-btn.selected-full, #favorite-mode-toggle-btn.selected-full {
             background-color: #10b981;
             color: var(--background);
             border-color: #10b981;
+        }
+        #favorite-mode-toggle-btn.selected-full {
+             background-color: #f59e0b;
+             border-color: #f59e0b;
         }
         .status-btn.selected-partial {
             background-color: #fbbf24;
@@ -438,7 +436,6 @@
                 </div>
             
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-8">
-                <!-- MODIFICATION: Added ID for swipe, removed prev/next buttons -->
                 <div id="day-navigation-card" class="lg:col-span-4 content-card">
                     <div id="plan-view-header" class="flex flex-col sm:flex-row justify-between items-center gap-4">
                          <div class="flex-1">
@@ -470,8 +467,10 @@
                         <div>
                             <div class="flex justify-between items-center mb-2 border-b border-border-color pb-1">
                                 <h5 class="font-semibold text-lg">Plan</h5>
-                                <!-- NEW: Add Temporary Exercise Button -->
-                                <button id="add-temporary-exercise-btn" class="btn btn-secondary !p-1.5 hidden" title="Add Exercise for Today"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                                <div class="flex items-center gap-2">
+                                    <button id="favorite-mode-toggle-btn" class="btn btn-secondary !p-1.5 hidden" title="Toggle Favorite Mode"><i data-lucide="star" class="w-4 h-4"></i></button>
+                                    <button id="add-temporary-exercise-btn" class="btn btn-secondary !p-1.5 hidden" title="Add Exercise for Today"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                                </div>
                             </div>
                             <div id="workout-plan-for-day" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar pr-2"></div>
                         </div>
@@ -487,7 +486,6 @@
                     </div>
                 </div>
 
-                <!-- MODIFICATION: Added time range filter buttons for progression chart -->
                 <div class="content-card lg:col-span-4 lg:col-start-1">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                         <h3 class="text-xl sm:text-2xl font-semibold">Progression Chart</h3>
@@ -692,8 +690,9 @@
             let restTimerInterval = null;
             let isAddingFromLibrary = false;
             let modalUnit = 'kg';
-            let isNativeDragging = false; // FIX: Flag to prevent swipe/drag conflicts
-            let chartRange = 'year'; // MODIFICATION: New state for chart time range
+            let isNativeDragging = false; 
+            let chartRange = 'year';
+            let isFavoriteMode = false; // New state for favorite mode
             
             // Undo Toast State
             let undoTimeout = null;
@@ -722,7 +721,7 @@
                 exerciseDetailNotes: document.getElementById('exercise-detail-notes'), saveExerciseNotesBtn: document.getElementById('save-exercise-notes-btn'), logFromDetailBtn: document.getElementById('log-from-detail-btn'),
                 dayViewDateDisplayBtn: document.getElementById('day-view-date-display-btn'), dayViewStatus: document.getElementById('day-view-status'), dayViewDateDisplay: document.getElementById('day-view-date-display-btn'),
                 workoutPlanForDay: document.getElementById('workout-plan-for-day'), historyDayContent: document.getElementById('history-day-content'), 
-                dayNavigationCard: document.getElementById('day-navigation-card'), // MODIFICATION: New UI element for swipe
+                dayNavigationCard: document.getElementById('day-navigation-card'), 
                 aiTabSpecific: document.getElementById('ai-tab-specific'), aiTabGeneral: document.getElementById('ai-tab-general'), aiPanelSpecific: document.getElementById('ai-panel-specific'), openWorkoutChatBtn: document.getElementById('open-workout-chat-btn'),
                 workoutStatusControls: document.getElementById('workout-status-controls'),
                 reorganizeAiBtn: document.getElementById('reorganize-ai-btn'),
@@ -910,6 +909,17 @@
                 }
                 return `${weightKg.toFixed(1)} kg`;
             }
+            
+            // New function to toggle favorite by name
+            function toggleFavoriteByName(itemName) {
+                const exIndex = exerciseDB.findIndex(ex => ex.name === itemName);
+                if (exIndex > -1) {
+                    exerciseDB[exIndex].favorite = !exerciseDB[exIndex].favorite;
+                    saveData();
+                    renderWorkoutPlanForDate(viewDate); // Re-render to update star visuals
+                }
+            }
+
 
             // --- UNDO TOAST FUNCTION ---
             function showUndoToast(message, onUndo) {
@@ -977,7 +987,6 @@
                 ui.saveWorkoutBtn.textContent = 'Save Workout';
                 ui.setsContainer.innerHTML = '';
             
-                // --- MODIFICATION START: Dynamic Set Rows ---
                 const exerciseDetails = exerciseDB.find(ex => ex.name === exerciseName);
                 let numSets = 3; // Default to 3 sets
                 if (exerciseDetails && exerciseDetails.sets) {
@@ -989,7 +998,6 @@
                 for (let i = 0; i < numSets; i++) {
                     addSetRow();
                 }
-                // --- MODIFICATION END ---
             
                 modalUnit = userSettings.unit;
                 updateUnitToggleUI(modalUnit);
@@ -1020,7 +1028,9 @@
             
             // --- DAY VIEW & PLAN RENDERING ---
             function updateDayView(date) {
-                viewDate = date; 
+                viewDate = date;
+                isFavoriteMode = false; // Reset favorite mode when changing day
+                
                 renderWorkoutPlanForDate(date);
                 renderHistoryForDate(date);
                 updateWorkoutStatusControls(date);
@@ -1032,10 +1042,12 @@
                 ui.dayViewDateDisplay.querySelector('#day-view-title-span').textContent = date.toLocaleDateString(undefined, { weekday: 'long' }) + (isToday ? ' (Today)' : '');
                 ui.dayViewDateDisplay.querySelector('#day-view-date-span').textContent = date.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
                 
-                // NEW: Show/hide temporary add button
                 const addTempBtn = document.getElementById('add-temporary-exercise-btn');
-                if (addTempBtn) {
-                    addTempBtn.classList.toggle('hidden', isFutureDay);
+                const favModeBtn = document.getElementById('favorite-mode-toggle-btn');
+                if (addTempBtn) addTempBtn.classList.toggle('hidden', isFutureDay);
+                if (favModeBtn) {
+                    favModeBtn.classList.toggle('hidden', isFutureDay);
+                    favModeBtn.classList.remove('selected-full');
                 }
 
                 lucide.createIcons();
@@ -1049,13 +1061,10 @@
 
             function renderWorkoutPlanForDate(date) {
                 const dayType = getWorkoutDayType(date);
-                const today = new Date(); today.setHours(0,0,0,0);
-                const isFutureDay = date > today;
                 const dateKey = dateToKey(date);
                 const loggedExercisesForDay = new Set(workoutHistory.filter(log => log.date === dateKey).map(l => l.name));
                 let exercisesHtml = '';
 
-                // Handle daily modifications
                 const modsForDay = dailyModifications[dateKey] || { removed: [], added: [] };
                 const removedExercises = new Set(modsForDay.removed);
                 const addedExercises = modsForDay.added || [];
@@ -1068,37 +1077,35 @@
                     
                     const statusIcon = isLogged
                         ? '<i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>'
-                        : (!isFutureDay && dayType !== 'Rest' ? '<i data-lucide="x-circle" class="w-5 h-5 text-red-400/80"></i>' : '');
+                        : '';
                     
                     const temporaryBadge = isTemporary ? '<span class="text-xs ml-2 bg-blue-500/30 text-blue-300 px-1.5 py-0.5 rounded">Today</span>' : '';
 
+                    const buttonHtml = isFavoriteMode 
+                        ? `<button class="btn btn-secondary !p-2 favorite-toggle-btn" data-name="${ex.name}" title="Toggle Favorite">
+                               <i data-lucide="star" class="w-4 h-4 pointer-events-none ${isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-500'}"></i>
+                           </button>`
+                        : `<button class="btn btn-secondary !p-2 info-btn" data-name="${ex.name}" data-type="${type}" data-day-type="${dayType}" title="View Info">
+                               <i data-lucide="info" class="w-4 h-4 pointer-events-none"></i>
+                           </button>`;
+
                     return `
                         <div class="swipe-item plan-item-container rounded-lg" data-name="${ex.name}" data-type="${type}" data-day-type="${dayType}" draggable="true">
-                            <div class="swipe-actions">
-                                <div class="swipe-action-container left">
-                                    <div class="action delete"><i data-lucide="trash-2" class="pointer-events-none"></i><span class="ml-2 pointer-events-none">Remove</span></div>
-                                </div>
-                                <div class="swipe-action-container right">
-                                    <div class="action edit"><span class="mr-2 pointer-events-none">Edit</span><i data-lucide="pencil" class="pointer-events-none"></i></div>
-                                </div>
+                             <div class="swipe-actions">
+                                <div class="swipe-action-container left"><div class="action delete"><i data-lucide="trash-2" class="pointer-events-none"></i><span class="ml-2 pointer-events-none">Remove</span></div></div>
+                                <div class="swipe-action-container right"><div class="action edit"><span class="mr-2 pointer-events-none">Edit</span><i data-lucide="pencil" class="pointer-events-none"></i></div></div>
                             </div>
                             <div class="swipe-content p-3 rounded-lg">
                                 <div class="text-base text-gray-300 flex justify-between items-center group">
                                     <div class="flex-grow flex items-center gap-3">
-                                        <div class="w-5 h-5 flex-shrink-0 flex items-center justify-center">
-                                          ${statusIcon}
-                                        </div>
+                                        <div class="w-5 h-5 flex-shrink-0 flex items-center justify-center">${statusIcon}</div>
                                         ${type === 'exercise' ? `<i data-lucide="star" class="w-4 h-4 flex-shrink-0 favorite-indicator ${isFavorite ? 'text-yellow-400 fill-yellow-400' : 'text-transparent'}"></i>` : '<div class="w-4 h-4 flex-shrink-0"></div>'}
                                         <div>
                                             <span class="flex-grow text-left flex items-center">${ex.name}${temporaryBadge}</span>
                                             ${type === 'exercise' ? `<p class="text-xs text-blue-400">${ex.group}</p>` : ''}
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <button class="btn btn-secondary !p-2 log-workout-btn" data-name="${ex.name}" ${isFutureDay ? 'disabled' : ''}>
-                                            <i data-lucide="plus" class="w-4 h-4 pointer-events-none"></i>
-                                        </button>
-                                    </div>
+                                    <div class="flex items-center gap-2">${buttonHtml}</div>
                                 </div>
                             </div>
                         </div>`;
@@ -1210,7 +1217,7 @@
                 lucide.createIcons();
             }
 
-            // --- UNIFIED SWIPE & TAP HANDLERS (REBUILT & FIXED) ---
+            // --- UNIFIED SWIPE & TAP HANDLERS ---
             let pointerStart = { x: 0, y: 0 };
             let currentX = 0;
             let isSwiping = false;
@@ -1294,32 +1301,12 @@
                 }
             }
 
-            // NEW: Function to handle favoriting an exercise
-            function handleItemFavorite(element) {
-                const exName = element.dataset.name;
-                if (element.dataset.type !== 'exercise') return;
-
-                const exIndex = exerciseDB.findIndex(ex => ex.name === exName);
-                if (exIndex > -1) {
-                    exerciseDB[exIndex].favorite = !exerciseDB[exIndex].favorite;
-                    saveData();
-                    
-                    const indicator = element.querySelector('.favorite-indicator');
-                    if (indicator) {
-                        const isFavorite = exerciseDB[exIndex].favorite;
-                        indicator.classList.toggle('text-yellow-400', isFavorite);
-                        indicator.classList.toggle('fill-yellow-400', isFavorite);
-                        indicator.classList.toggle('text-transparent', !isFavorite);
-                    }
-                }
-            }
-
             function getPointerCoordinates(e) { return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY }; }
             
             function handlePointerDown(e) {
                 const target = e.target.closest('.swipe-item');
                 if (!target || e.target.closest('button, a')) return;
-                isNativeDragging = false; // FIX: Reset flag on new interaction start
+                isNativeDragging = false;
                 const coords = getPointerCoordinates(e);
                 pointerStart.x = coords.x; pointerStart.y = coords.y;
                 currentX = 0; swipedElement = target;
@@ -1329,7 +1316,7 @@
             }
 
             function handlePointerMove(e) {
-                if (isNativeDragging) return; // FIX: Prevent custom swipe if native drag is happening
+                if (isNativeDragging) return;
                 if (!swipedElement) return;
                 const coords = getPointerCoordinates(e);
                 const deltaX = coords.x - pointerStart.x; const deltaY = coords.y - pointerStart.y;
@@ -1361,19 +1348,16 @@
                     else if (currentX > swipeThreshold) { handleItemDelete(elementToClean); } 
                     else { content.style.transform = 'translateX(0)'; }
                 } else {
-                    const currentTime = new Date().getTime(); const tapLength = currentTime - lastTap;
-                    clearTimeout(tapTimeout);
-                    if (elementToClean.classList.contains('plan-item-container')) {
-                        if (tapLength < 300 && tapLength > 0) { // This is a double tap
-                            handleItemFavorite(elementToClean); 
-                            lastTap = 0; 
-                        } 
-                        else { // This is a single tap
-                            lastTap = currentTime;
-                            tapTimeout = setTimeout(() => { 
-                                const { name, type, dayType } = elementToClean.dataset; 
-                                openExerciseDetailModal(name, type, dayType); 
-                            }, 300);
+                     if (elementToClean.classList.contains('plan-item-container')) {
+                        const today = new Date(); today.setHours(0,0,0,0);
+                        const isFutureDay = viewDate > today;
+                        if (isFutureDay || isFavoriteMode || isNativeDragging) {
+                            // Do nothing on tap in these modes
+                        } else {
+                            const { name } = swipedElement.dataset;
+                            if (name) {
+                                openWorkoutModal(name);
+                            }
                         }
                     }
                 }
@@ -1387,7 +1371,7 @@
                 }, 300);
             }
 
-            // --- MODIFICATION: Day Navigation Swipe ---
+            // Day Navigation Swipe
             let dayNavPointerStart = { x: 0, y: 0 };
             let dayNavCurrentX = 0;
             let isDayNavSwiping = false;
@@ -1421,12 +1405,10 @@
                 document.removeEventListener('mousemove', handleDayNavPointerMove); document.removeEventListener('mouseup', handleDayNavPointerUp);
                 document.removeEventListener('touchmove', handleDayNavPointerMove); document.removeEventListener('touchend', handleDayNavPointerUp);
                 const swipeThreshold = 75; 
-                const today = new Date(); today.setHours(0,0,0,0);
-                const nextDay = new Date(viewDate); nextDay.setDate(nextDay.getDate() + 1);
 
                 ui.dayNavigationCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
                 if (isDayNavSwiping) {
-                    if (dayNavCurrentX < -swipeThreshold && nextDay <= today) { // Swipe left for next day
+                    if (dayNavCurrentX < -swipeThreshold) { // Swipe left for next day
                         viewDate.setDate(viewDate.getDate() + 1); 
                         updateUI(); 
                     } 
@@ -1448,7 +1430,7 @@
                     e.preventDefault();
                     return;
                 }
-                isNativeDragging = true; // FIX: Set flag
+                isNativeDragging = true; 
                 draggedPlanItem = e.target;
                 setTimeout(() => { if (draggedPlanItem) draggedPlanItem.classList.add('dragging'); }, 0);
             }
@@ -1459,7 +1441,7 @@
                     draggedPlanItem = null;
                 }
                 document.querySelectorAll('.plan-item-container.drag-over').forEach(el => el.classList.remove('drag-over'));
-                isNativeDragging = false; // FIX: Reset flag
+                isNativeDragging = false;
             }
             
             function getDragAfterElementPlan(container, y) {
@@ -1477,7 +1459,6 @@
                 const container = e.target.closest('.warmup-list, .exercise-list');
                 if (!container || !draggedPlanItem) return;
 
-                // FIX: Prevent mixing warmup and workout items
                 const draggedType = draggedPlanItem.dataset.type;
                 if ((draggedType === 'warmup' && !container.classList.contains('warmup-list')) ||
                     (draggedType === 'exercise' && !container.classList.contains('exercise-list'))) {
@@ -1493,8 +1474,7 @@
                 e.preventDefault();
                 const container = e.target.closest('.warmup-list, .exercise-list');
                 if (!container || !draggedPlanItem) return;
-
-                // FIX: Prevent mixing warmup and workout items
+                
                 const draggedType = draggedPlanItem.dataset.type;
                 if ((draggedType === 'warmup' && !container.classList.contains('warmup-list')) ||
                     (draggedType === 'exercise' && !container.classList.contains('exercise-list'))) {
@@ -1528,14 +1508,29 @@
             ui.historyDayContent.addEventListener('touchstart', handlePointerDown, { passive: true });
             
             ui.workoutPlanForDay.addEventListener('click', (e) => {
-                const logBtn = e.target.closest('.log-workout-btn');
-                if(logBtn) openWorkoutModal(logBtn.dataset.name);
+                const infoBtn = e.target.closest('.info-btn');
+                const favoriteBtn = e.target.closest('.favorite-toggle-btn');
+
+                if (infoBtn) {
+                    const { name, type, dayType } = infoBtn.dataset;
+                    openExerciseDetailModal(name, type, dayType);
+                }
+
+                if (favoriteBtn) {
+                    toggleFavoriteByName(favoriteBtn.dataset.name);
+                }
             });
 
             document.getElementById('undo-toast-btn').addEventListener('click', () => {
                 if (undoCallback) undoCallback();
                 clearTimeout(undoTimeout); document.getElementById('undo-toast').classList.remove('show');
                 undoCallback = null;
+            });
+            
+            document.getElementById('favorite-mode-toggle-btn').addEventListener('click', (e) => {
+                isFavoriteMode = !isFavoriteMode;
+                e.currentTarget.classList.toggle('selected-full', isFavoriteMode);
+                renderWorkoutPlanForDate(viewDate);
             });
 
             ui.closeExerciseLibraryModalBtn.addEventListener('click', () => hideModal(ui.exerciseLibraryModal));
@@ -1552,7 +1547,7 @@
                         workout.exercises = Array.from(existingExercises);
                         renderExercisesForEdit(dayType);
                     }
-                } else if (libraryModalContext.purpose === 'add-temporary') { // NEW: Handle temporary add
+                } else if (libraryModalContext.purpose === 'add-temporary') {
                     const { dateKey } = libraryModalContext;
                     if (selected.length > 0 && dateKey) {
                         if (!dailyModifications[dateKey]) {
@@ -1617,7 +1612,6 @@
                 chatInput.value = prompt; handleAiChatSend();
             });
 
-            // MODIFICATION: Add event listener for new chart range buttons
             document.getElementById('progress-range-selector').addEventListener('click', e => {
                 const btn = e.target.closest('.progress-range-btn');
                 if (btn) {
@@ -1639,7 +1633,6 @@
                 ui.aiAdviceExerciseSelect.innerHTML = '<option value="">Select an exercise...</option>' + singleExerciseOptions;
             };
             
-            // MODIFICATION: Helper to filter logs by date range
             function getStartDateForRange(range) {
                 const now = new Date();
                 if (range === 'month') {
@@ -1657,7 +1650,6 @@
                 return null; // for 'all'
             }
 
-            // MODIFICATION: Updated progression chart rendering
             function renderProgressionChart(selection) {
                 if (selection === "today-general") { renderTodaysGeneralProgressionChart(); return; }
                 if (selection === "general" || !selection) { renderGeneralProgressionChart(); return; }
@@ -2097,7 +2089,6 @@
                 libraryModalContext = { purpose: 'edit-plan-add', dayType: dayType }; openExerciseLibrary();
             });
 
-            // NEW: Add temporary exercise listener
             document.getElementById('add-temporary-exercise-btn').addEventListener('click', () => {
                 const dayType = getWorkoutDayType(viewDate);
                 if (!dayType || dayType === 'Rest') {
@@ -2388,7 +2379,6 @@
             document.getElementById('ai-chat-send-btn').addEventListener('click', handleAiChatSend);
             document.getElementById('ai-chat-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') handleAiChatSend(); });
 
-            // MODIFICATION: Day navigation swipe listeners moved to the correct card
             ui.dayNavigationCard.addEventListener('mousedown', handleDayNavPointerDown);
             ui.dayNavigationCard.addEventListener('touchstart', handleDayNavPointerDown, { passive: true });
             

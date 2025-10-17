@@ -468,7 +468,6 @@
                             <div class="flex justify-between items-center mb-2 border-b border-border-color pb-1">
                                 <h5 class="font-semibold text-lg">Plan</h5>
                                 <div class="flex items-center gap-2">
-                                    <button id="favorite-mode-toggle-btn" class="btn btn-secondary !p-1.5 hidden" title="Toggle Favorite Mode"><i data-lucide="star" class="w-4 h-4"></i></button>
                                     <button id="add-temporary-exercise-btn" class="btn btn-secondary !p-1.5 hidden" title="Add Exercise for Today"><i data-lucide="plus" class="w-4 h-4"></i></button>
                                 </div>
                             </div>
@@ -692,7 +691,6 @@
             let modalUnit = 'kg';
             let isNativeDragging = false; 
             let chartRange = 'year';
-            let isFavoriteMode = false; // New state for favorite mode
             
             // Undo Toast State
             let undoTimeout = null;
@@ -1029,7 +1027,6 @@
             // --- DAY VIEW & PLAN RENDERING ---
             function updateDayView(date) {
                 viewDate = date;
-                isFavoriteMode = false; // Reset favorite mode when changing day
                 
                 renderWorkoutPlanForDate(date);
                 renderHistoryForDate(date);
@@ -1043,12 +1040,7 @@
                 ui.dayViewDateDisplay.querySelector('#day-view-date-span').textContent = date.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
                 
                 const addTempBtn = document.getElementById('add-temporary-exercise-btn');
-                const favModeBtn = document.getElementById('favorite-mode-toggle-btn');
                 if (addTempBtn) addTempBtn.classList.toggle('hidden', isFutureDay);
-                if (favModeBtn) {
-                    favModeBtn.classList.toggle('hidden', isFutureDay);
-                    favModeBtn.classList.remove('selected-full');
-                }
 
                 lucide.createIcons();
             }
@@ -1075,20 +1067,33 @@
                     const isLogged = loggedExercisesForDay.has(ex.name);
                     const isFavorite = type === 'exercise' && ex.favorite;
                     
+                    // CHANGE 2: Add cross for un-logged exercises
                     const statusIcon = isLogged
                         ? '<i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>'
-                        : '';
+                        : '<i data-lucide="x-circle" class="w-5 h-5 text-gray-600"></i>';
                     
                     const temporaryBadge = isTemporary ? '<span class="text-xs ml-2 bg-blue-500/30 text-blue-300 px-1.5 py-0.5 rounded">Today</span>' : '';
 
-                    const buttonHtml = isFavoriteMode 
-                        ? `<button class="btn btn-secondary !p-2 favorite-toggle-btn" data-name="${ex.name}" title="Toggle Favorite">
-                               <i data-lucide="star" class="w-4 h-4 pointer-events-none ${isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-500'}"></i>
-                           </button>`
-                        : `<button class="btn btn-secondary !p-2 info-btn" data-name="${ex.name}" data-type="${type}" data-day-type="${dayType}" title="View Info">
-                               <i data-lucide="info" class="w-4 h-4 pointer-events-none"></i>
-                           </button>`;
+                    // CHANGE 3: New button logic
+                    let buttonHtml = '';
+                    if (type === 'exercise') {
+                        buttonHtml = `
+                            <button class="btn btn-secondary !p-2 favorite-toggle-btn" data-name="${ex.name}" title="Toggle Favorite">
+                                <i data-lucide="star" class="w-4 h-4 pointer-events-none ${isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-500'}"></i>
+                            </button>
+                            <button class="btn btn-secondary !p-2 info-btn" data-name="${ex.name}" data-type="${type}" data-day-type="${dayType}" title="View Info">
+                                <i data-lucide="info" class="w-4 h-4 pointer-events-none"></i>
+                            </button>
+                        `;
+                    } else { // for warmups, just show the info button
+                        buttonHtml = `
+                            <button class="btn btn-secondary !p-2 info-btn" data-name="${ex.name}" data-type="${type}" data-day-type="${dayType}" title="View Info">
+                                <i data-lucide="info" class="w-4 h-4 pointer-events-none"></i>
+                            </button>
+                        `;
+                    }
 
+                    // CHANGE 3: Removed favorite-indicator from the main content area
                     return `
                         <div class="swipe-item plan-item-container rounded-lg" data-name="${ex.name}" data-type="${type}" data-day-type="${dayType}" draggable="true">
                              <div class="swipe-actions">
@@ -1099,7 +1104,6 @@
                                 <div class="text-base text-gray-300 flex justify-between items-center group">
                                     <div class="flex-grow flex items-center gap-3">
                                         <div class="w-5 h-5 flex-shrink-0 flex items-center justify-center">${statusIcon}</div>
-                                        ${type === 'exercise' ? `<i data-lucide="star" class="w-4 h-4 flex-shrink-0 favorite-indicator ${isFavorite ? 'text-yellow-400 fill-yellow-400' : 'text-transparent'}"></i>` : '<div class="w-4 h-4 flex-shrink-0"></div>'}
                                         <div>
                                             <span class="flex-grow text-left flex items-center">${ex.name}${temporaryBadge}</span>
                                             ${type === 'exercise' ? `<p class="text-xs text-blue-400">${ex.group}</p>` : ''}
@@ -1351,7 +1355,8 @@
                      if (elementToClean.classList.contains('plan-item-container')) {
                         const today = new Date(); today.setHours(0,0,0,0);
                         const isFutureDay = viewDate > today;
-                        if (isFutureDay || isFavoriteMode || isNativeDragging) {
+                        // CHANGE 3: Removed isFavoriteMode from this check
+                        if (isFutureDay || isNativeDragging) {
                             // Do nothing on tap in these modes
                         } else {
                             const { name } = swipedElement.dataset;
@@ -1377,7 +1382,8 @@
             let isDayNavSwiping = false;
 
             function handleDayNavPointerDown(e) {
-                if (e.target.closest('.swipe-item, a, select, input, button')) return;
+                // CHANGE 1: Allow swipe to start on the date/title button
+                if (e.target.closest('.swipe-item, a, select, input')) return;
                 const coords = getPointerCoordinates(e);
                 dayNavPointerStart.x = coords.x; dayNavPointerStart.y = coords.y;
                 dayNavCurrentX = 0; isDayNavSwiping = false;
@@ -1527,12 +1533,6 @@
                 undoCallback = null;
             });
             
-            document.getElementById('favorite-mode-toggle-btn').addEventListener('click', (e) => {
-                isFavoriteMode = !isFavoriteMode;
-                e.currentTarget.classList.toggle('selected-full', isFavoriteMode);
-                renderWorkoutPlanForDate(viewDate);
-            });
-
             ui.closeExerciseLibraryModalBtn.addEventListener('click', () => hideModal(ui.exerciseLibraryModal));
             
             ui.addSelectedExercisesBtn.addEventListener('click', () => {
@@ -1972,7 +1972,7 @@
                 filterSelect.value = group || ""; equipmentFilterSelect.value = ""; searchInput.value = '';
                 const preSelected = libraryModalContext.purpose === 'pref' ? exercisePrefs[group] : undefined;
                 const renderLibrary = (muscleFilter = '', search = '', equipmentFilter = '') => {
-                    libraryList.innerHTML = exerciseDB.filter(ex => (muscleFilter ? ex.group === muscleFilter : true) && (equipmentFilter ? ex.type === equipmentFilter : true) && (search ? ex.name.toLowerCase().includes(search.toLowerCase()) : true)).sort((a,b) => a.name.localeCompare(b.name)).map(ex => ` <div class="flex items-center justify-between p-2 rounded-md hover:bg-input-bg group"> <label class="flex-grow flex items-center gap-3 cursor-pointer"> <input type="checkbox" value="${ex.name}" ${ (libraryModalContext.purpose === 'add' && false) || (libraryModalContext.purpose === 'pref' && (preSelected === undefined || preSelected.includes(ex.name))) ? 'checked' : ''} class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500"> <div><p>${ex.name}</p><p class="text-xs text-blue-400">${ex.group}</p></div> </label> <div class="hidden group-hover:flex items-center gap-1"> <button class="btn !p-1.5 !bg-transparent edit-exercise-library-btn" data-id="${ex.id}" title="Edit"><i data-lucide="pencil" class="w-4 h-4 pointer-events-none"></i></button> <button class="btn !p-1.5 !bg-transparent delete-exercise-library-btn" data-id="${ex.id}" title="Delete"><i data-lucide="trash-2" class="w-4 h-4 text-red-500/80 pointer-events-none"></i></button> </div> </div>`).join('');
+                    libraryList.innerHTML = exerciseDB.filter(ex => (muscleFilter ? ex.group === muscleFilter : true) && (equipmentFilter ? ex.type === equipmentFilter : true) && (search ? ex.name.toLowerCase().includes(search.toLowerCase()) : true)).sort((a,b) => a.name.localeCompare(b.name)).map(ex => ` <div class="flex items-center justify-between p-2 rounded-md hover:bg-input-bg group"> <label class="flex-grow flex items-center gap-3 cursor-pointer"> <input type="checkbox" value="${ex.name}" ${ (libraryModalContext.purpose === 'add' && false) || (libraryModalContext.purpose === 'pref' && (preSelected === undefined || preSelected.includes(ex.name))) ? 'checked' : ''} class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500"> <div><p>${ex.name}</p><p class="text-xs text-blue-400">${ex.group}</p></div> </label> <div class="hidden group-hover:flex items-center gap-1"> <button class="btn !p-1.5 !bg-transparent edit-exercise-library-btn" data-id="${ex.id}" title="Edit"><i data-lucide="pencil" class="w-4 h-4 pointer-events-none"></i></button> <button class="btn !p-1.5 !bg-transparent delete-exercise-library-btn" data-id="${ex.id}" title="Delete"><i data-lucide="trash-2" class="w-4 h-4 text-red-500/80 pointer-events-none"></i></button> </div> </div> `).join('');
                         lucide.createIcons();
                 };
                 const renderFilteredLibrary = () => { renderLibrary(filterSelect.value, searchInput.value, equipmentFilterSelect.value); };

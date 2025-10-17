@@ -323,12 +323,12 @@
         }
 
         /* --- HISTORY SWIPE --- */
-        #plan-history-grid {
+        #plan-history-container-card {
             touch-action: pan-y;
             cursor: grab;
         }
 
-        #plan-history-grid:active {
+        #plan-history-container-card:active {
             cursor: grabbing;
         }
         
@@ -434,8 +434,9 @@
                 </div>
             
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-8">
+                <!-- Day Navigation Card -->
                 <div class="lg:col-span-4 content-card">
-                    <div id="plan-view-header" class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+                    <div id="plan-view-header" class="flex flex-col sm:flex-row justify-between items-center gap-4">
                          <div class="flex-1">
                              <button id="day-view-date-display-btn" class="text-left hover:bg-input-bg px-4 py-2 rounded-lg transition-colors w-full">
                                  <span id="day-view-title-span" class="text-xl sm:text-2xl font-semibold block"></span>
@@ -461,26 +462,29 @@
                             <button id="next-day-btn" class="btn btn-secondary !p-2"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
                         </div>
                     </div>
-                    <div>
-                        <div id="plan-history-grid" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mt-4">
-                            <div>
-                                <div class="flex justify-between items-center mb-2 border-b border-border-color pb-1">
-                                    <h5 class="font-semibold text-lg">Plan</h5>
-                                </div>
-                                <div id="workout-plan-for-day" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar pr-2"></div>
+                </div>
+
+                <!-- Plan and History Card -->
+                <div id="plan-history-container-card" class="content-card lg:col-span-4">
+                    <div id="plan-history-grid" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                        <div>
+                            <div class="flex justify-between items-center mb-2 border-b border-border-color pb-1">
+                                <h5 class="font-semibold text-lg">Plan</h5>
                             </div>
-                            <div>
-                                <div class="flex justify-between items-center mb-2 border-b border-border-color pb-1">
-                                    <h5 class="font-semibold text-lg">History</h5>
-                                    <button id="clear-history-btn" class="btn btn-secondary !p-1.5 !text-red-400" title="Clear All History"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                                </div>
-                                <div id="history-day-content" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar pr-2">
-                                    <p class="text-secondary-text">No workouts logged.</p>
-                                </div>
+                            <div id="workout-plan-for-day" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar pr-2"></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2 border-b border-border-color pb-1">
+                                <h5 class="font-semibold text-lg">History</h5>
+                                <button id="clear-history-btn" class="btn btn-secondary !p-1.5 !text-red-400" title="Clear All History"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                            <div id="history-day-content" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar pr-2">
+                                <p class="text-secondary-text">No workouts logged.</p>
                             </div>
                         </div>
                     </div>
                 </div>
+
 
                 <div class="content-card lg:col-span-4 lg:col-start-1">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
@@ -708,7 +712,7 @@
                 exerciseDetailNotes: document.getElementById('exercise-detail-notes'), saveExerciseNotesBtn: document.getElementById('save-exercise-notes-btn'), logFromDetailBtn: document.getElementById('log-from-detail-btn'),
                 dayViewDateDisplayBtn: document.getElementById('day-view-date-display-btn'), dayViewStatus: document.getElementById('day-view-status'), dayViewDateDisplay: document.getElementById('day-view-date-display-btn'),
                 workoutPlanForDay: document.getElementById('workout-plan-for-day'), historyDayContent: document.getElementById('history-day-content'), 
-                planHistoryGrid: document.getElementById('plan-history-grid'),
+                planHistoryContainerCard: document.getElementById('plan-history-container-card'),
                 prevDayBtn: document.getElementById('prev-day-btn'), nextDayBtn: document.getElementById('next-day-btn'),
                 aiTabSpecific: document.getElementById('ai-tab-specific'), aiTabGeneral: document.getElementById('ai-tab-general'), aiPanelSpecific: document.getElementById('ai-panel-specific'), openWorkoutChatBtn: document.getElementById('open-workout-chat-btn'),
                 workoutStatusControls: document.getElementById('workout-status-controls'),
@@ -1279,11 +1283,11 @@
             let isDayNavSwiping = false;
 
             function handleDayNavPointerDown(e) {
-                if (e.target.closest('.swipe-item, button')) return;
+                if (e.target.closest('.swipe-item, button, .custom-scrollbar')) return;
                 const coords = getPointerCoordinates(e);
                 dayNavPointerStart.x = coords.x; dayNavPointerStart.y = coords.y;
                 dayNavCurrentX = 0; isDayNavSwiping = false;
-                ui.planHistoryGrid.style.transition = 'none';
+                ui.planHistoryContainerCard.style.transition = 'none';
                 document.addEventListener('mousemove', handleDayNavPointerMove); document.addEventListener('mouseup', handleDayNavPointerUp);
                 document.addEventListener('touchmove', handleDayNavPointerMove, { passive: false }); document.addEventListener('touchend', handleDayNavPointerUp);
             }
@@ -1298,8 +1302,8 @@
                 if (isDayNavSwiping) {
                     if(e.cancelable) e.preventDefault();
                     dayNavCurrentX = deltaX;
-                    ui.planHistoryGrid.style.transform = `translateX(${dayNavCurrentX}px)`;
-                    ui.planHistoryGrid.style.opacity = (1 - Math.abs(dayNavCurrentX) / ui.planHistoryGrid.offsetWidth).toString();
+                    ui.planHistoryContainerCard.style.transform = `translateX(${dayNavCurrentX}px)`;
+                    ui.planHistoryContainerCard.style.opacity = (1 - Math.abs(dayNavCurrentX) / ui.planHistoryContainerCard.offsetWidth).toString();
                 }
             }
 
@@ -1307,14 +1311,14 @@
                 document.removeEventListener('mousemove', handleDayNavPointerMove); document.removeEventListener('mouseup', handleDayNavPointerUp);
                 document.removeEventListener('touchmove', handleDayNavPointerMove); document.removeEventListener('touchend', handleDayNavPointerUp);
                 const swipeThreshold = 75; 
-                ui.planHistoryGrid.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                ui.planHistoryContainerCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
                 if (isDayNavSwiping) {
                     if (dayNavCurrentX < -swipeThreshold) { viewDate.setDate(viewDate.getDate() + 1); updateUI(); } 
                     else if (dayNavCurrentX > swipeThreshold) { viewDate.setDate(viewDate.getDate() - 1); updateUI(); }
                 }
-                ui.planHistoryGrid.style.transform = 'translateX(0)'; ui.planHistoryGrid.style.opacity = '1';
+                ui.planHistoryContainerCard.style.transform = 'translateX(0)'; ui.planHistoryContainerCard.style.opacity = '1';
                 isDayNavSwiping = false; dayNavCurrentX = 0;
-                setTimeout(() => { ui.planHistoryGrid.style.transition = ''; }, 300);
+                setTimeout(() => { ui.planHistoryContainerCard.style.transition = ''; }, 300);
             }
 
             // --- EVENT LISTENERS ---
@@ -1808,7 +1812,7 @@
             function renderWarmupsForEdit(dayType) {
                 const warmupItems = warmups[dayType] || [];
                 if (warmupItems.length === 0) { ui.editPlanWarmupList.innerHTML = `<p class="text-secondary-text p-4 text-center">No warm-ups for ${dayType} day.</p>`; return; }
-                ui.editPlanWarmupList.innerHTML = warmupItems.map((warmup, index) => ` <div class="draggable-item flex items-center justify-between p-2 rounded-md hover:bg-input-bg" draggable="true" data-index="${index}"> <div class="flex items-center gap-3"> <i data-lucide="grip-vertical" class="drag-handle text-gray-500"></i> <span>${warmup.name}</span> </div> <div class="flex items-center gap-1"> <button class="btn !p-1.5 !bg-transparent edit-warmup-btn" title="Edit Warmup"><i data-lucide="pencil" class="w-4 h-4 pointer-events-none"></i></button> <button class="btn !p-1.5 !bg-transparent delete-warmup-btn" title="Remove Warmup"><i data-lucide="trash-2" class="w-4 h-4 text-red-500/80 pointer-events-none"></i></button> </div> </div> `).join('');
+                ui.editPlanWarmupList.innerHTML = warmupItems.map((warmup) => ` <div class="draggable-item flex items-center justify-between p-2 rounded-md hover:bg-input-bg" draggable="true" data-name="${warmup.name}"> <div class="flex items-center gap-3"> <i data-lucide="grip-vertical" class="drag-handle text-gray-500"></i> <span>${warmup.name}</span> </div> <div class="flex items-center gap-1"> <button class="btn !p-1.5 !bg-transparent edit-warmup-btn" title="Edit Warmup"><i data-lucide="pencil" class="w-4 h-4 pointer-events-none"></i></button> <button class="btn !p-1.5 !bg-transparent delete-warmup-btn" title="Remove Warmup"><i data-lucide="trash-2" class="w-4 h-4 text-red-500/80 pointer-events-none"></i></button> </div> </div> `).join('');
                 lucide.createIcons();
             }
 
@@ -1865,19 +1869,21 @@
                 
                 (workoutPlan.workouts || []).forEach(workout => {
                     const dayType = workout.day;
-                    if (ui.editPlanDayTypeSelect.value === dayType) {
+                    const dayTypeSelect = document.getElementById('edit-plan-day-type-select');
+                    if (dayTypeSelect && dayTypeSelect.value === dayType) {
                         const newExerciseOrder = Array.from(ui.editPlanExerciseList.querySelectorAll('.draggable-item')).map(el => el.dataset.name);
                         workout.exercises = newExerciseOrder;
                     }
                 });
 
                 Object.keys(warmups).forEach(dayType => {
-                    if (ui.editPlanWarmupDayTypeSelect.value === dayType) {
-                        const newWarmupOrder = Array.from(ui.editPlanWarmupList.querySelectorAll('.draggable-item')).map(el => {
-                            const originalIndex = parseInt(el.dataset.index);
-                            return warmups[dayType][originalIndex];
-                        });
-                        warmups[dayType] = newWarmupOrder;
+                     const dayTypeSelect = document.getElementById('edit-plan-warmup-day-type-select');
+                     if (dayTypeSelect && dayTypeSelect.value === dayType) {
+                        const currentWarmupsMap = new Map(warmups[dayType].map(w => [w.name, w]));
+                        const newWarmupOrderNames = Array.from(ui.editPlanWarmupList.querySelectorAll('.draggable-item')).map(el => el.dataset.name);
+                        
+                        const reorderedWarmups = newWarmupOrderNames.map(name => currentWarmupsMap.get(name)).filter(Boolean);
+                        warmups[dayType] = reorderedWarmups;
                     }
                 });
                 
@@ -1897,8 +1903,10 @@
                  const dayType = ui.editPlanWarmupDayTypeSelect.value;
                  const item = e.target.closest('.draggable-item'); if (!item) return;
 
-                 const index = parseInt(item.dataset.index);
-                 const warmup = warmups[dayType][index];
+                 const name = item.dataset.name;
+                 const warmup = warmups[dayType].find(w => w.name === name);
+                 if (!warmup) return;
+                 const index = warmups[dayType].indexOf(warmup);
                  
                  if (e.target.closest('.edit-warmup-btn')) {
                      editingWarmupIndex = index; document.getElementById('warmup-form-title').textContent = `Edit Warmup for ${dayType}`;
@@ -2093,8 +2101,8 @@
             document.getElementById('ai-chat-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') handleAiChatSend(); });
 
             // Day navigation swipe listeners
-            ui.planHistoryGrid.addEventListener('mousedown', handleDayNavPointerDown);
-            ui.planHistoryGrid.addEventListener('touchstart', handleDayNavPointerDown, { passive: true });
+            ui.planHistoryContainerCard.addEventListener('mousedown', handleDayNavPointerDown);
+            ui.planHistoryContainerCard.addEventListener('touchstart', handleDayNavPointerDown, { passive: true });
             
             // --- NEW: Mobile Menu Listeners ---
             const openMenu = () => {

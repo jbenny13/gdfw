@@ -438,32 +438,30 @@
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-8">
                 <div id="day-navigation-card" class="lg:col-span-4 content-card">
                     <div id="plan-view-header" class="flex flex-col sm:flex-row justify-between items-center gap-4">
-                         <div class="flex-1">
-                             <button id="day-view-date-display-btn" class="text-left hover:bg-input-bg px-4 py-2 rounded-lg transition-colors w-full">
-                                 <span id="day-view-title-span" class="text-xl sm:text-2xl font-semibold block"></span>
-                                 <span id="day-view-date-span" class="text-sm sm:text-base text-secondary-text"></span>
-                             </button>
+                           <div class="flex-1">
+                               <button id="day-view-date-display-btn" class="text-left hover:bg-input-bg px-4 py-2 rounded-lg transition-colors w-full">
+                                   <span id="day-view-title-span" class="text-xl sm:text-2xl font-semibold block"></span>
+                                   <span id="day-view-date-span" class="text-sm sm:text-base text-secondary-text"></span>
+                               </button>
+                           </div>
+                         <div class="flex flex-col items-center justify-center sm:justify-between gap-2">
+                             <div class="flex items-center justify-center">
+                                 <span id="day-view-status" class="text-sm font-bold text-secondary-text w-full sm:w-auto text-center"></span>
+                                 <!-- REORGANIZE BUTTON REMOVED HERE -->
+                             </div>
+                             <div id="workout-status-controls" class="flex gap-2 text-sm">
+                                 <button class="status-btn btn !p-2 !py-1" data-status="full">Full</button>
+                                 <button class="status-btn btn !p-2 !py-1" data-status="partial">Partial</button>
+                                 <button class="status-btn btn !p-2 !py-1" data-status="none">None</button>
+                             </div>
                          </div>
-                        <div class="flex flex-col items-center justify-center sm:justify-between gap-2">
-                            <div class="flex items-center justify-center">
-                                <span id="day-view-status" class="text-sm font-bold text-secondary-text w-full sm:w-auto text-center"></span>
-                                <button id="reorganize-ai-btn" class="btn btn-secondary !p-2 !py-1 text-xs hidden ml-2">
-                                    <i data-lucide="wand-2" class="w-3 h-3"></i>
-                                    <span>Reorganize</span>
-                                </button>
-                            </div>
-                            <div id="workout-status-controls" class="flex gap-2 text-sm">
-                                <button class="status-btn btn !p-2 !py-1" data-status="full">Full</button>
-                                <button class="status-btn btn !p-2 !py-1" data-status="partial">Partial</button>
-                                <button class="status-btn btn !p-2 !py-1" data-status="none">None</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <!-- Plan and History Card -->
+                <!-- Plan Card (Modified to remove History column for space) -->
                 <div id="plan-history-container-card" class="content-card lg:col-span-4">
-                    <div id="plan-history-grid" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                    <!-- Updated grid class to remove the second column for history -->
+                    <div id="plan-history-grid" class="grid grid-cols-1 gap-x-8 gap-y-4">
                         <div>
                             <div class="flex justify-between items-center mb-2 border-b border-border-color pb-1">
                                 <h5 class="font-semibold text-lg">Plan</h5>
@@ -471,17 +469,10 @@
                                     <button id="add-temporary-exercise-btn" class="btn btn-secondary !p-1.5 hidden" title="Add Exercise for Today"><i data-lucide="plus" class="w-4 h-4"></i></button>
                                 </div>
                             </div>
-                            <div id="workout-plan-for-day" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar pr-2"></div>
+                            <!-- Increased max-height slightly to utilize the newly freed vertical space -->
+                            <div id="workout-plan-for-day" class="space-y-2 max-h-[28rem] overflow-y-auto custom-scrollbar pr-2"></div>
                         </div>
-                        <div>
-                            <div class="flex justify-between items-center mb-2 border-b border-border-color pb-1">
-                                <h5 class="font-semibold text-lg">History</h5>
-                                <button id="clear-history-btn" class="btn btn-secondary !p-1.5 !text-red-400" title="Clear All History"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                            </div>
-                            <div id="history-day-content" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar pr-2">
-                                <p class="text-secondary-text">No workouts logged.</p>
-                            </div>
-                        </div>
+                        <!-- HISTORY SECTION REMOVED AS REQUESTED -->
                     </div>
                 </div>
 
@@ -529,7 +520,7 @@
                                 <button id="open-workout-chat-btn" class="btn btn-primary w-full">Chat with AI Coach</button>
                             </div>
                         </div>
-                  </div>
+                    </div>
             </div>
         </main>
     </div>
@@ -612,11 +603,11 @@
             <div id="exercise-gif-loader" class="loader hidden"></div>
             <div id="exercise-gif-animation" class="w-full h-full bg-no-repeat bg-contain bg-center"></div>
              <button id="redo-gif-btn" class="absolute bottom-2 right-2 btn btn-secondary !p-1.5 hidden" title="Redo Animation">
-                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-            </button>
+                 <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+             </button>
         </div>
         <div><h3 class="font-bold text-lg text-blue-400 mb-2">Instructions</h3><textarea id="exercise-detail-instructions" class="form-input mt-1 w-full bg-input-bg text-sm transition-colors" disabled style="resize: none; overflow-y: hidden;"></textarea><button id="save-instructions-btn" class="mt-2 w-full btn btn-secondary">Edit Instructions</button></div><div class="grid grid-cols-2 gap-4"><div><h3 class="font-bold text-lg text-blue-400 mb-2">Sets</h3><p id="exercise-detail-sets" class="text-gray-300"></p></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Rep Range</h3><p id="exercise-detail-rep-range" class="text-gray-300"></p></div></div><div><h3 class="font-bold text-lg text-blue-400 mb-2">Personal Notes & Advice</h3><textarea id="exercise-detail-notes" rows="4" class="form-input mt-1" placeholder="Add your personal cues, weight progression goals, etc."></textarea><button id="save-exercise-notes-btn" class="mt-2 w-full btn btn-secondary">Save Notes</button></div><button id="log-from-detail-btn" class="w-full btn btn-primary mt-4">Log This Exercise</button></div></div></div>
-    <div id="warmup-manage-modal" class="modal-backdrop"><div class="modal-content !max-w-xl"><div class="flex justify-between items-center mb-4"><h2 id="warmup-form-title" class="text-xl sm:text-2xl font-bold">Manage Warm-up</h2><button id="close-warmup-manage-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="warmup-form" class="space-y-3"><div><label for="warmup-name" class="form-label">Name</label><input type="text" id="warmup-name" class="form-input mt-1" required></div><div><label for="warmup-instructions" class="form-label">Instructions (one per line)</label><textarea id="warmup-instructions" rows="4" class="form-input mt-1"></textarea></div><button type="submit" id="save-warmup-btn" class="w-full btn btn-primary">Add Warm-up</button></form></div></div>
+    <div id="warmup-manage-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="warmup-form-title" class="text-xl sm:text-2xl font-bold">Manage Warm-up</h2><button id="close-warmup-manage-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="warmup-form" class="space-y-3"><div><label for="warmup-name" class="form-label">Name</label><input type="text" id="warmup-name" class="form-input mt-1" required></div><div><label for="warmup-instructions" class="form-label">Instructions (one per line)</label><textarea id="warmup-instructions" rows="4" class="form-input mt-1"></textarea></div><button type="submit" id="save-warmup-btn" class="w-full btn btn-primary">Add Warm-up</button></form></div></div>
     <div id="workout-modal" class="modal-backdrop"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 id="modal-title" class="text-xl sm:text-2xl font-bold">Log Exercise</h2><div class="flex items-center gap-1 border border-border-color rounded-lg p-1"><button type="button" id="unit-toggle-kg" class="btn !py-1 !px-3 text-sm unit-toggle-btn">kg</button><button type="button" id="unit-toggle-lbs" class="btn !py-1 !px-3 text-sm unit-toggle-btn">lbs</button></div><button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div><form id="workout-log-form"><div class="space-y-4"><div id="sets-container"></div><button type="button" id="add-set-btn" class="w-full btn btn-secondary">Add Set</button><button type="submit" id="save-workout-btn" class="w-full btn btn-primary mt-2">Save Workout</button></div></form></div></div>
     <div id="exercise-library-modal" class="modal-backdrop"><div class="modal-content !max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-xl sm:text-2xl font-bold" id="exercise-library-title">Exercise Library</h2><button id="close-exercise-library-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button></div>
     <div class="flex flex-wrap gap-2 mb-4">
@@ -635,8 +626,8 @@
             <h2 class="text-xl font-bold mb-4">Permanent Edits</h2>
             <p class="text-gray-300 mb-6">To permanently edit an exercise's details (like instructions or name), please use the "Edit Current Plan" section or manage it in the Exercise Library. Swiping here only allows temporary, single-day removal.</p>
             <div class="flex items-center mb-6">
-                 <input type="checkbox" id="permanent-edit-dont-show-again" class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500">
-                 <label for="permanent-edit-dont-show-again" class="ml-2 text-sm text-gray-400">Don't show this again</label>
+                <input type="checkbox" id="permanent-edit-dont-show-again" class="form-checkbox h-4 w-4 bg-input-bg border-border-color rounded text-blue-500 focus:ring-blue-500">
+                <label for="permanent-edit-dont-show-again" class="ml-2 text-sm text-gray-400">Don't show this again</label>
             </div>
             <div class="flex justify-end">
                 <button id="permanent-edit-ok-btn" class="btn btn-primary">OK</button>
@@ -676,6 +667,7 @@
             let userSettings = { unit: 'kg', showPermanentEditWarning: true };
             let workoutChatHistory = [];
             let dailyModifications = {}; // For temporary daily changes
+            let lastLoggedSets = {}; // NEW: Stores the last logged weights/reps per exercise
             let currentlyLoggingExercise = null;
             let editingWorkoutLogId = null;
             let editingExerciseId = null;
@@ -711,14 +703,14 @@
                 exerciseLibraryModal: document.getElementById('exercise-library-modal'), closeExerciseLibraryModalBtn: document.getElementById('close-exercise-library-modal-btn'),
                 exerciseLibraryTitle: document.getElementById('exercise-library-title'),
                 addSelectedExercisesBtn: document.getElementById('add-selected-exercises-btn'),
-                progressExerciseSelect: document.getElementById('progress-exercise-select'), clearHistoryBtn: document.getElementById('clear-history-btn'),
+                progressExerciseSelect: document.getElementById('progress-exercise-select'),
                 aiAdviceExerciseSelect: document.getElementById('ai-advice-exercise-select'), getAIAdviceBtn: document.getElementById('get-ai-advice-btn'), aiAdviceOutput: document.getElementById('ai-advice-output'),
                 exerciseDetailModal: document.getElementById('exercise-detail-modal'), closeExerciseDetailModalBtn: document.getElementById('close-exercise-detail-modal-btn'), exerciseDetailTitle: document.getElementById('exercise-detail-title'),
                 exerciseGifLoader: document.getElementById('exercise-gif-loader'), exerciseGifAnimation: document.getElementById('exercise-gif-animation'), redoGifBtn: document.getElementById('redo-gif-btn'),
                 exerciseDetailInstructions: document.getElementById('exercise-detail-instructions'), saveInstructionsBtn: document.getElementById('save-instructions-btn'), exerciseDetailRepRange: document.getElementById('exercise-detail-rep-range'),
                 exerciseDetailNotes: document.getElementById('exercise-detail-notes'), saveExerciseNotesBtn: document.getElementById('save-exercise-notes-btn'), logFromDetailBtn: document.getElementById('log-from-detail-btn'),
                 dayViewDateDisplayBtn: document.getElementById('day-view-date-display-btn'), dayViewStatus: document.getElementById('day-view-status'), dayViewDateDisplay: document.getElementById('day-view-date-display-btn'),
-                workoutPlanForDay: document.getElementById('workout-plan-for-day'), historyDayContent: document.getElementById('history-day-content'), 
+                workoutPlanForDay: document.getElementById('workout-plan-for-day'),
                 dayNavigationCard: document.getElementById('day-navigation-card'), 
                 aiTabSpecific: document.getElementById('ai-tab-specific'), aiTabGeneral: document.getElementById('ai-tab-general'), aiPanelSpecific: document.getElementById('ai-panel-specific'), openWorkoutChatBtn: document.getElementById('open-workout-chat-btn'),
                 workoutStatusControls: document.getElementById('workout-status-controls'),
@@ -820,7 +812,7 @@
             }
 
 
-            // --- LOCALSTORAGE & DATA FUNCTIONS ---
+            // --- LOCALSTORAGE & DATA FUNCTIONS (UPDATED) ---
             function saveData() {
                 localStorage.setItem('fitTrackAI_workoutPlan', JSON.stringify(workoutPlan));
                 localStorage.setItem('fitTrackAI_workoutHistory', JSON.stringify(workoutHistory));
@@ -831,6 +823,8 @@
                 localStorage.setItem('fitTrackAI_userSettings', JSON.stringify(userSettings));
                 localStorage.setItem('fitTrackAI_workoutChatHistory', JSON.stringify(workoutChatHistory));
                 localStorage.setItem('fitTrackAI_dailyModifications', JSON.stringify(dailyModifications));
+                // NEW: Save last logged sets
+                localStorage.setItem('fitTrackAI_lastLoggedSets', JSON.stringify(lastLoggedSets));
             }
             
             async function loadAllData() {
@@ -855,6 +849,9 @@
                 const localUserSettings = JSON.parse(localStorage.getItem('fitTrackAI_userSettings')) || { unit: 'kg', showPermanentEditWarning: true };
                 const localChatHistory = JSON.parse(localStorage.getItem('fitTrackAI_workoutChatHistory')) || [];
                 const localDailyModifications = JSON.parse(localStorage.getItem('fitTrackAI_dailyModifications')) || {};
+                // NEW: Load last logged sets
+                const localLastLoggedSets = JSON.parse(localStorage.getItem('fitTrackAI_lastLoggedSets')) || {};
+
 
                 const baseExerciseIds = new Set(baseExercises.map(ex => ex.id));
                 const uniqueCustomExercises = customExercises.filter(ex => !baseExerciseIds.has(ex.id));
@@ -868,6 +865,7 @@
                 userSettings = {...{ unit: 'kg', showPermanentEditWarning: true }, ...localUserSettings}; // Ensure defaults
                 workoutChatHistory = localChatHistory;
                 dailyModifications = localDailyModifications;
+                lastLoggedSets = localLastLoggedSets; // ASSIGN NEW STATE
 
                 exerciseDB.forEach(ex => { if (!ex.id) ex.id = crypto.randomUUID(); });
                 
@@ -882,7 +880,7 @@
 
             // --- CORE & HELPER FUNCTIONS ---
             const getApiUrl = (model, action = 'generateContent') => {
-                const apiKey = ""; // API key is handled by the environment
+                const apiKey = "AIzaSyDY48xF1byvU05kS9qKvN8iyrIR3hheP8w"; // API key is handled by the environment
                 return `https://generativelanguage.googleapis.com/v1beta/models/${model}:${action}?key=${apiKey}`;
             };
             
@@ -976,7 +974,7 @@
             }
 
 
-            // --- WORKOUT LOGGING FUNCTIONS ---
+            // --- WORKOUT LOGGING FUNCTIONS (UPDATED) ---
             function openWorkoutModal(exerciseName) {
                 isLogging = true;
                 editingWorkoutLogId = null;
@@ -984,21 +982,36 @@
                 ui.modalTitle.textContent = `Log: ${exerciseName}`;
                 ui.saveWorkoutBtn.textContent = 'Save Workout';
                 ui.setsContainer.innerHTML = '';
-            
+                
+                modalUnit = userSettings.unit; // Set modal unit based on user setting
+                updateUnitToggleUI(modalUnit);
+
                 const exerciseDetails = exerciseDB.find(ex => ex.name === exerciseName);
-                let numSets = 3; // Default to 3 sets
-                if (exerciseDetails && exerciseDetails.sets) {
-                    const setsMatch = String(exerciseDetails.sets).match(/\d+/); // Get the first number (e.g., from "3-4")
-                    if (setsMatch) {
-                        numSets = parseInt(setsMatch[0], 10);
+                let setsToRender = []; // Array to hold set data (in KG for internal consistency)
+
+                // 1. Check for last logged data and use it for pre-fill
+                if (lastLoggedSets[exerciseName] && lastLoggedSets[exerciseName].length > 0) {
+                    setsToRender = lastLoggedSets[exerciseName];
+                } else {
+                    // 2. If no last logged data, default based on plan (existing logic)
+                    let numSets = 3;
+                    if (exerciseDetails && exerciseDetails.sets) {
+                        const setsMatch = String(exerciseDetails.sets).match(/\d+/); // Get the first number (e.g., from "3-4")
+                        if (setsMatch) {
+                            numSets = parseInt(setsMatch[0], 10);
+                        }
+                    }
+                    // Fill with default empty sets (in KG format)
+                    for (let i = 0; i < numSets; i++) {
+                        setsToRender.push([{weight: '', reps: '', partial: false}]);
                     }
                 }
-                for (let i = 0; i < numSets; i++) {
-                    addSetRow();
-                }
-            
-                modalUnit = userSettings.unit;
-                updateUnitToggleUI(modalUnit);
+                
+                // 3. Render the sets, performing KG -> LBS conversion if necessary inside addSetRow
+                setsToRender.forEach(setParts => {
+                    addSetRow(setParts);
+                });
+                
                 showModal(ui.workoutModal);
             };
 
@@ -1012,7 +1025,8 @@
                 
                 const partsContainer = row.querySelector('.parts-container');
                 setParts.forEach(part => {
-                    const displayWeight = userSettings.unit === 'lbs' ? (part.weight ? kgToLbs(part.weight).toFixed(1) : '') : (part.weight || '');
+                    // Convert stored KG weight (part.weight) to the current modal display unit
+                    const displayWeight = modalUnit === 'lbs' ? (part.weight ? kgToLbs(part.weight).toFixed(1) : '') : (part.weight || '');
                     addWeightRepPart(partsContainer, displayWeight, part.reps, part.partial)
                 });
                 row.querySelector('.add-part-btn').addEventListener('click', () => addWeightRepPart(partsContainer));
@@ -1024,12 +1038,12 @@
                 lucide.createIcons();
             };
             
-            // --- DAY VIEW & PLAN RENDERING ---
+            // --- DAY VIEW & PLAN RENDERING (UPDATED) ---
             function updateDayView(date) {
                 viewDate = date;
                 
                 renderWorkoutPlanForDate(date);
-                renderHistoryForDate(date);
+                // REMOVED: renderHistoryForDate(date);
                 updateWorkoutStatusControls(date);
 
                 const today = new Date(); today.setHours(0,0,0,0);
@@ -1074,13 +1088,10 @@
                     
                     const temporaryBadge = isTemporary ? '<span class="text-xs ml-2 bg-blue-500/30 text-blue-300 px-1.5 py-0.5 rounded">Today</span>' : '';
 
-                    // CHANGE 3: New button logic
+                    // CHANGE 3: New button logic (removed favorite button)
                     let buttonHtml = '';
                     if (type === 'exercise') {
                         buttonHtml = `
-                            <button class="btn btn-secondary !p-2 favorite-toggle-btn" data-name="${ex.name}" title="Toggle Favorite">
-                                <i data-lucide="star" class="w-4 h-4 pointer-events-none ${isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-500'}"></i>
-                            </button>
                             <button class="btn btn-secondary !p-2 info-btn" data-name="${ex.name}" data-type="${type}" data-day-type="${dayType}" title="View Info">
                                 <i data-lucide="info" class="w-4 h-4 pointer-events-none"></i>
                             </button>
@@ -1093,10 +1104,9 @@
                         `;
                     }
 
-                    // CHANGE 3: Removed favorite-indicator from the main content area
                     return `
                         <div class="swipe-item plan-item-container rounded-lg" data-name="${ex.name}" data-type="${type}" data-day-type="${dayType}" draggable="true">
-                             <div class="swipe-actions">
+                            <div class="swipe-actions">
                                 <div class="swipe-action-container left"><div class="action delete"><i data-lucide="trash-2" class="pointer-events-none"></i><span class="ml-2 pointer-events-none">Remove</span></div></div>
                                 <div class="swipe-action-container right"><div class="action edit"><span class="mr-2 pointer-events-none">Edit</span><i data-lucide="pencil" class="pointer-events-none"></i></div></div>
                             </div>
@@ -1109,7 +1119,11 @@
                                             ${type === 'exercise' ? `<p class="text-xs text-blue-400">${ex.group}</p>` : ''}
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-2">${buttonHtml}</div>
+                                    <div class="flex items-center gap-2">
+                                        <!-- Favorite Star Indicator -->
+                                        ${isFavorite ? '<i data-lucide="star" class="w-4 h-4 fill-yellow-400 text-yellow-400"></i>' : ''}
+                                        ${buttonHtml}
+                                    </div>
                                 </div>
                             </div>
                         </div>`;
@@ -1144,6 +1158,8 @@
                 ui.workoutPlanForDay.innerHTML = exercisesHtml;
                 lucide.createIcons();
             }
+
+            // REMOVED: renderHistoryForDate - Not needed anymore
 
             // --- HISTORY & STATUS FUNCTIONS ---
             function calculateAutoStatus(date) {
@@ -1188,45 +1204,17 @@
 
                 const dayType = getWorkoutDayType(date);
                 const shouldShowReorganize = !isFutureDay && currentStatus === 'none' && dayType !== 'Rest';
-                ui.reorganizeAiBtn.classList.toggle('hidden', !shouldShowReorganize);
+                // REORGANIZE BUTTON LOGIC REMOVED
             }
 
-            function renderHistoryForDate(date) {
-                const dateKey = dateToKey(date);
-                const logsForDay = workoutHistory.filter(log => log.date === dateKey).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-                if (logsForDay.length === 0) { ui.historyDayContent.innerHTML = `<p class="text-secondary-text">No workouts logged.</p>`; return; }
+            // REMOVED: renderHistoryForDate - Replaced by local persistence logic
 
-                ui.historyDayContent.innerHTML = logsForDay.map(log => {
-                    const sets = typeof log.sets === 'string' ? JSON.parse(log.sets) : log.sets;
-                    const setsHtml = sets.map((setParts, i) => `<span><strong>Set ${i+1}:</strong> ${setParts.map(p => `${formatWeight(p.weight)} x ${p.reps}r ${p.partial ? '(P)' : ''}`).join(', ')}</span>`).join('<br>');
-                    return `
-                        <div class="swipe-item history-item-container rounded-lg" data-id="${log.id}">
-                            <div class="swipe-actions">
-                                <div class="swipe-action-container left">
-                                    <div class="action delete"><i data-lucide="trash-2" class="pointer-events-none"></i><span class="ml-2 pointer-events-none">Delete</span></div>
-                                </div>
-                                <div class="swipe-action-container right">
-                                    <div class="action edit"><span class="mr-2 pointer-events-none">Edit</span><i data-lucide="pencil" class="pointer-events-none"></i></div>
-                                </div>
-                            </div>
-                            <div class="swipe-content p-3 rounded-lg bg-black/30">
-                                <div class="flex justify-between items-start">
-                                    <strong class="text-primary-text">${log.name}</strong>
-                                </div>
-                                <div class="text-sm text-secondary-text mt-1">${setsHtml}</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                lucide.createIcons();
-            }
-
-            // --- UNIFIED SWIPE & TAP HANDLERS ---
+            // --- UNIFIED SWIPE & TAP HANDLERS (UPDATED FOR DOUBLE TAP) ---
             let pointerStart = { x: 0, y: 0 };
             let currentX = 0;
             let isSwiping = false;
             let swipedElement = null;
-            let lastTap = 0;
+            let lastTap = 0; // For double tap detection
             let tapTimeout = null;
 
             function handleItemDelete(element) {
@@ -1266,23 +1254,8 @@
                     }
                     saveData(); updateUI(); 
 
-                } else if (element.classList.contains('history-item-container')) {
-                    const logId = element.dataset.id;
-                    const originalLog = workoutHistory.find(log => log.id === logId);
-                    if (!originalLog) return;
-
-                    showConfirmModal('Delete Log?', 'Are you sure?', () => {
-                        workoutHistory = workoutHistory.filter(log => log.id !== logId); 
-                        saveData(); 
-                        updateUI();
-                        
-                        showUndoToast(`${originalLog.name} log deleted.`, () => {
-                            workoutHistory.push(originalLog);
-                            saveData();
-                            updateUI();
-                        });
-                    });
-                }
+                } 
+                // REMOVED HISTORY ITEM DELETION LOGIC (Since UI is gone)
             }
             
             function handleItemEdit(element) {
@@ -1291,10 +1264,8 @@
                     const type = element.dataset.type;
                     if (type === 'exercise') { showPermanentEditWarningModal(); } 
                     else if (type === 'warmup') { openEditPlanModal(); }
-                } else if (element.classList.contains('history-item-container')) {
-                    const logId = element.dataset.id;
-                    openEditWorkoutModal(logId);
-                }
+                } 
+                // REMOVED: else if (element.classList.contains('history-item-container')) { ... }
             }
             
             function showPermanentEditWarningModal() {
@@ -1344,6 +1315,10 @@
                 
                 const elementToClean = swipedElement;
                 const content = elementToClean.querySelector('.swipe-content');
+                
+                const currentTime = new Date().getTime();
+                const isDoubleTap = (currentTime - lastTap) < 300 && !isSwiping;
+                lastTap = currentTime;
 
                 if (isSwiping) {
                     const elementWidth = elementToClean.offsetWidth; const swipeThreshold = elementWidth * 0.35;
@@ -1355,14 +1330,17 @@
                      if (elementToClean.classList.contains('plan-item-container')) {
                         const today = new Date(); today.setHours(0,0,0,0);
                         const isFutureDay = viewDate > today;
-                        // CHANGE 3: Removed isFavoriteMode from this check
-                        if (isFutureDay || isNativeDragging) {
-                            // Do nothing on tap in these modes
-                        } else {
-                            const { name } = swipedElement.dataset;
-                            if (name) {
-                                openWorkoutModal(name);
-                            }
+                        const { name, type } = swipedElement.dataset;
+
+                        if (type === 'exercise' && isDoubleTap) {
+                            toggleFavoriteByName(name);
+                            // Prevent normal single-tap log modal from opening on double-tap
+                            swipedElement = null;
+                            isSwiping = false;
+                            return; 
+                        } else if (!isFutureDay && !isNativeDragging && type === 'exercise') {
+                            // Single tap opens log modal (Only for exercises, not warmups)
+                            openWorkoutModal(name);
                         }
                     }
                 }
@@ -1376,7 +1354,7 @@
                 }, 300);
             }
 
-            // Day Navigation Swipe
+            // Day Navigation Swipe (UPDATED THRESHOLD)
             let dayNavPointerStart = { x: 0, y: 0 };
             let dayNavCurrentX = 0;
             let isDayNavSwiping = false;
@@ -1410,7 +1388,7 @@
             function handleDayNavPointerUp() {
                 document.removeEventListener('mousemove', handleDayNavPointerMove); document.removeEventListener('mouseup', handleDayNavPointerUp);
                 document.removeEventListener('touchmove', handleDayNavPointerMove); document.removeEventListener('touchend', handleDayNavPointerUp);
-                const swipeThreshold = 75; 
+                const swipeThreshold = 40; // REDUCED THRESHOLD
 
                 ui.dayNavigationCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
                 if (isDayNavSwiping) {
@@ -1507,24 +1485,20 @@
                 handlePlanDragEnd();
             }
 
-            // --- EVENT LISTENERS ---
+            // --- EVENT LISTENERS (REMOVED HISTORY LISTENERS) ---
             ui.workoutPlanForDay.addEventListener('mousedown', handlePointerDown);
             ui.workoutPlanForDay.addEventListener('touchstart', handlePointerDown, { passive: true });
-            ui.historyDayContent.addEventListener('mousedown', handlePointerDown);
-            ui.historyDayContent.addEventListener('touchstart', handlePointerDown, { passive: true });
+            // REMOVED: ui.historyDayContent listeners
             
             ui.workoutPlanForDay.addEventListener('click', (e) => {
                 const infoBtn = e.target.closest('.info-btn');
-                const favoriteBtn = e.target.closest('.favorite-toggle-btn');
 
                 if (infoBtn) {
                     const { name, type, dayType } = infoBtn.dataset;
                     openExerciseDetailModal(name, type, dayType);
                 }
 
-                if (favoriteBtn) {
-                    toggleFavoriteByName(favoriteBtn.dataset.name);
-                }
+                // Double tap is now handled in handlePointerUp, so we don't need the single-tap favorite toggle here.
             });
 
             document.getElementById('undo-toast-btn').addEventListener('click', () => {
@@ -1601,16 +1575,8 @@
                 if (btn) { const status = btn.dataset.status; const dateKey = dateToKey(viewDate); workoutStatusHistory[dateKey] = status; saveData(); updateWorkoutStatusControls(viewDate); }
             });
 
-            ui.reorganizeAiBtn.addEventListener('click', () => {
-                const dayType = getWorkoutDayType(viewDate);
-                const dateString = viewDate.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
-                const workoutDetails = {}; workoutPlan.workouts.forEach(w => { workoutDetails[w.day] = w.exercises.map(exName => { const ex = exerciseDB.find(e => e.name === exName); return { name: exName, group: ex ? ex.group : 'Unknown' }; }); });
-                const missedMuscleGroups = [...new Set(workoutDetails[dayType]?.map(ex => ex.group) || [])].join(', ');
-                const prompt = `Act as an expert fitness coach specializing in exercise science. I missed my "${dayType}" workout on ${dateString}. My goal is to reschedule it this week without overtraining. - My current weekly schedule is: ${JSON.stringify(workoutPlan.schedule)}. - The workouts are: ${JSON.stringify(workoutDetails, null, 2)}. - The missed "${dayType}" workout targets: ${missedMuscleGroups}. Analyze the schedule and muscle groups. Propose a new schedule for the rest of the week (from ${new Date().toLocaleDateString(undefined, { weekday: 'long' })}) that fits in the missed workout while ensuring at least 48 hours of rest for major muscle groups (e.g., don't put two 'Push' days back-to-back). Respond with a valid JSON object ONLY with two keys: "newSchedule" (the complete, new weekly schedule object) and "reasoning" (a concise explanation for your changes).`;
-                renderChatHistory(); showModal(document.getElementById('ai-workout-chat-modal'));
-                const chatInput = document.getElementById('ai-chat-input');
-                chatInput.value = prompt; handleAiChatSend();
-            });
+            // REORGANIZE BUTTON LISTENER REMOVED
+            // ui.reorganizeAiBtn.addEventListener('click', ...)
 
             document.getElementById('progress-range-selector').addEventListener('click', e => {
                 const btn = e.target.closest('.progress-range-btn');
@@ -1881,6 +1847,10 @@
              ).filter(set => set.length > 0);
 
              if(sets.length === 0) return showCustomAlert('Empty Workout', 'Please log at least one valid set.');
+             
+             // NEW: Save the successful sets to lastLoggedSets
+             lastLoggedSets[currentlyLoggingExercise] = sets; 
+
              const dateString = dateToKey(viewDate);
             
              if (editingWorkoutLogId) {
@@ -1892,7 +1862,7 @@
              if (workoutStatusHistory[dateString] !== undefined) delete workoutStatusHistory[dateString];
              saveData(); updateUI(); hideModal(ui.workoutModal);
              isLogging = false; stopRestTimer();
-           });
+            });
 
             ui.setsContainer.addEventListener('input', e => {
                 if (e.target.classList.contains('set-weight') || e.target.classList.contains('set-reps')) {
@@ -1907,7 +1877,7 @@
                 else if (removePartBtn) { const partRow = removePartBtn.closest('.set-part-row'), partsContainer = partRow.parentElement; if (partsContainer.children.length > 1) { partRow.remove(); } else { showCustomAlert("Action blocked", "A set must have at least one part."); } }
             });
 
-            ui.clearHistoryBtn.addEventListener('click', () => { showConfirmModal('Clear History?', 'This will delete all workout logs.', () => { workoutHistory = []; workoutStatusHistory = {}; saveData(); updateUI(); })});
+            // REMOVED: ui.clearHistoryBtn.addEventListener('click', ...) - Obsolete
             
             // --- PLAN GENERATOR FUNCTIONS ---
             function openAiPlanGenerator() {
@@ -2040,10 +2010,10 @@
 
             function applyNewPlan() {
                try {
-                   const newPlan = JSON.parse(ui.aiPlanJsonOutput.textContent); delete newPlan.reasoning;
-                   const todayKey = dateToKey(new Date()); const hasWorkedOutToday = workoutHistory.some(log => log.date === todayKey);
-                   if(hasWorkedOutToday) { const oldTodayType = getWorkoutDayType(new Date()); newPlan.schedule[(new Date()).toLocaleDateString('en-US', { weekday: 'long' })] = oldTodayType; }
-                   workoutPlan = newPlan; saveData(); updateUI(); hideModal(ui.aiPlanGeneratorModal); showCustomAlert("Success", "Your new workout plan has been applied!");
+                    const newPlan = JSON.parse(ui.aiPlanJsonOutput.textContent); delete newPlan.reasoning;
+                    const todayKey = dateToKey(new Date()); const hasWorkedOutToday = workoutHistory.some(log => log.date === todayKey);
+                    if(hasWorkedOutToday) { const oldTodayType = getWorkoutDayType(new Date()); newPlan.schedule[(new Date()).toLocaleDateString('en-US', { weekday: 'long' })] = oldTodayType; }
+                    workoutPlan = newPlan; saveData(); updateUI(); hideModal(ui.aiPlanGeneratorModal); showCustomAlert("Success", "Your new workout plan has been applied!");
                } catch (error) { showCustomAlert("Error", "Could not save the new plan. The generated data might be invalid."); }
             }
             
@@ -2163,7 +2133,7 @@
                         
                         const reorderedWarmups = newWarmupOrderNames.map(name => currentWarmupsMap.get(name)).filter(Boolean);
                         warmups[dayType] = reorderedWarmups;
-                    }
+                     }
                 });
                 
                 saveData(); updateUI(); hideModal(ui.editPlanModal); showCustomAlert("Success", "Your plan has been updated!");
@@ -2217,7 +2187,8 @@
             // Custom Exercise AI Listeners
             function openCustomExerciseModal(exercise = null) {
                 ui.customExerciseForm.reset(); ui.customExerciseDetailsContainer.classList.add('hidden');
-                ui.customExerciseInitialChoice.classList.remove('hidden');
+                ui.customExerciseInitialChoice.classList.add('hidden'); // Start hidden for a cleaner reset
+                ui.customExerciseInitialChoice.classList.remove('hidden'); // Show choice for new exercises
                 ui.customExerciseGroup.innerHTML = ALL_MUSCLE_GROUPS.map(g => `<option value="${g}">${g}</option>`).join('');
                 document.getElementById('custom-exercise-type').innerHTML = ALL_EQUIPMENT_TYPES.map(g => `<option value="${g}">${g}</option>`).join('');
                 editingExerciseId = exercise ? exercise.id : null;
@@ -2247,9 +2218,9 @@
                 hideModal(ui.customExerciseModal);
                 if (isAddingFromLibrary) { openExerciseLibrary(libraryModalContext.group); isAddingFromLibrary = false; } 
                  if (document.getElementById('edit-plan-modal').style.display === 'none' && !isAddingFromLibrary) {
-                    const lastActiveDay = ui.editPlanDayTypeSelect.value;
-                    if(lastActiveDay){ openEditPlanModal(); ui.editPlanDayTypeSelect.value = lastActiveDay; renderExercisesForEdit(lastActiveDay); }
-                }
+                     const lastActiveDay = ui.editPlanDayTypeSelect.value;
+                     if(lastActiveDay){ openEditPlanModal(); ui.editPlanDayTypeSelect.value = lastActiveDay; renderExercisesForEdit(lastActiveDay); }
+                 }
             });
 
             ui.aiGenerateExerciseDetailsBtn.addEventListener('click', async () => {
@@ -2286,15 +2257,15 @@
 
             function handleSaveCustomExercise(isNewVariation = false) {
              const newExerciseData = { id: (editingExerciseId && !isNewVariation) ? editingExerciseId : crypto.randomUUID(), isCustom: true, name: ui.customExerciseNameInput.value.trim(), instructions: ui.customExerciseInstructions.value.split('\n').filter(Boolean), repRange: ui.customExerciseRepRange.value, group: document.getElementById('custom-exercise-group').value, type: document.getElementById('custom-exercise-type').value, videoPlaceholder: document.getElementById('custom-img-url').value.trim() || ui.customExerciseImg.src, notes: '', favorite: false, };
-              if (!newExerciseData.name || !newExerciseData.group) { showCustomAlert("Missing Info", "Exercise name and muscle group are required."); return; }
-              const isNameDuplicate = exerciseDB.some(ex => ex.name.toLowerCase() === newExerciseData.name.toLowerCase() && ex.id !== newExerciseData.id);
-              if (isNameDuplicate) { showCustomAlert("Duplicate Name", "An exercise with this name already exists. Please choose a different name."); return; }
-              if (editingExerciseId && !isNewVariation) { const index = exerciseDB.findIndex(ex => ex.id === editingExerciseId); if (index > -1) exerciseDB[index] = { ...exerciseDB[index], ...newExerciseData }; } 
-              else { exerciseDB.push(newExerciseData); }
-              saveData(); hideModal(ui.customExerciseModal);
-              showCustomAlert("Success", `Exercise "${newExerciseData.name}" has been saved!`);
-              if (isAddingFromLibrary) { openExerciseLibrary(libraryModalContext.group); isAddingFromLibrary = false; } 
-              else { updateUI(); }
+             if (!newExerciseData.name || !newExerciseData.group) { showCustomAlert("Missing Info", "Exercise name and muscle group are required."); return; }
+             const isNameDuplicate = exerciseDB.some(ex => ex.name.toLowerCase() === newExerciseData.name.toLowerCase() && ex.id !== newExerciseData.id);
+             if (isNameDuplicate) { showCustomAlert("Duplicate Name", "An exercise with this name already exists. Please choose a different name."); return; }
+             if (editingExerciseId && !isNewVariation) { const index = exerciseDB.findIndex(ex => ex.id === editingExerciseId); if (index > -1) exerciseDB[index] = { ...exerciseDB[index], ...newExerciseData }; } 
+             else { exerciseDB.push(newExerciseData); }
+             saveData(); hideModal(ui.customExerciseModal);
+             showCustomAlert("Success", `Exercise "${newExerciseData.name}" has been saved!`);
+             if (isAddingFromLibrary) { openExerciseLibrary(libraryModalContext.group); isAddingFromLibrary = false; } 
+             else { updateUI(); }
             }
             
             ui.customExerciseForm.addEventListener('submit', (e) => { e.preventDefault(); handleSaveCustomExercise(false); });
